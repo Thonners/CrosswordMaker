@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
 import android.text.Layout;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.WindowManager;
 import android.widget.GridLayout;
@@ -69,7 +71,7 @@ public class Crossword {
                 cells[i][j].setHeight(cellWidth);
                 cells[i][j].setAllCaps(true);
                 cells[i][j].setTextColor(context.getResources().getColor(R.color.black));
-                cells[i][j].setTextSize(fontSize);
+                cells[i][j].setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize);
 
                 GridLayout.Spec row = GridLayout.spec(i);
                 GridLayout.Spec col = GridLayout.spec(j);
@@ -101,6 +103,9 @@ public class Crossword {
         cellWidth = (int) screenWidth / (rowCount + 1);
         gridPadding = (int) cellWidth / 2 ;
         fontSize = (float) cellWidth / 2 ;
+
+        Log.d("Sizes","cellWidth = " + cellWidth);
+        Log.d("Sizes","fontSize = " + fontSize);
     }
 
     public void freezeGrid() {

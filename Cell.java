@@ -3,6 +3,7 @@ package com.thonners.crosswordmaker;
 import android.content.Context;
 import android.text.InputFilter;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.GridLayout;
@@ -40,8 +41,10 @@ public class Cell extends EditText implements View.OnClickListener {
         this.setTextColor(context.getResources().getColor(R.color.black));
         this.setClickable(true);
         this.setFocusable(false);
+        this.setPadding(0,0,0,0);
+        this.setGravity(Gravity.CENTER);
 
-        this.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxLength)});
+        this.setFilters(new InputFilter[]{new InputFilter.LengthFilter(maxLength)});
 
         setOnClickListener(this);
     }
