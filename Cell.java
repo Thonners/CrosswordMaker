@@ -30,7 +30,7 @@ public class Cell extends EditText implements View.OnClickListener {
     public Cell(Context context, int r, int c) {
         super(context);
 
-        cell1 = new TextView(context);
+//        cell1 = new TextView(context);
 
         row = r ;
         column = c ;
@@ -104,10 +104,18 @@ public class Cell extends EditText implements View.OnClickListener {
             // Set focusable if white cell so that text can be edited
             this.setFocusable(true);
             this.setFocusableInTouchMode(true);
+
+            // Force all input to capital letters
+            this.setFilters(new InputFilter[] {new InputFilter.AllCaps()});
         } else {
             // Set not clickable if black cell
             this.setClickable(false);
         }
+    }
+
+
+    public int getCellId(int rowCount) {
+        return (this.row * rowCount + column) ;     // Cells are numbered from 0 through to rowCount^2 -1
     }
 
 
