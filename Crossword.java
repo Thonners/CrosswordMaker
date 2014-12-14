@@ -1,16 +1,11 @@
 package com.thonners.crosswordmaker;
 
-import android.app.Activity;
 import android.content.Context;
-import android.graphics.Point;
-import android.text.Layout;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Display;
-import android.view.WindowManager;
 import android.widget.GridLayout;
-import android.widget.GridLayout.Spec;
-import android.widget.Space;
+
+import java.util.ArrayList;
 
 /**
  * Created by mat on 28/11/14.
@@ -34,10 +29,10 @@ public class Crossword {
 
     private float fontSize ;
 
-    private Clue hClues[] ;     // Storage for all the horizontal clues
-    private Clue vClues[] ;     // Storage for all the vertical clues
+    private ArrayList<Clue> hClues = new ArrayList<Clue>() ;     // Storage for all the horizontal clues
+    private ArrayList<Clue> vClues = new ArrayList<Clue>() ;     // Storage for all the vertical clues
     public int clueCount = 0;
-    public int horizontalClueCount = 0;
+    public int horizontalClueIndex = -1;    // Start at -1, first clue found will bump this up to 0
     public int verticalClueCount = 0;
 
     public boolean[][] blackCells;
@@ -56,7 +51,6 @@ public class Crossword {
         calculateCellWidth() ;
         createGrid();
         createCells();
-        findClues();
 
     }
 
@@ -109,7 +103,7 @@ public class Crossword {
         return rowCountIn * rowCountIn;
     }
 
-    private void findClues() {
+    public void findClues() {
         // Locate clues by cycling through grid and finding all clues and their numbered square
         // TODO: make horizontal and vertical clue finding happen on different threads
 
@@ -121,23 +115,29 @@ public class Crossword {
     private void findHorizontalClues(int row) {
         // Method to find all clues in row
         boolean nextWhiteCellNewClue = true ;
-        for (int col = 0 ; col < rowCount-1 ; col++) {  // only go as far as rowCount-1 because there cannot be a horizontal clue in the final column.
+        for (int col = 0 ; col < rowCount ; col++) {  // only go as far as rowCount-1 because there cannot be a horizontal clue in the final column.
 
             // Test to see if next cell is a new clue - if next cell is
-            if (nextWhiteCellNewClue && ! cells[row][col].blackCell && !cells[row][col + 1].blackCell){
-                horizontalClueCount++ ;
+            if (nextWhiteCellNewClue && ! cells[row][col].blackCell && !cells[row][col + 1].blackCell && col < rowCount -1){
+                horizontalClueIndex++ ;
                 nextWhiteCellNewClue = false ;
                 Clue newClue = new Clue(Clue.HORIZONTAL_CLUE, cells[row][col]);
-              //  hClues[horizontalClueCount] = newClue ; //TODO: change hClues to a collection/ArrayList
+                hClues.add(newClue);
 
                 Log.d("Clues", "New clue found at: r = " + row + " & c = " + col) ;
             }
 
             // If white cell, augment clue count. If not, reset nextWhiteCellNewClue
             if (! nextWhiteCellNewClue && ! cells[row][col].blackCell) {
-                hClues[horizontalClueCount].setLength(col - hClues[horizontalClueCount].startCell.column);
+                int clueLength = col - hClues.get(horizontalClueIndex).startCell.column + 1 ;
+                hClues.get(horizontalClueIndex).setLength(clueLength);
 
-                Log.d("Clues", "increasing clue length to " + (col - hClues[horizontalClueCount].startCell.column)) ;
+                Log.d("Clues", "increasing clue length to " + clueLength) ;
+            }
+
+            // If a black cell is found, reset nextWhiteCellNewClue flag
+            if (cells[row][col].blackCell) {
+                nextWhiteCellNewClue = true ;
             }
 
 
