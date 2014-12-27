@@ -24,7 +24,7 @@ public class Crossword {
     private int screenWidth ;
     private int screenHeight ;
     private int cellWidth ;
-    private int borderWidth = 1 ;   // This is the width of the border around the cells. (Needs to be accounted for in cell width calculation else final column is too thin
+    private int borderWidth = 1 ;   // This is the width of the cell_white around the cells. (Needs to be accounted for in cell width calculation else final column is too thin
     private int gridPadding ;
 
     private float fontSize ;
@@ -114,25 +114,32 @@ public class Crossword {
 
     private void findHorizontalClues(int row) {
         // Method to find all clues in row
+        Clue currentClue = null ;
+
         boolean nextWhiteCellNewClue = true ;
         for (int col = 0 ; col < rowCount ; col++) {  // only go as far as rowCount-1 because there cannot be a horizontal clue in the final column.
 
             // Test to see if next cell is a new clue - if next cell is
-            if (nextWhiteCellNewClue && ! cells[row][col].blackCell && !cells[row][col + 1].blackCell && col < rowCount -1){
+            if (col < rowCount -1 && nextWhiteCellNewClue && ! cells[row][col].blackCell && !cells[row][col + 1].blackCell ){
                 horizontalClueIndex++ ;
                 nextWhiteCellNewClue = false ;
                 Clue newClue = new Clue(Clue.HORIZONTAL_CLUE, cells[row][col]);
-                hClues.add(newClue);
+                hClues.add(newClue);                                            // Add clue to collection of clues
+                //currentClue.addCellToClue(cells[row][col]);
+                hClues.get(horizontalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
 
                 Log.d("Clues", "New clue found at: r = " + row + " & c = " + col) ;
+                Log.d("Clues", "horizontalClueIndex = " + horizontalClueIndex + " & hClues.length = " + hClues.size()) ;
             }
 
             // If white cell, augment clue count. If not, reset nextWhiteCellNewClue
             if (! nextWhiteCellNewClue && ! cells[row][col].blackCell) {
                 int clueLength = col - hClues.get(horizontalClueIndex).startCell.column + 1 ;
                 hClues.get(horizontalClueIndex).setLength(clueLength);
+                hClues.get(horizontalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
 
                 Log.d("Clues", "increasing clue length to " + clueLength) ;
+                Log.d("Clues", "horizontalClueIndex = " + horizontalClueIndex + " & hClues.length = " + hClues.size()) ;
             }
 
             // If a black cell is found, reset nextWhiteCellNewClue flag
