@@ -14,14 +14,17 @@ public class Clue {
 
     private String logTag = "Clue" ;
 
-    public String type ;
-    public Cell startCell ;
+    private String orientation;
+    private Cell startCell ;
     private int length ;
     private ArrayList<Cell> clueCells = new ArrayList<Cell>();
 
+    private boolean isHighlighted ;
+
     public Clue (String clueOrientation , Cell startCell) {
-        this.type = clueOrientation;
+        this.orientation = clueOrientation;
         this.startCell = startCell ;
+        this.isHighlighted = false ;
     }
 
     public void setLength(int l) {
@@ -33,9 +36,41 @@ public class Clue {
     }
 
     public void addCellToClue(Cell newCell) {
-        Log.d(logTag , "Adding new cell to clue that starts in " + startCell.row + ", "  + startCell.column);
+        Log.d(logTag , "Adding new cell to clue that starts in " + startCell.getRow() + ", "  + startCell.getColumn());
         clueCells.add(newCell);
     }
 
+
+
+    public void highlightClue(Cell focusCell) {
+        // Highlight the cells in the clue
+        Log.d(logTag, "Highlighting clue with start cell " + startCell.getCellName());
+        setIsHighlighted();
+        for (Cell cell : clueCells ) {
+            cell.setActiveClue(this);
+            if (cell.equals(focusCell)) {
+                Log.d(logTag, "Setting cell " + cell.getCellName() + " to major highlight");
+                cell.setFocusedMajor();
+            } else {
+                Log.d(logTag, "Setting cell " + cell.getCellName() + " to minor highlight");
+                cell.setFocusedMinor();
+            }
+        }
+    }
+
+    private void setIsHighlighted() {
+        this.isHighlighted = true ;
+    }
+
+    private boolean isHighlighted() {
+        return isHighlighted ;
+    }
+
+    public Cell getStartCell() {
+        return startCell ;
+    }
+    public String getClueOrientation() {
+        return orientation;
+    }
 
 }

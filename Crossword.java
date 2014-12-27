@@ -33,7 +33,10 @@ public class Crossword {
     private ArrayList<Clue> vClues = new ArrayList<Clue>() ;     // Storage for all the vertical clues
     public int clueCount = 0;
     public int horizontalClueIndex = -1;    // Start at -1, first clue found will bump this up to 0
-    public int verticalClueCount = 0;
+    public int verticalClueIndex = -1;
+
+    private Cell focusedCell ;
+    private Clue highlightedClue ;
 
     public boolean[][] blackCells;
 
@@ -71,7 +74,7 @@ public class Crossword {
             for (int j = 0; j < rowCount; j++) {
 
                 // Create the cell
-                cells[i][j] = new Cell(context, i, j);
+                cells[i][j] = new Cell(context, this, i, j);
                 cells[i][j].setId(cells[i][j].getCellId(rowCount));
                 cells[i][j].setWidth(cellWidth);
                 cells[i][j].setHeight(cellWidth);
@@ -110,44 +113,97 @@ public class Crossword {
         for (int row = 0 ; row < rowCount ; row++) {
             findHorizontalClues(row);
         }
+        for (int col = 0 ; col < rowCount ; col++) {
+            findVerticalClues(col);
+        }
     }
 
     private void findHorizontalClues(int row) {
         // Method to find all clues in row
-        Clue currentClue = null ;
 
         boolean nextWhiteCellNewClue = true ;
         for (int col = 0 ; col < rowCount ; col++) {  // only go as far as rowCount-1 because there cannot be a horizontal clue in the final column.
 
             // Test to see if next cell is a new clue - if next cell is
-            if (col < rowCount -1 && nextWhiteCellNewClue && ! cells[row][col].blackCell && !cells[row][col + 1].blackCell ){
+            if (col < rowCount -1 && nextWhiteCellNewClue && !cells[row][col].isBlackCell() && !cells[row][col + 1].isBlackCell() ){
                 horizontalClueIndex++ ;
                 nextWhiteCellNewClue = false ;
                 Clue newClue = new Clue(Clue.HORIZONTAL_CLUE, cells[row][col]);
                 hClues.add(newClue);                                            // Add clue to collection of clues
-                //currentClue.addCellToClue(cells[row][col]);
                 hClues.get(horizontalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
+                cells[row][col].setHClue(hClues.get(horizontalClueIndex));          // Tell the cell which clue it belongs to
 
                 Log.d("Clues", "New clue found at: r = " + row + " & c = " + col) ;
                 Log.d("Clues", "horizontalClueIndex = " + horizontalClueIndex + " & hClues.length = " + hClues.size()) ;
             }
 
             // If white cell, augment clue count. If not, reset nextWhiteCellNewClue
-            if (! nextWhiteCellNewClue && ! cells[row][col].blackCell) {
-                int clueLength = col - hClues.get(horizontalClueIndex).startCell.column + 1 ;
+            if (! nextWhiteCellNewClue && ! cells[row][col].isBlackCell()) {
+                int clueLength = col - hClues.get(horizontalClueIndex).getStartCell().getColumn() + 1 ;
                 hClues.get(horizontalClueIndex).setLength(clueLength);
                 hClues.get(horizontalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
+                cells[row][col].setHClue(hClues.get(horizontalClueIndex));          // Tell the cell which clue it belongs to
 
                 Log.d("Clues", "increasing clue length to " + clueLength) ;
                 Log.d("Clues", "horizontalClueIndex = " + horizontalClueIndex + " & hClues.length = " + hClues.size()) ;
             }
 
             // If a black cell is found, reset nextWhiteCellNewClue flag
-            if (cells[row][col].blackCell) {
+            if (cells[row][col].isBlackCell()) {
                 nextWhiteCellNewClue = true ;
             }
 
 
+        }
+    }
+
+    private void findVerticalClues(int col) {
+        // Method to find all clues in col
+
+        boolean nextWhiteCellNewClue = true ;
+        for (int row = 0 ; row < rowCount ; row++) {  // only go as far as rowCount-1 because there cannot be a horizontal clue in the final column.
+
+            // Test to see if next cell is a new clue - if next cell is
+            if (row < rowCount -1 && nextWhiteCellNewClue && !cells[row][col].isBlackCell() && !cells[row + 1][col].isBlackCell() ){
+                verticalClueIndex++ ;
+                nextWhiteCellNewClue = false ;
+                Clue newClue = new Clue(Clue.VERTICAL_CLUE, cells[row][col]);
+                vClues.add(newClue);                                            // Add clue to collection of clues
+                vClues.get(verticalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
+                cells[row][col].setVClue(vClues.get(verticalClueIndex));          // Tell the cell which clue it belongs to
+
+                Log.d("Clues", "New clue found at: r = " + row + " & c = " + col) ;
+                Log.d("Clues", "verticalClueIndex = " + verticalClueIndex + " & vClues.length = " + vClues.size()) ;
+            }
+
+            // If white cell, augment clue count. If not, reset nextWhiteCellNewClue
+            if (! nextWhiteCellNewClue && ! cells[row][col].isBlackCell()) {
+                int clueLength = col - vClues.get(verticalClueIndex).getStartCell().getColumn() + 1 ;
+                vClues.get(verticalClueIndex).setLength(clueLength);
+                vClues.get(verticalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
+                cells[row][col].setVClue(vClues.get(verticalClueIndex));          // Tell the cell which clue it belongs to
+
+                Log.d("Clues", "increasing clue length to " + clueLength) ;
+                Log.d("Clues", "verticalClueIndex = " + verticalClueIndex + " & vClues.length = " + vClues.size()) ;
+            }
+
+            // If a black cell is found, reset nextWhiteCellNewClue flag
+            if (cells[row][col].isBlackCell()) {
+                nextWhiteCellNewClue = true ;
+            }
+
+
+        }
+    }
+
+    public void clearCellHighlights() {
+        // Set all (non black) cells back to white backgrounds
+        for (int i = 0; i < rowCount; i++) {
+            for (int j = 0; j < rowCount; j++) {
+                if (!cells[i][j].isBlackCell()) {
+                    cells[i][j].clearHighlighting();
+                }
+            }
         }
     }
 

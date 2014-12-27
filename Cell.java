@@ -1,6 +1,7 @@
 package com.thonners.crosswordmaker;
 
 import android.content.Context;
+import android.database.CrossProcessCursorWrapper;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.Spanned;
@@ -15,13 +16,19 @@ import java.security.Key;
 /**
  * Created by mat on 30/11/14.
  */
-public class Cell extends EditText implements View.OnClickListener, View.OnFocusChangeListener{
+public class Cell extends EditText implements View.OnClickListener, View.OnFocusChangeListener {
 
     private String logTag = "Clue" ;
 
-    public int row ;
-    public int column ;
+    private Crossword crossword ;
+
+    private int row ;
+    private int column ;
     private String cellName ; // String to make it quicker to include in debugging. Format (X,Y)
+
+    private Clue hClue = null ;  // Horizontal clue to which cell belongs - initialise as null, and set later if required.
+    private Clue vClue = null  ; // Vertical clue to which cell belongs
+    private Clue activeClue = null  ; // Set the active clue so that cell focus can move as input is done
 
     private int maxLength = 1 ; // Max number of letters in the editText
     private InputFilter[] whiteCellInputFilter = {new InputFilter.AllCaps(), new InputFilter.LengthFilter(maxLength), new InputFilter() {
@@ -39,14 +46,15 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
         }
     }} ;
 
-    public boolean blackCell ;
+    private boolean blackCell ;
     public Character value ;
     public boolean gridMakingPhase = true ;    // If gridMakingPhase, clicking on a cell changes it from black to white
 
     // Constructor:
     // For creating the initial grid, all cells start life as white cells
-    public Cell(Context context, int r, int c) {
+    public Cell(Context context, Crossword crossword, int r, int c) {
         super(context);
+        setCrossword(crossword);
 
         setRow(r) ;
         setColumn(c);
@@ -54,10 +62,9 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
         setBlackCellStatus(false) ; // Force all cells to start life white
 
         this.setBackground(getResources().getDrawable(R.drawable.cell_white));
-        this.setAllCaps(true);
         this.setTextColor(context.getResources().getColor(R.color.black));
         this.setClickable(true);
-        this.setFocusable(false);
+        this.setFocusable(false);   // Initialise as false for gridMaker
         this.setPadding(0,0,0,0);
         this.setGravity(Gravity.CENTER);
         this.setSelectAllOnFocus(true);         // Will select text on focus so user doesn't need to delete previous text if incorrect
@@ -69,7 +76,7 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
     }
 
     // Maybe for creating the grid after user has made choices (/when camera has worked it out)
-    public Cell(Context context, int r, int c, boolean blackCellIn) {
+    public Cell(Context context, Crossword crossword, int r, int c, boolean blackCellIn) {
         super(context);
 
         row = r ;
@@ -79,16 +86,20 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
         this.setBackground(getResources().getDrawable(R.drawable.cell_white));
     }
 
+    private void setCrossword(Crossword cwd) {
+        this.crossword = cwd ;
+    }
+
     private void setBlackCell() {
         this.setBackground(getResources().getDrawable(R.drawable.cell_black));
     }
     private void setWhiteCell() {
         this.setBackground(getResources().getDrawable(R.drawable.cell_white));
     }
-    private void setFocusedMajor() {
+    public void setFocusedMajor() {
         this.setBackground(getResources().getDrawable(R.drawable.cell_focus_main));
     }
-    private void setFocusedMinor() {
+    public void setFocusedMinor() {
         this.setBackground(getResources().getDrawable(R.drawable.cell_focus_minor));
     }
 
@@ -110,6 +121,10 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
             toggleBlackCell();
             return ;
         }
+
+        Log.d(logTag, " Cell click repeated, swapping clue highlight orientation");
+        swapClueHighlightOrientation();
+
     }
 
     // For highlighting active cell during normal operation
@@ -118,10 +133,24 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
         // To change cell highlight if cell has focus
         if (hasFocus) {
             Log.d(logTag, "Cell " + cellName + " has focus");
-            setFocusedMajor();
+
+            crossword.clearCellHighlights();
+
+            if (activeClue != null) {
+                activeClue.highlightClue(this);
+            } else {
+                // Default to selecting horizontal clue if cell belongs to both a horizontal and vertical clue but isn't active
+                if (hClue != null) {
+                    hClue.highlightClue(this);
+                } else if (vClue != null) {
+                    vClue.highlightClue(this);
+                } else {
+                    Log.d(logTag, "Cell seems not to belong to a clue. Is the grid valid?");
+                }
+            }
         } else {
             Log.d(logTag, "Cell " + cellName + " has lost focus");
-            setWhiteCell();
+//            setWhiteCell(); // not required as cleared by crossword.clearCellHighlighting. DELETE LINE ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         }
     }
 
@@ -144,37 +173,72 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
         }
     }
 
+
+    private void swapClueHighlightOrientation() {
+        // If clue belongs to both horizontal and vertical clues, swap orientation
+        if (this.hasHorizontalClue() && this.hasVerticalClue()) {
+            if (activeClue.getClueOrientation() == Clue.HORIZONTAL_CLUE) {
+                crossword.clearCellHighlights();
+                vClue.highlightClue(this);
+            } else if (activeClue.getClueOrientation() == Clue.VERTICAL_CLUE) {
+                crossword.clearCellHighlights();
+                hClue.highlightClue(this);
+            }
+        }
+    }
+
     public void setBlackCellStatus(boolean isBlackCell){
         this.blackCell = isBlackCell ;
     }
-
     public void setColumn(int col) {
         this.column = col ;
     }
-
     public void setRow (int row) {
         this.row = row ;
     }
-
     public void setCellName(int row, int col) {
         this.cellName = "(" + row + "," + col + ")" ;
     }
 
-
+    public String getCellName() {
+        return cellName ;
+    }
     public int getCellId(int rowCount) {
         return (this.row * rowCount + column) ;     // Cells are numbered from 0 through to rowCount^2 -1
     }
-
     public int getRow() {
         return this.row ;
     }
-
     public int getColumn() {
         return this.column ;
     }
-
     public boolean isBlackCell() {
         return blackCell ;
     }
-
+    public void setHClue(Clue clue) {
+        hClue = clue ;
+    }
+    public void setVClue(Clue clue) {
+        vClue = clue ;
+    }
+    public boolean hasHorizontalClue() {
+        if (hClue == null) {
+            return false ;
+        } else {
+            return true ;
+        }
+    }
+    public boolean hasVerticalClue() {
+        if (vClue == null) {
+            return false ;
+        } else {
+            return true ;
+        }
+    }
+    public void clearHighlighting() {
+        setWhiteCell();
+    }
+    public void setActiveClue(Clue clue) {
+        activeClue = clue ;
+    }
 }
