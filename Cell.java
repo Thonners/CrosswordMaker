@@ -18,7 +18,7 @@ import java.security.Key;
 /**
  * Created by mat on 30/11/14.
  */
-public class Cell extends EditText implements View.OnClickListener, View.OnFocusChangeListener , TextWatcher{
+public class Cell extends EditText implements View.OnClickListener, View.OnFocusChangeListener , TextWatcher {
 
     private String logTag = "Clue" ;
 
@@ -118,7 +118,7 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
         }
     }
 
-    // During grid creation phase
+    // During grid creation phase toggle black cell. During normal operation, swap clue orientation
     @Override
     public void onClick(View view) {
         if(gridMakingPhase) {
@@ -132,7 +132,7 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
 
     }
 
-    // For highlighting active cell during normal operation
+    // For highlighting active cell & clue during normal operation
     @Override
     public void onFocusChange(View view, boolean hasFocus){
         // To change cell highlight if cell has focus

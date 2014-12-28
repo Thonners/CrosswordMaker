@@ -45,6 +45,7 @@ public class Crossword {
     public boolean[][] blackCells;
 
     public Cell[][] cells;
+    public CellView[][] cellViews;
 
     GridLayout grid;
 
@@ -71,6 +72,7 @@ public class Crossword {
 
         // Initialise the cells variable to the right size
         cells = new Cell[rowCount][rowCount];
+        cellViews = new CellView[rowCount][rowCount];
 
         // TODO: Make each row in a separate parallel thread
 
@@ -78,7 +80,9 @@ public class Crossword {
             for (int j = 0; j < rowCount; j++) {
 
                 // Create the cell
-                cells[i][j] = new Cell(context, this, i, j);
+//                cells[i][j] = new Cell(context, this, i, j);
+                cellViews[i][j] = new CellView(context, this, i, j);
+                cells[i][j] = cellViews[i][j].getCell();
                 cells[i][j].setId(cells[i][j].getCellId(rowCount));
                 cells[i][j].setWidth(cellWidth);
                 cells[i][j].setHeight(cellWidth);
@@ -89,7 +93,7 @@ public class Crossword {
                 GridLayout.Spec row = GridLayout.spec(i);
                 GridLayout.Spec col = GridLayout.spec(j);
                 GridLayout.LayoutParams params = new GridLayout.LayoutParams(row, col);
-                grid.addView(cells[i][j], params);
+                grid.addView(cellViews[i][j], params);
 
             }
         }
@@ -202,11 +206,10 @@ public class Crossword {
             if (cells[row][col].isBlackCell()) {
                 nextWhiteCellNewClue = true ;
             }
+        }
 
         // Print cells in first clue to check for duplicates
         Log.d(LOG_TAG, "First Vertical Clue Contains cells " + vClues.get(0).getCells());
-
-        }
     }
 
     public void clearCellHighlights() {
