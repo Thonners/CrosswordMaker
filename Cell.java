@@ -2,9 +2,11 @@ package com.thonners.crosswordmaker;
 
 import android.content.Context;
 import android.database.CrossProcessCursorWrapper;
+import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.Spanned;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -16,7 +18,7 @@ import java.security.Key;
 /**
  * Created by mat on 30/11/14.
  */
-public class Cell extends EditText implements View.OnClickListener, View.OnFocusChangeListener {
+public class Cell extends EditText implements View.OnClickListener, View.OnFocusChangeListener , TextWatcher{
 
     private String logTag = "Clue" ;
 
@@ -97,6 +99,9 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
         this.setBackground(getResources().getDrawable(R.drawable.cell_white));
     }
     public void setFocusedMajor() {
+        if (! this.hasFocus()) {
+            requestFocus();
+        }
         this.setBackground(getResources().getDrawable(R.drawable.cell_focus_main));
     }
     public void setFocusedMinor() {
@@ -154,6 +159,23 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
         }
     }
 
+    // For moving on to the next cell once a character has been entered
+    @Override
+    public void onTextChanged(CharSequence s, int start,int before, int count){
+        if(activeClue != null) {
+            if (this.getText().toString().length() == maxLength) {
+                activeClue.highlightNextCell(this);
+            }
+        }
+    }
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // TODO Auto-generated method stub
+
+    }
+
+    public void afterTextChanged(Editable s) {
+                // TODO Auto-generated method stub
+    }
 
     public void setGridMakingPhase(Boolean isGridMakingPhase){
         gridMakingPhase = isGridMakingPhase ;

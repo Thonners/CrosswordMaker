@@ -12,6 +12,8 @@ import java.util.ArrayList;
  */
 public class Crossword {
 
+    private static final String LOG_TAG = "Crossword" ;
+
     public Context context;
 
     public String cwdTitle = "Default title";   // Add the date to the default title?
@@ -31,7 +33,9 @@ public class Crossword {
 
     private ArrayList<Clue> hClues = new ArrayList<Clue>() ;     // Storage for all the horizontal clues
     private ArrayList<Clue> vClues = new ArrayList<Clue>() ;     // Storage for all the vertical clues
-    public int clueCount = 0;
+    private int totalClueCount = 0;
+    private int hClueCount = 0 ;
+    private int vClueCount = 0 ;
     public int horizontalClueIndex = -1;    // Start at -1, first clue found will bump this up to 0
     public int verticalClueIndex = -1;
 
@@ -126,19 +130,20 @@ public class Crossword {
 
             // Test to see if next cell is a new clue - if next cell is
             if (col < rowCount -1 && nextWhiteCellNewClue && !cells[row][col].isBlackCell() && !cells[row][col + 1].isBlackCell() ){
+                hClueCount++;
+                totalClueCount++;
                 horizontalClueIndex++ ;
                 nextWhiteCellNewClue = false ;
-                Clue newClue = new Clue(Clue.HORIZONTAL_CLUE, cells[row][col]);
+                Clue newClue = new Clue(Clue.HORIZONTAL_CLUE, cells[row][col], hClueCount);
                 hClues.add(newClue);                                            // Add clue to collection of clues
                 hClues.get(horizontalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
                 cells[row][col].setHClue(hClues.get(horizontalClueIndex));          // Tell the cell which clue it belongs to
 
                 Log.d("Clues", "New clue found at: r = " + row + " & c = " + col) ;
                 Log.d("Clues", "horizontalClueIndex = " + horizontalClueIndex + " & hClues.length = " + hClues.size()) ;
-            }
 
+            } else if (! nextWhiteCellNewClue && ! cells[row][col].isBlackCell()) {
             // If white cell, augment clue count. If not, reset nextWhiteCellNewClue
-            if (! nextWhiteCellNewClue && ! cells[row][col].isBlackCell()) {
                 int clueLength = col - hClues.get(horizontalClueIndex).getStartCell().getColumn() + 1 ;
                 hClues.get(horizontalClueIndex).setLength(clueLength);
                 hClues.get(horizontalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
@@ -155,29 +160,35 @@ public class Crossword {
 
 
         }
+
+        // Print cells in first clue to check for duplicates
+        Log.d(LOG_TAG, "First Horizontal Clue Contains cells " + hClues.get(0).getCells());
+
     }
 
     private void findVerticalClues(int col) {
         // Method to find all clues in col
 
         boolean nextWhiteCellNewClue = true ;
-        for (int row = 0 ; row < rowCount ; row++) {  // only go as far as rowCount-1 because there cannot be a horizontal clue in the final column.
+        for (int row = 0 ; row < rowCount ; row++) {
 
-            // Test to see if next cell is a new clue - if next cell is
+            // only go as far as rowCount-1 because there cannot be a horizontal clue starting in the final column.
+            // Test to see if next cell is a new clue - if next cell is, add to clue collections
             if (row < rowCount -1 && nextWhiteCellNewClue && !cells[row][col].isBlackCell() && !cells[row + 1][col].isBlackCell() ){
+                vClueCount++;
+                totalClueCount++;
                 verticalClueIndex++ ;
                 nextWhiteCellNewClue = false ;
-                Clue newClue = new Clue(Clue.VERTICAL_CLUE, cells[row][col]);
+                Clue newClue = new Clue(Clue.VERTICAL_CLUE, cells[row][col], vClueCount);
                 vClues.add(newClue);                                            // Add clue to collection of clues
                 vClues.get(verticalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
                 cells[row][col].setVClue(vClues.get(verticalClueIndex));          // Tell the cell which clue it belongs to
 
                 Log.d("Clues", "New clue found at: r = " + row + " & c = " + col) ;
                 Log.d("Clues", "verticalClueIndex = " + verticalClueIndex + " & vClues.length = " + vClues.size()) ;
-            }
 
+            } else if (! nextWhiteCellNewClue && ! cells[row][col].isBlackCell()) {
             // If white cell, augment clue count. If not, reset nextWhiteCellNewClue
-            if (! nextWhiteCellNewClue && ! cells[row][col].isBlackCell()) {
                 int clueLength = col - vClues.get(verticalClueIndex).getStartCell().getColumn() + 1 ;
                 vClues.get(verticalClueIndex).setLength(clueLength);
                 vClues.get(verticalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
@@ -192,6 +203,8 @@ public class Crossword {
                 nextWhiteCellNewClue = true ;
             }
 
+        // Print cells in first clue to check for duplicates
+        Log.d(LOG_TAG, "First Vertical Clue Contains cells " + vClues.get(0).getCells());
 
         }
     }
