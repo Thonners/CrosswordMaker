@@ -124,6 +124,7 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
         if(gridMakingPhase) {
             Log.d("GridMakingPhase","Trying to toggleBlackCell()");
             toggleBlackCell();
+            crossword.toggleOppositeBlackCell(this);    // Get crossword to toggleBlackCell of the cell rotationally opposite this one
             return ;
         }
 

@@ -124,6 +124,9 @@ public class Crossword {
         for (int col = 0 ; col < rowCount ; col++) {
             findVerticalClues(col);
         }
+        // Print cells in first clue to check for duplicates. Check size > 0 to prevent it crashing due to IndexOutOfBounds Exception
+        if (hClues.size() > 0 ){ Log.d(LOG_TAG, "First Horizontal Clue Contains cells " + hClues.get(0).getCells()); }
+        if (vClues.size() > 0 ){ Log.d(LOG_TAG, "First Vertical Clue Contains cells " + vClues.get(0).getCells()); }
     }
 
     private void findHorizontalClues(int row) {
@@ -164,10 +167,6 @@ public class Crossword {
 
 
         }
-
-        // Print cells in first clue to check for duplicates
-        Log.d(LOG_TAG, "First Horizontal Clue Contains cells " + hClues.get(0).getCells());
-
     }
 
     private void findVerticalClues(int col) {
@@ -207,9 +206,6 @@ public class Crossword {
                 nextWhiteCellNewClue = true ;
             }
         }
-
-        // Print cells in first clue to check for duplicates
-        Log.d(LOG_TAG, "First Vertical Clue Contains cells " + vClues.get(0).getCells());
     }
 
     public void clearCellHighlights() {
@@ -242,5 +238,18 @@ public class Crossword {
                 cells[i][j].setWhiteCellsEditable();
             }
         }
+    }
+
+    public void toggleOppositeBlackCell(Cell inputCell) {
+        // Makes use of crossword's rotational symmetry to speed the process of creating your own grid.
+        // Applys toggleBlackCell method to 'opposite' cell to that input
+
+        // indices run 0 -> (rowCount - 1), hence use of that term below
+        int oppositeRow = (rowCount - 1) - inputCell.getRow();
+        int oppositeCol = (rowCount - 1) - inputCell.getColumn();
+
+        Log.d(LOG_TAG,"Toggling blackCell opposite: " + inputCell.getCellName() + ", i.e. toggling: " + cells[oppositeRow][oppositeCol].getCellName());
+        cells[oppositeRow][oppositeCol].toggleBlackCell();
+
     }
 }
