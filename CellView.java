@@ -42,8 +42,12 @@ public class CellView extends RelativeLayout {
     private void createClueNumber() {
         TextView clueNumberDisplay = new TextView(getContext()) ;
         clueNumberDisplay.setText("" + clueNumber);
-        float clueNumberTextSize = (float) (cell.getTextSize() * 0.2) ;
+        clueNumberDisplay.setPadding(2,0,0,0);
+        float clueNumberTextSize = (float) (cell.getTextSize() * 0.5) ;
         clueNumberDisplay.setTextSize(TypedValue.COMPLEX_UNIT_PX, clueNumberTextSize);
+
+        this.addView(clueNumberDisplay, 1, cellNoLP);
+        clueNumberDisplay.bringToFront();
     }
 
     public Cell getCell() {

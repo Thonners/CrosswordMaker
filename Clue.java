@@ -22,11 +22,10 @@ public class Clue {
 
     private boolean isHighlighted ;
 
-    public Clue (String clueOrientation , Cell startCell, int clueNumber) {
+    public Clue (String clueOrientation , Cell startCell) {
         this.orientation = clueOrientation;
         this.startCell = startCell ;
         this.isHighlighted = false ;
-        this.clueNo = clueNumber ;
     }
 
     public void setLength(int l) {
@@ -42,7 +41,13 @@ public class Clue {
         clueCells.add(newCell);
     }
 
-
+    public void setClueNo(int clueNumber){
+        // Set the clue number
+        this.clueNo = clueNumber ;
+    }
+    public int getClueNo(int clueNumber){
+        return this.clueNo ;
+    }
 
     public void highlightClue(Cell focusCell) {
         // Highlight the cells in the clue

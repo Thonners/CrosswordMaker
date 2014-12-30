@@ -14,7 +14,7 @@ public class Crossword {
 
     private static final String LOG_TAG = "Crossword" ;
 
-    public Context context;
+    private Context context;
 
     public String cwdTitle = "Default title";   // Add the date to the default title?
 
@@ -30,6 +30,7 @@ public class Crossword {
     private int gridPadding ;
 
     private float fontSize ;
+
 
     private ArrayList<Clue> hClues = new ArrayList<Clue>() ;     // Storage for all the horizontal clues
     private ArrayList<Clue> vClues = new ArrayList<Clue>() ;     // Storage for all the vertical clues
@@ -127,6 +128,11 @@ public class Crossword {
         // Print cells in first clue to check for duplicates. Check size > 0 to prevent it crashing due to IndexOutOfBounds Exception
         if (hClues.size() > 0 ){ Log.d(LOG_TAG, "First Horizontal Clue Contains cells " + hClues.get(0).getCells()); }
         if (vClues.size() > 0 ){ Log.d(LOG_TAG, "First Vertical Clue Contains cells " + vClues.get(0).getCells()); }
+
+        Log.d(LOG_TAG, "");
+        Log.d(LOG_TAG, "Getting clue numbers...");
+        Log.d(LOG_TAG, "");
+        getClueNumbers();
     }
 
     private void findHorizontalClues(int row) {
@@ -141,7 +147,7 @@ public class Crossword {
                 totalClueCount++;
                 horizontalClueIndex++ ;
                 nextWhiteCellNewClue = false ;
-                Clue newClue = new Clue(Clue.HORIZONTAL_CLUE, cells[row][col], hClueCount);
+                Clue newClue = new Clue(Clue.HORIZONTAL_CLUE, cells[row][col]);
                 hClues.add(newClue);                                            // Add clue to collection of clues
                 hClues.get(horizontalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
                 cells[row][col].setHClue(hClues.get(horizontalClueIndex));          // Tell the cell which clue it belongs to
@@ -182,7 +188,7 @@ public class Crossword {
                 totalClueCount++;
                 verticalClueIndex++ ;
                 nextWhiteCellNewClue = false ;
-                Clue newClue = new Clue(Clue.VERTICAL_CLUE, cells[row][col], vClueCount);
+                Clue newClue = new Clue(Clue.VERTICAL_CLUE, cells[row][col]);
                 vClues.add(newClue);                                            // Add clue to collection of clues
                 vClues.get(verticalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
                 cells[row][col].setVClue(vClues.get(verticalClueIndex));          // Tell the cell which clue it belongs to
@@ -252,4 +258,64 @@ public class Crossword {
         cells[oppositeRow][oppositeCol].toggleBlackCell();
 
     }
+
+    private void getClueNumbers() {
+        ArrayList<Cell> startCells = new ArrayList<Cell>();
+        ArrayList<Integer[]> startCellCoordsGeneral = new ArrayList<Integer[]>();
+        ArrayList<Integer[]> startCellCoordsOrdered = new ArrayList<Integer[]>();
+
+        Integer[] lastCellCoords = {rowCount, rowCount};          // Initialise coords as last cell so that it will definitely be corrected on the first run through
+        Integer[] nextClueStartCellCoords = lastCellCoords;
+        int clueNo = 1;
+
+
+        for (Clue clue : hClues){
+            if (! startCells.contains(clue.getStartCell())){
+                startCells.add(clue.getStartCell());
+                Integer[] coords = {clue.getStartCell().getRow(), clue.getStartCell().getColumn()} ;
+                startCellCoordsGeneral.add(coords);
+
+            }
+        }
+        for (Clue clue : vClues){
+            if (! startCells.contains(clue.getStartCell())){
+                startCells.add(clue.getStartCell());
+                Integer[] coords = {clue.getStartCell().getRow(), clue.getStartCell().getColumn()} ;
+                startCellCoordsGeneral.add(coords);
+            }
+        }
+
+        // Loop through all coords and sort them into order. Once the next startCell is found, remove it from the general list.
+        while (startCellCoordsGeneral.size() > 0 ) {
+            for (Integer[] coords : startCellCoordsGeneral) {
+                // Make nextClueStartCell equal to that under investigation if its row is less than that of another
+                if (coords[0] < nextClueStartCellCoords[0]) {
+                    nextClueStartCellCoords = coords;
+                } else if (coords[0] == nextClueStartCellCoords[0]) {
+                    if (coords[1] < nextClueStartCellCoords[1]) {
+                        nextClueStartCellCoords = coords;
+                    }
+                }
+            }
+
+            // Check that it isn't the last time through
+            if (nextClueStartCellCoords != lastCellCoords) {
+                Log.d(LOG_TAG, "Next Clue Start Cell Coords = (" + nextClueStartCellCoords[0] + "," + nextClueStartCellCoords[1] + ").");
+                startCellCoordsOrdered.add(nextClueStartCellCoords);
+                startCellCoordsGeneral.remove(nextClueStartCellCoords);
+
+                //Reset nextClueStartCellCoords:
+                nextClueStartCellCoords = lastCellCoords;
+            }
+        }
+
+        for (Integer[] coords : startCellCoordsOrdered ) {
+            // Loop through and assign each clue its number
+            // i.e. cellViews[row][col].setClueNumber(clueNo);
+            cellViews[coords[0]][coords[1]].setClueNumber(clueNo);
+
+            clueNo++;
+        }
+    }
+
 }
