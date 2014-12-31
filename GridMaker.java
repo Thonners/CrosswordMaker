@@ -1,5 +1,6 @@
 package com.thonners.crosswordmaker;
 
+import android.content.Intent;
 import android.graphics.Point;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -66,12 +67,22 @@ public class GridMaker extends ActionBarActivity {
     public void enterClicked(View view){
         // Freeze crossword grid and progress to next stage
         Log.d("CWM","Enter clicked (GridMaker activity)");
-        Log.d("CWM","Freezing grid" +
+        Log.d("CWM", "Freezing grid" +
                 "");
         crossword.freezeGrid();
         crossword.findClues();
 
+        startCrosswordActivity();
+
     }
 
+    private void startCrosswordActivity(){
+        // Start the com.thonners.CrosswordMaker.CrosswordActivity
+        // Put the crossword in the Intent as an Extra using Crossword.getSaveArray()
+        Intent intent = new Intent(this, CrosswordActivity.class);
+        intent.putExtra(Crossword.CROSSWORD_EXTRA, crossword.getSaveArray());
+
+        startActivity(intent);
+    }
 
 }

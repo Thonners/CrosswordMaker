@@ -13,6 +13,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 
+import java.io.Serializable;
 import java.security.Key;
 
 /**
@@ -173,7 +174,6 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
                 // TODO Auto-generated method stub
 
     }
-
     public void afterTextChanged(Editable s) {
                 // TODO Auto-generated method stub
     }

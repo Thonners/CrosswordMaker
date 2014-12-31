@@ -1,9 +1,11 @@
 package com.thonners.crosswordmaker;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.GridLayout;
 
 
@@ -16,7 +18,11 @@ public class CrosswordActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crossword);
+
         grid = (GridLayout) findViewById(R.id.crossword_grid);
+        String[] crosswordSavedArray = getIntent().getStringArrayExtra(Crossword.CROSSWORD_EXTRA);
+
+        crossword = new Crossword(this, grid, crosswordSavedArray);
     }
 
 
@@ -40,5 +46,11 @@ public class CrosswordActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+
+    public void saveGrid(View view) {
+        // Save the grid
     }
 }

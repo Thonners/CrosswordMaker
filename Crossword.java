@@ -5,18 +5,32 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.widget.GridLayout;
 
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by mat on 28/11/14.
  */
 public class Crossword {
 
+    public static final String CROSSWORD_EXTRA = "com.thonners.crosswordmaker.crossword_extra";
     private static final String LOG_TAG = "Crossword" ;
+
+    public static final int SAVED_ARRAY_INDEX_TITLE = 0 ;
+    public static final int SAVED_ARRAY_INDEX_DATE = 1 ;
+    public static final int SAVED_ARRAY_INDEX_ROW_COUNT = 2 ;
+    public static final int SAVED_ARRAY_INDEX_CELL_WIDTH = 3 ;
+    public static final int SAVED_ARRAY_INDEX_CROSSWORD_IMAGE = 4 ;
+    public static final int SAVED_ARRAY_INDEX_CLUE_IMAGE = 5 ;
+    private final int saveArrayStartIndex = 6 ;       // Update this if format of saveArray changes, i.e. if more fields are added before the grid is saved.
 
     private Context context;
 
-    public String cwdTitle = "Default title";   // Add the date to the default title?
+    public String title = "Default title";   // Add the date to the default title?
+    public String date = "00000000" ;       // Default date
 
     public int rowCount;
     public int totalCells;
@@ -45,8 +59,11 @@ public class Crossword {
 
     public boolean[][] blackCells;
 
-    public Cell[][] cells;
-    public CellView[][] cellViews;
+    private Cell[][] cells;
+    private CellView[][] cellViews;
+    private String [] crosswordStringArray ;    // Place to save progress
+    private String crosswordImagePath ;
+    private String clueImagePath ;
 
     GridLayout grid;
 
@@ -60,6 +77,33 @@ public class Crossword {
         calculateCellWidth() ;
         createGrid();
         createCells();
+
+    }
+
+    public Crossword(Context context, GridLayout gridLayout, String[] savedCrossword) {
+        // Constructor for a saved crossword
+        this.context = context ;
+        grid = gridLayout;
+        this.crosswordStringArray = savedCrossword ;
+        this.title = crosswordStringArray[SAVED_ARRAY_INDEX_TITLE];
+        this.date = crosswordStringArray[SAVED_ARRAY_INDEX_DATE];
+        this.rowCount = Integer.parseInt(crosswordStringArray[SAVED_ARRAY_INDEX_ROW_COUNT]);
+        this.cellWidth = Integer.parseInt(crosswordStringArray[SAVED_ARRAY_INDEX_CELL_WIDTH]);
+        this.crosswordImagePath = crosswordStringArray[SAVED_ARRAY_INDEX_CROSSWORD_IMAGE];
+        this.clueImagePath = crosswordStringArray[SAVED_ARRAY_INDEX_CLUE_IMAGE];
+
+        createGrid();
+        createCells();
+        fillCells();
+        freezeGrid();
+        findClues();
+    }
+
+    public void redrawGrid(GridLayout gridLayout) {
+        // For redrawing a grid when an instance of a Crossword is passed to another activity
+        this.grid = gridLayout ;
+        createGrid();
+        fillCells();
 
     }
 
@@ -81,7 +125,6 @@ public class Crossword {
             for (int j = 0; j < rowCount; j++) {
 
                 // Create the cell
-//                cells[i][j] = new Cell(context, this, i, j);
                 cellViews[i][j] = new CellView(context, this, i, j);
                 cells[i][j] = cellViews[i][j].getCell();
                 cells[i][j].setId(cells[i][j].getCellId(rowCount));
@@ -98,6 +141,30 @@ public class Crossword {
 
             }
         }
+    }
+
+    private void fillCells() {
+      // Fill a grid with pre-existing CellViews
+        Log.d(LOG_TAG, "Rebuilding grid from saveArray...");
+      // TODO: Make each row in a separate parallel thread
+        int index = saveArrayStartIndex ;
+        String tempString ;
+        for (int i = 0; i < rowCount; i++) {
+            for (int j = 0; j < rowCount; j++) {
+                tempString = crosswordStringArray[index] ;
+                Log.d(LOG_TAG,"For cell " + cells[i][j].getCellName() + ", read value: " + tempString);
+                if (tempString.matches("-")) {
+                    Log.d(LOG_TAG,"Value matched '-', so toggling black cell.");
+                    cells[i][j].toggleBlackCell();
+                } else {
+                    Log.d(LOG_TAG,"Setting value to: " + tempString);
+                    cells[i][j].setText(tempString);
+                }
+                index++;
+            }
+        }
+
+
     }
 
     private void setAllCellsWhite() {
@@ -316,6 +383,73 @@ public class Crossword {
 
             clueNo++;
         }
+    }
+
+    private String getFormattedDate() {
+        // Return current date in YYYYMMDD format
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        String formattedDate = sdf.format(new Date());
+        Log.d(LOG_TAG, "Date being input to saveArray[1] = " + formattedDate);
+
+        return formattedDate ;
+    }
+
+    public String getCrosswordPictureResource() {
+        //TODO: Once pictures have been taken, find a way to save them and note their location
+
+        // Do stuff / make  a note of its location whilst saving.
+        // Return the location
+
+        return "" ;
+    }
+    public String getCluePictureResource() {
+        //TODO: Once pictures have been taken, find a way to save them and note their location
+
+        // Do stuff / make  a note of its location whilst saving.
+        // Return the location
+
+        return "" ;
+    }
+
+    public String[] getSaveArray() {
+        // Create String array to save and pass around with intents
+        // Format:  array[0]    = Crossword name
+        //          array[1]    = crossword date
+        //          array[2]    = crossword rowCount
+        //          array[3]    = cell width
+        //          array[4]    = crossword picture resource
+        //          array[5]    = clues picture resource
+        //          array[6-n]  = crossword cells. "" denotes a blank (white) cell. "-" denotes a black cell.
+
+        Log.d(LOG_TAG, "Saving Crossword...");
+
+        int saveArraySize = saveArrayStartIndex + (rowCount * rowCount);
+        String[] saveArray = new String[saveArraySize];
+
+        // Initialise array
+        saveArray[SAVED_ARRAY_INDEX_TITLE] = this.title ;
+        saveArray[SAVED_ARRAY_INDEX_DATE] = getFormattedDate() ;
+        saveArray[SAVED_ARRAY_INDEX_ROW_COUNT] = "" + rowCount ;
+        saveArray[SAVED_ARRAY_INDEX_CELL_WIDTH] = "" + cellWidth ;
+        saveArray[SAVED_ARRAY_INDEX_CROSSWORD_IMAGE] = "" + getCrosswordPictureResource() ;
+        saveArray[SAVED_ARRAY_INDEX_CLUE_IMAGE] = "" + getCluePictureResource() ;
+
+        // Loop through cells and save contents to the array.
+        int index = saveArrayStartIndex ; // For iterating over, and saving current cell to index.
+         for (int i = 0; i < rowCount; i++) {
+            for (int j = 0; j < rowCount; j++) {
+                if (!cells[i][j].isBlackCell()) {
+                    saveArray[index] = cells[i][j].getText().toString() ;   // Save whatever text is in the box to the saveArray. Will be empty if box is empty.
+                } else {
+                    saveArray[index] = "-" ;
+                }
+
+                Log.d("SAVEARRAY:", "At index = " + index + ", saveArray[index] = " + saveArray[index]);
+                index++ ;
+            }
+        }
+
+        return saveArray ;
     }
 
 }

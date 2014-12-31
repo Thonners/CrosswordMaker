@@ -7,10 +7,12 @@ import android.widget.GridLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.io.Serializable;
+
 /**
  * Created by mat on 28/12/14.
  */
-public class CellView extends RelativeLayout {
+public class CellView extends RelativeLayout implements Serializable {
 
     private Cell cell ;
     private int clueNumber ;

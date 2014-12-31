@@ -2,6 +2,7 @@ package com.thonners.crosswordmaker;
 
 import android.util.Log;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /** Class to hold all the details of different clues
