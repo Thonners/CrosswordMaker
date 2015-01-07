@@ -69,8 +69,8 @@ public class GridMaker extends ActionBarActivity {
         Log.d("CWM","Enter clicked (GridMaker activity)");
         Log.d("CWM", "Freezing grid" +
                 "");
-        crossword.freezeGrid();
-        crossword.findClues();
+   //     crossword.freezeGrid();
+ //       crossword.findClues();
 
         startCrosswordActivity();
 

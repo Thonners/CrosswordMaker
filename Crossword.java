@@ -1,14 +1,17 @@
 package com.thonners.crosswordmaker;
 
 import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
 import android.util.TypedValue;
 import android.widget.GridLayout;
 
-import java.io.Serializable;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -30,7 +33,7 @@ public class Crossword {
     private Context context;
 
     public String title = "Default title";   // Add the date to the default title?
-    public String date = "00000000" ;       // Default date
+    public String date = getFormattedDate() ;       // Default date
 
     public int rowCount;
     public int totalCells;
@@ -40,7 +43,7 @@ public class Crossword {
     private int screenWidth ;
     private int screenHeight ;
     private int cellWidth ;
-    private int borderWidth = 1 ;   // This is the width of the cell_white around the cells. (Needs to be accounted for in cell width calculation else final column is too thin
+    private int borderWidth = 1 ;   // This is the width of the border around the cells. (Needs to be accounted for in cell width calculation else final column is too thin
     private int gridPadding ;
 
     private float fontSize ;
@@ -65,6 +68,14 @@ public class Crossword {
     private String crosswordImagePath ;
     private String clueImagePath ;
 
+    FileOutputStream fileOutputStream ;
+    File saveDir ;
+    File crosswordFile ;
+    File clueImageFile ;
+    File crosswordImageFile ;
+    String fileName ;
+    String savePath ;
+
     GridLayout grid;
 
     public Crossword(Context context, int rows, GridLayout gridLayout, int screenWidth, int screenHeight) {
@@ -75,15 +86,18 @@ public class Crossword {
         this.screenHeight = screenHeight ;
 
         calculateCellWidth() ;
+        calculateFontSize();
         createGrid();
         createCells();
+
+        initialiseSaveFiles();
 
     }
 
     public Crossword(Context context, GridLayout gridLayout, String[] savedCrossword) {
         // Constructor for a saved crossword
         this.context = context ;
-        grid = gridLayout;
+        this.grid = gridLayout;
         this.crosswordStringArray = savedCrossword ;
         this.title = crosswordStringArray[SAVED_ARRAY_INDEX_TITLE];
         this.date = crosswordStringArray[SAVED_ARRAY_INDEX_DATE];
@@ -93,18 +107,13 @@ public class Crossword {
         this.clueImagePath = crosswordStringArray[SAVED_ARRAY_INDEX_CLUE_IMAGE];
 
         createGrid();
+        calculateFontSize();
         createCells();
         fillCells();
         freezeGrid();
         findClues();
-    }
 
-    public void redrawGrid(GridLayout gridLayout) {
-        // For redrawing a grid when an instance of a Crossword is passed to another activity
-        this.grid = gridLayout ;
-        createGrid();
-        fillCells();
-
+        initialiseSaveFiles();
     }
 
     private void createGrid() {
@@ -297,9 +306,12 @@ public class Crossword {
         // Make cell size (screenWidth / (rowCount + 1)). This allows half a cellWidth on each side to keep the borders nice
         cellWidth = (int) screenWidth / (rowCount + 1) - (borderWidth * 2) ;
         gridPadding = (int) cellWidth / 2 ;
-        fontSize = (float) cellWidth / 2 ;
 
         Log.d("Sizes","cellWidth = " + cellWidth);
+    }
+
+    private void calculateFontSize() {
+        fontSize = (float) cellWidth / 2 ;
         Log.d("Sizes","fontSize = " + fontSize);
     }
 
@@ -450,6 +462,86 @@ public class Crossword {
         }
 
         return saveArray ;
+    }
+
+    public void saveCrossword() {
+        // Save file to memory. Use files created by initialiseSaveFiles
+        String[] saveArray = getSaveArray() ;
+
+        try {
+            Log.d(LOG_TAG, "Saving crossword...");
+            FileWriter fileWriter = new FileWriter(crosswordFile);
+
+            for (int i = 0 ; i < saveArray.length ; i++) {
+                fileWriter.write(saveArray[i] + "\n");
+            }
+            fileWriter.close();
+
+
+        }catch (Exception e) {
+            Log.e(LOG_TAG, "Couldn't open fileWriter to save the crossword file.");
+        }
+    }
+
+    private void initialiseSaveFiles() {
+        // Format File name
+        fileName = date + "-" + title.replaceAll(" ","_").toLowerCase() ;
+        // Create the save files/directories
+        // Directory
+        saveDir = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),fileName);
+        Log.d(LOG_TAG,"saveDir = " + saveDir.getPath());
+        if(!saveDir.exists()) {
+            Log.d(LOG_TAG,"saveDir doesn't exist, so creating it...");
+            if (!saveDir.mkdirs()) {
+                Log.e(LOG_TAG, "Main directory not created");
+            }
+        } else {
+            Log.d(LOG_TAG, "saveDir already exsits.");
+        }
+
+        // Main Crossword file
+        crosswordFile = new File(saveDir, "crossword");
+        if(!crosswordFile.exists()) {
+            try {
+                if (!crosswordFile.createNewFile()) {
+                    Log.e(LOG_TAG, "Crossword file not created");
+                }
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Crossword file not created. Exception message: ");
+                Log.e(LOG_TAG,e.getMessage());
+
+            }
+        }
+
+        // Clue Image path
+        clueImageFile = new File(saveDir,"clue") ;
+        if(!clueImageFile.exists()) {
+            try {
+                if (!clueImageFile.createNewFile()) {
+                    Log.e(LOG_TAG, "Clue image file not created");
+                }
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Clue image file not created. Exception message: ");
+                Log.e(LOG_TAG,e.getMessage());
+
+            }
+        }
+        // Crossword Image path
+        crosswordImageFile = new File(saveDir,"clue") ;
+        if(!crosswordImageFile.exists()) {
+            try {
+                if (!crosswordImageFile.createNewFile()) {
+                    Log.e(LOG_TAG, "Crossword image file not created");
+                }
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Crossword image file not created. Exception message: ");
+                Log.e(LOG_TAG,e.getMessage());
+
+            }
+        }
+
+        // Save the grid
+        saveCrossword();
     }
 
 }

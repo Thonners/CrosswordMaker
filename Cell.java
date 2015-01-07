@@ -129,6 +129,7 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
             return ;
         }
 
+        // If in crossword filling mode, and cell clicked, change clue orientation
         Log.d(logTag, " Cell click repeated, swapping clue highlight orientation");
         swapClueHighlightOrientation();
 
