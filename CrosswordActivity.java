@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.GridLayout;
+import android.widget.Toast;
 
 
 public class CrosswordActivity extends ActionBarActivity {
@@ -52,5 +53,9 @@ public class CrosswordActivity extends ActionBarActivity {
 
     public void saveGrid(View view) {
         // Save the grid
+        crossword.saveCrossword();
+
+        Toast toast = Toast.makeText(this,"Crossword progress saved.", Toast.LENGTH_SHORT);
+        toast.show();
     }
 }

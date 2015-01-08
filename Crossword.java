@@ -4,15 +4,19 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.ViewGroup;
 import android.widget.GridLayout;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Scanner;
 
 /**
  * Created by mat on 28/11/14.
@@ -21,6 +25,11 @@ public class Crossword {
 
     public static final String CROSSWORD_EXTRA = "com.thonners.crosswordmaker.crossword_extra";
     private static final String LOG_TAG = "Crossword" ;
+
+    public static final String SAVE_DATE_FORMAT = "yyyyMMdd";
+    public static final String SAVE_CROSSWORD_FILE_NAME = "crossword";
+    public static final String SAVE_CLUE_IMAGE_FILE_NAME = "clue";
+    public static final String SAVE_CROSSWORD_IMAGE_FILE_NAME = "image_crossword";
 
     public static final int SAVED_ARRAY_INDEX_TITLE = 0 ;
     public static final int SAVED_ARRAY_INDEX_DATE = 1 ;
@@ -173,17 +182,6 @@ public class Crossword {
             }
         }
 
-
-    }
-
-    private void setAllCellsWhite() {
-        blackCells = new boolean[rowCount][rowCount];
-
-        for (int i = 0; i < rowCount; i++) {
-            for (int j = 0; j < rowCount; j++) {
-                blackCells[i][j] = false;
-            }
-        }
 
     }
 
@@ -399,7 +397,7 @@ public class Crossword {
 
     private String getFormattedDate() {
         // Return current date in YYYYMMDD format
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat sdf = new SimpleDateFormat(SAVE_DATE_FORMAT);
         String formattedDate = sdf.format(new Date());
         Log.d(LOG_TAG, "Date being input to saveArray[1] = " + formattedDate);
 
@@ -464,6 +462,43 @@ public class Crossword {
         return saveArray ;
     }
 
+    public static String[] getSaveArray(File savedFile) {
+        // Return the save array so that the app may continue as normal from a saved file
+        int maxIndex = 0 ;
+        int index = 0 ;
+        String[] saveArray ;
+        String collectLines = "";  // Add all lines to this string
+        // Probably not required as Activity calling this method should check the file exists first
+        if (!savedFile.exists()) {
+            Log.e(LOG_TAG, "saved file does not exist, so cannot be loaded");
+            saveArray = new String[0];  // Return empty array
+            return saveArray ;
+        }
+
+        try {
+            // Read file
+            BufferedReader br = new BufferedReader(new FileReader(savedFile));
+            String line ;
+            while ((line = br.readLine()) != null) {
+                collectLines = collectLines + "|" + line;
+                maxIndex++ ;
+            }
+            br.close() ;
+
+        }catch (Exception e) {
+            e.printStackTrace();
+            Log.e(LOG_TAG, e.getMessage());
+        }
+
+        Log.d(LOG_TAG, "size of file read = " + maxIndex);
+
+        saveArray = collectLines.substring(1).split("|") ;  // Start substring at index 1 to omit the first '|' that will be in collectLines
+
+        Log.d(LOG_TAG, "Length of saveArray = " + saveArray.length);
+
+        return saveArray ;
+    }
+
     public void saveCrossword() {
         // Save file to memory. Use files created by initialiseSaveFiles
         String[] saveArray = getSaveArray() ;
@@ -485,22 +520,22 @@ public class Crossword {
 
     private void initialiseSaveFiles() {
         // Format File name
-        fileName = date + "-" + title.replaceAll(" ","_").toLowerCase() ;
+        fileName = date + "-" + title.replaceAll(" ","_").replaceAll("-","__").toLowerCase() ;
         // Create the save files/directories
         // Directory
         saveDir = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),fileName);
-        Log.d(LOG_TAG,"saveDir = " + saveDir.getPath());
+        Log.d(LOG_TAG,"rootDir = " + saveDir.getPath());
         if(!saveDir.exists()) {
-            Log.d(LOG_TAG,"saveDir doesn't exist, so creating it...");
+            Log.d(LOG_TAG,"rootDir doesn't exist, so creating it...");
             if (!saveDir.mkdirs()) {
                 Log.e(LOG_TAG, "Main directory not created");
             }
         } else {
-            Log.d(LOG_TAG, "saveDir already exsits.");
+            Log.d(LOG_TAG, "rootDir already exsits.");
         }
 
         // Main Crossword file
-        crosswordFile = new File(saveDir, "crossword");
+        crosswordFile = new File(saveDir, SAVE_CROSSWORD_FILE_NAME);
         if(!crosswordFile.exists()) {
             try {
                 if (!crosswordFile.createNewFile()) {
@@ -514,7 +549,7 @@ public class Crossword {
         }
 
         // Clue Image path
-        clueImageFile = new File(saveDir,"clue") ;
+        clueImageFile = new File(saveDir,SAVE_CLUE_IMAGE_FILE_NAME) ;
         if(!clueImageFile.exists()) {
             try {
                 if (!clueImageFile.createNewFile()) {
@@ -527,7 +562,7 @@ public class Crossword {
             }
         }
         // Crossword Image path
-        crosswordImageFile = new File(saveDir,"clue") ;
+        crosswordImageFile = new File(saveDir,SAVE_CROSSWORD_IMAGE_FILE_NAME) ;
         if(!crosswordImageFile.exists()) {
             try {
                 if (!crosswordImageFile.createNewFile()) {
