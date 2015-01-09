@@ -13,6 +13,8 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -98,8 +100,6 @@ public class Crossword {
         calculateFontSize();
         createGrid();
         createCells();
-
-        initialiseSaveFiles();
 
     }
 
@@ -187,6 +187,30 @@ public class Crossword {
 
     private int getTotalCells(int rowCountIn) {
         return rowCountIn * rowCountIn;
+    }
+
+    public void setTitle(String newTitle) {
+        this.title = newTitle ;
+        return ;
+    }
+
+    public void setDate(String newDate) {
+        // Turn date from save file into easier to read date
+        SimpleDateFormat saveDateFormat = new SimpleDateFormat(Crossword.SAVE_DATE_FORMAT);    // Format of how date is input
+        DateFormat localeDateFormat = android.text.format.DateFormat.getDateFormat(context);
+        Date date ;
+
+        try {
+            date = localeDateFormat.parse(newDate);
+        } catch (ParseException e) {
+            // handle exception here !
+            Log.e(LOG_TAG, "Couldn't parse date into something useful, so setting it to today's date");
+            this.date = saveDateFormat.format(new Date());
+            return ;
+        }
+
+        this.date = saveDateFormat.format(date) ;
+
     }
 
     public void findClues() {
@@ -438,7 +462,7 @@ public class Crossword {
 
         // Initialise array
         saveArray[SAVED_ARRAY_INDEX_TITLE] = this.title ;
-        saveArray[SAVED_ARRAY_INDEX_DATE] = getFormattedDate() ;
+        saveArray[SAVED_ARRAY_INDEX_DATE] = date ;
         saveArray[SAVED_ARRAY_INDEX_ROW_COUNT] = "" + rowCount ;
         saveArray[SAVED_ARRAY_INDEX_CELL_WIDTH] = "" + cellWidth ;
         saveArray[SAVED_ARRAY_INDEX_CROSSWORD_IMAGE] = "" + getCrosswordPictureResource() ;
@@ -459,19 +483,23 @@ public class Crossword {
             }
         }
 
+        for (int k = 0 ; k < saveArray.length ; k++) {
+            Log.d(LOG_TAG, "saveArray[" + k + "] = " + saveArray[k]) ;
+        }
+
+
         return saveArray ;
     }
 
     public static String[] getSaveArray(File savedFile) {
         // Return the save array so that the app may continue as normal from a saved file
-        int maxIndex = 0 ;
-        int index = 0 ;
         String[] saveArray ;
-        String collectLines = "";  // Add all lines to this string
+        ArrayList<String> saveArrayList = new ArrayList<String>() ;
         // Probably not required as Activity calling this method should check the file exists first
         if (!savedFile.exists()) {
             Log.e(LOG_TAG, "saved file does not exist, so cannot be loaded");
-            saveArray = new String[0];  // Return empty array
+            saveArrayList.add(null);  // Return empty array
+            saveArray = saveArrayList.toArray(new String[saveArrayList.size()]) ;
             return saveArray ;
         }
 
@@ -480,8 +508,7 @@ public class Crossword {
             BufferedReader br = new BufferedReader(new FileReader(savedFile));
             String line ;
             while ((line = br.readLine()) != null) {
-                collectLines = collectLines + "|" + line;
-                maxIndex++ ;
+                saveArrayList.add(line) ;
             }
             br.close() ;
 
@@ -490,10 +517,9 @@ public class Crossword {
             Log.e(LOG_TAG, e.getMessage());
         }
 
-        Log.d(LOG_TAG, "size of file read = " + maxIndex);
+        Log.d(LOG_TAG, "size of file read = " + saveArrayList.size());
 
-        saveArray = collectLines.substring(1).split("|") ;  // Start substring at index 1 to omit the first '|' that will be in collectLines
-
+        saveArray = saveArrayList.toArray(new String[saveArrayList.size()]) ;
         Log.d(LOG_TAG, "Length of saveArray = " + saveArray.length);
 
         return saveArray ;

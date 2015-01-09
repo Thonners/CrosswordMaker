@@ -9,9 +9,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.GridLayout;
+import android.widget.TextView;
 
 
 public class GridMaker extends ActionBarActivity {
+
+    private static final String LOG_TAG = "GridMaker";
 
     private int screenWidth ;
     private int screenHeight ;
@@ -66,11 +69,14 @@ public class GridMaker extends ActionBarActivity {
 
     public void enterClicked(View view){
         // Freeze crossword grid and progress to next stage
+        String crosswordTitle = ((TextView) findViewById(R.id.crossword_title_input)).getText().toString() ;
+        String crosswordDate = ((TextView) findViewById(R.id.crossword_date_input)).getText().toString() ;
         Log.d("CWM","Enter clicked (GridMaker activity)");
-        Log.d("CWM", "Freezing grid" +
-                "");
-   //     crossword.freezeGrid();
- //       crossword.findClues();
+        Log.d(LOG_TAG,"Setting crossword title to: " + crosswordTitle );
+        Log.d(LOG_TAG,"Setting crossword date to: " + crosswordDate );
+
+        crossword.setTitle(crosswordTitle);
+        crossword.setDate(crosswordDate);
 
         startCrosswordActivity();
 

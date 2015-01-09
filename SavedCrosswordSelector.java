@@ -134,14 +134,6 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
 
     private void addCrosswordToLayout(int index, String text) {
 
-        // On click listener for the
-   /*     View.OnClickListener onClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                crosswordSelected(v);
-            }
-        } ;
-*/
         TextView tv = new TextView(this);
 
         tv.setText(text) ;
@@ -149,7 +141,6 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
         tv.setPadding(sidePadding, verticalPadding, sidePadding, verticalPadding);
         tv.setBackground(defaultBackground);
         tv.setId(index); // Not sure if this is required or not yet
-        //tv.setOnClickListener(onClickListener);
         tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -158,7 +149,6 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
         });
         layout.addView(tv);
 
-        //viewIndexCounter++ ; //DELETE ME
     }
 
     private void crosswordSelected(View view) {
