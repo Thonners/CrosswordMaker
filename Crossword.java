@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.ViewGroup;
 import android.widget.GridLayout;
 
 import java.io.BufferedReader;
@@ -18,7 +17,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Scanner;
 
 /**
  * Created by mat on 28/11/14.
@@ -30,8 +28,8 @@ public class Crossword {
 
     public static final String SAVE_DATE_FORMAT = "yyyyMMdd";
     public static final String SAVE_CROSSWORD_FILE_NAME = "crossword";
-    public static final String SAVE_CLUE_IMAGE_FILE_NAME = "clue";
-    public static final String SAVE_CROSSWORD_IMAGE_FILE_NAME = "image_crossword";
+    public static final String SAVE_CLUE_IMAGE_FILE_NAME = "clue.jpg";
+    public static final String SAVE_CROSSWORD_IMAGE_FILE_NAME = "image_crossword.jpg";
 
     public static final int SAVED_ARRAY_INDEX_TITLE = 0 ;
     public static final int SAVED_ARRAY_INDEX_DATE = 1 ;
@@ -428,13 +426,11 @@ public class Crossword {
         return formattedDate ;
     }
 
-    public String getCrosswordPictureResource() {
-        //TODO: Once pictures have been taken, find a way to save them and note their location
-
-        // Do stuff / make  a note of its location whilst saving.
-        // Return the location
-
-        return "" ;
+    public File getCrosswordPictureFile() {
+        return crosswordImageFile ;
+    }
+    public File getCluePictureFile() {
+        return clueImageFile ;
     }
     public String getCluePictureResource() {
         //TODO: Once pictures have been taken, find a way to save them and note their location
@@ -465,7 +461,7 @@ public class Crossword {
         saveArray[SAVED_ARRAY_INDEX_DATE] = date ;
         saveArray[SAVED_ARRAY_INDEX_ROW_COUNT] = "" + rowCount ;
         saveArray[SAVED_ARRAY_INDEX_CELL_WIDTH] = "" + cellWidth ;
-        saveArray[SAVED_ARRAY_INDEX_CROSSWORD_IMAGE] = "" + getCrosswordPictureResource() ;
+        saveArray[SAVED_ARRAY_INDEX_CROSSWORD_IMAGE] = "" + getCrosswordPictureFile() ;
         saveArray[SAVED_ARRAY_INDEX_CLUE_IMAGE] = "" + getCluePictureResource() ;
 
         // Loop through cells and save contents to the array.
