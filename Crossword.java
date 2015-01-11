@@ -35,8 +35,8 @@ public class Crossword {
     public static final int SAVED_ARRAY_INDEX_DATE = 1 ;
     public static final int SAVED_ARRAY_INDEX_ROW_COUNT = 2 ;
     public static final int SAVED_ARRAY_INDEX_CELL_WIDTH = 3 ;
-    public static final int SAVED_ARRAY_INDEX_CROSSWORD_IMAGE = 4 ;
-    public static final int SAVED_ARRAY_INDEX_CLUE_IMAGE = 5 ;
+    public static final int SAVED_ARRAY_INDEX_CROSSWORD_IMAGE = 4 ; // Not required
+    public static final int SAVED_ARRAY_INDEX_CLUE_IMAGE = 5 ;  // Not required
     private final int saveArrayStartIndex = 6 ;       // Update this if format of saveArray changes, i.e. if more fields are added before the grid is saved.
 
     private Context context;
@@ -427,7 +427,9 @@ public class Crossword {
 
         return formattedDate ;
     }
-
+    public int getScreenWidth() {
+        return screenWidth;
+    }
     public File getCrosswordPictureFile() {
         return crosswordImageFile ;
     }

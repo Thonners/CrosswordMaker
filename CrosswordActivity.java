@@ -3,6 +3,7 @@ package com.thonners.crosswordmaker;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
@@ -12,7 +13,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -23,6 +23,8 @@ import java.io.File;
 public class CrosswordActivity extends ActionBarActivity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1 ;
+
+    private static int MIN_CLUE_IMAGE_RES = 100 ;  // Minimum number of pixels for clue image width to use for resampling
 
     private static final String LOG_TAG = "CrosswordActivity" ;
 
@@ -44,6 +46,8 @@ public class CrosswordActivity extends ActionBarActivity {
         String[] crosswordSavedArray = getIntent().getStringArrayExtra(Crossword.CROSSWORD_EXTRA);
 
         crossword = new Crossword(this, grid, crosswordSavedArray);
+
+        loadClueImage() ;
     }
 
     private void getViewsByID() {
@@ -74,6 +78,16 @@ public class CrosswordActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void loadClueImage() {
+        // Load clue image if one already exists
+        String clueImagePath = crossword.getCluePictureFile().getAbsolutePath() ;
+        clueImageFile = crossword.getCluePictureFile() ;
+        if (clueImageFile.length() > 10) {
+            takeCluePhotoButton = (View) findViewById(R.id.take_picture_clues_button) ;
+            setClueImageInView();
+        }
+    }
+
     private void dispatchTakePictureIntent() {
         Log.d(LOG_TAG, "dispatchPictureIntent method started");
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -97,6 +111,11 @@ public class CrosswordActivity extends ActionBarActivity {
     {
         // Called when camera intent returns. Now load image just taken
 
+        setClueImageInView();
+
+    }
+
+    private void setClueImageInView() {
         Log.d(LOG_TAG, "trying to get the photo from: " + clueImageFile.getAbsolutePath());
         //Show image in clueImageView
         clueImageBitmap = getImage(clueImageFile);
@@ -105,13 +124,12 @@ public class CrosswordActivity extends ActionBarActivity {
         Log.d(LOG_TAG, "Setting image");
         clueImageView.setImageBitmap(clueImageBitmap);
 
-        //clueImageView.setMaxHeight(clueImageBitmap.getHeight());
-
         //Remove button from view
         //Check image exists
         Log.d(LOG_TAG, "Removing photo button");
         ((ViewGroup) takeCluePhotoButton.getParent()).removeView(takeCluePhotoButton);
 
+        crossword.saveCrossword();
     }
 
     public void takePictureClues(View clueImagePromptButton) {
@@ -120,11 +138,8 @@ public class CrosswordActivity extends ActionBarActivity {
         // Get file to save to from Crossword
         clueImageFile = crossword.getCluePictureFile();
         takeCluePhotoButton = clueImagePromptButton ;
-        //TODO: check whether file exists and if so prompt user (maybe not required as if image exists it should be shown?
         // Call intent to get image
         dispatchTakePictureIntent();
-
-
 
     }
 
@@ -151,22 +166,21 @@ public class CrosswordActivity extends ActionBarActivity {
         return BitmapFactory.decodeFile(bitmapFile.getAbsolutePath(), options);
     }
 
-    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth) {
+    public int calculateInSampleSize(BitmapFactory.Options options, int reqWidth) {
         Log.d(LOG_TAG,"Calculating bitmap sample size...");
-        // Raw height and width of image
-//        final int height = options.outHeight;
+        // Check that reqWidth is sensible
+        if (reqWidth < MIN_CLUE_IMAGE_RES) {
+            reqWidth = getScreenWidth();
+        }
+        // Raw width of image
         final int width = options.outWidth;
         int inSampleSize = 1;
 
- //       if (height > reqHeight || width > reqWidth) {
-
         if (width > reqWidth) {
-            //final int halfHeight = height / 2;
             final int halfWidth = width / 2;
 
             // Calculate the largest inSampleSize value that is a power of 2 and keeps both
             // height and width larger than the requested height and width.
-      //      while ((halfHeight / inSampleSize) > reqHeight && (halfWidth / inSampleSize) > reqWidth) {
 
             Log.d(LOG_TAG,"halfWidth / inSampleSize =  " + (halfWidth / inSampleSize));
             while ((halfWidth / inSampleSize) > reqWidth) {
@@ -175,6 +189,13 @@ public class CrosswordActivity extends ActionBarActivity {
         }
         Log.d(LOG_TAG,"Final sample size = " + inSampleSize);
         return inSampleSize;
+  //      return 2 ;  // TODO: Need to work out why clueImageView.getWidth() = 0 on resuming old crosswords.
+    }
+    private int getScreenWidth() {
+        Point size = new Point();
+        getWindowManager().getDefaultDisplay().getSize(size);
+
+        return size.x;
     }
     public void saveGrid(View view) {
         // Save the grid
