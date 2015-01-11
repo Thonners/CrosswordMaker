@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -30,6 +31,7 @@ public class CrosswordActivity extends ActionBarActivity {
     ImageView clueImageView ;
     File clueImageFile;
     Bitmap clueImageBitmap ;
+    View takeCluePhotoButton ;
 
 
     @Override
@@ -76,6 +78,7 @@ public class CrosswordActivity extends ActionBarActivity {
         Log.d(LOG_TAG, "dispatchPictureIntent method started");
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if(takePictureIntent.resolveActivity(getPackageManager()) != null) {
+
             // Check file exists
             if (clueImageFile != null) {
                 Log.d(LOG_TAG, "clueImage != null");
@@ -89,31 +92,90 @@ public class CrosswordActivity extends ActionBarActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        // Called when camera intent returns. Now load image just taken
+
+        Log.d(LOG_TAG, "trying to get the photo from: " + clueImageFile.getAbsolutePath());
+        //Show image in clueImageView
+        clueImageBitmap = getImage(clueImageFile);
+
+
+        Log.d(LOG_TAG, "Setting image");
+        clueImageView.setImageBitmap(clueImageBitmap);
+
+        //clueImageView.setMaxHeight(clueImageBitmap.getHeight());
+
+        //Remove button from view
+        //Check image exists
+        Log.d(LOG_TAG, "Removing photo button");
+        ((ViewGroup) takeCluePhotoButton.getParent()).removeView(takeCluePhotoButton);
+
+    }
 
     public void takePictureClues(View clueImagePromptButton) {
         Log.d(LOG_TAG, "takePictureClues clicked");
         // Start intent to get image of the clues
         // Get file to save to from Crossword
         clueImageFile = crossword.getCluePictureFile();
+        takeCluePhotoButton = clueImagePromptButton ;
         //TODO: check whether file exists and if so prompt user (maybe not required as if image exists it should be shown?
         // Call intent to get image
         dispatchTakePictureIntent();
 
 
-                Log.d(LOG_TAG, "trying to get the photo from: " + clueImageFile.getAbsolutePath());
-        //Show image in clueImageView
-        clueImageBitmap = BitmapFactory.decodeFile(clueImageFile.getAbsolutePath());
 
-
-        Log.d(LOG_TAG, "Setting image");
-        clueImageView.setImageBitmap(clueImageBitmap);
-        //Remove button from view
-            //Check image exists
-                Log.d(LOG_TAG, "Removing photo button");
-            ((ViewGroup)clueImagePromptButton.getParent()).removeView(clueImagePromptButton);
     }
 
+    private Bitmap getImage(File bitmapFile) {
+        // Decode bitmapFile and return the bitmap for use in an ImageView
+        Log.d(LOG_TAG, "trying to get the photo from: " + bitmapFile.getAbsolutePath());
 
+        // Decode bounds to get size image size. For use in loading a smaller scaled image
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        Log.d(LOG_TAG,"Decoding bounds...");
+        BitmapFactory.decodeFile(bitmapFile.getAbsolutePath(),options) ;
+        int imageHeight = options.outHeight;
+        int imageWidth = options.outWidth;
+        String imageType = options.outMimeType;
+        Log.d(LOG_TAG,"Bounds: imageHeight = " + imageHeight + ", imageWidth = " + imageWidth + ", imageType = " + imageType);
+
+        Log.d(LOG_TAG,"clueImageView.getWidth() = " + clueImageView.getWidth());
+        options.inSampleSize = calculateInSampleSize(options,clueImageView.getWidth());
+
+        // Turn off justDecodeBounds so that the file is properly decoded
+        options.inJustDecodeBounds = false ;
+
+        return BitmapFactory.decodeFile(bitmapFile.getAbsolutePath(), options);
+    }
+
+    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth) {
+        Log.d(LOG_TAG,"Calculating bitmap sample size...");
+        // Raw height and width of image
+//        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+ //       if (height > reqHeight || width > reqWidth) {
+
+        if (width > reqWidth) {
+            //final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+      //      while ((halfHeight / inSampleSize) > reqHeight && (halfWidth / inSampleSize) > reqWidth) {
+
+            Log.d(LOG_TAG,"halfWidth / inSampleSize =  " + (halfWidth / inSampleSize));
+            while ((halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+        Log.d(LOG_TAG,"Final sample size = " + inSampleSize);
+        return inSampleSize;
+    }
     public void saveGrid(View view) {
         // Save the grid
         crossword.saveCrossword();

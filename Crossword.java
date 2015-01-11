@@ -188,7 +188,9 @@ public class Crossword {
     }
 
     public void setTitle(String newTitle) {
-        this.title = newTitle ;
+        if(newTitle.length() > 0 ) {
+            this.title = newTitle;
+        }
         return ;
     }
 
@@ -461,8 +463,8 @@ public class Crossword {
         saveArray[SAVED_ARRAY_INDEX_DATE] = date ;
         saveArray[SAVED_ARRAY_INDEX_ROW_COUNT] = "" + rowCount ;
         saveArray[SAVED_ARRAY_INDEX_CELL_WIDTH] = "" + cellWidth ;
-        saveArray[SAVED_ARRAY_INDEX_CROSSWORD_IMAGE] = "" + getCrosswordPictureFile() ;
-        saveArray[SAVED_ARRAY_INDEX_CLUE_IMAGE] = "" + getCluePictureResource() ;
+ //       saveArray[SAVED_ARRAY_INDEX_CROSSWORD_IMAGE] = "" + saveDir.getAbsolutePath()  + "/" + SAVE_CROSSWORD_FILE_NAME;
+ //       saveArray[SAVED_ARRAY_INDEX_CLUE_IMAGE] = "" + saveDir.getAbsolutePath() + "/" + SAVE_CLUE_IMAGE_FILE_NAME;
 
         // Loop through cells and save contents to the array.
         int index = saveArrayStartIndex ; // For iterating over, and saving current cell to index.
