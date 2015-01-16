@@ -15,6 +15,7 @@ import android.widget.NumberPicker;
 public class NewCrossword extends ActionBarActivity {
 
     static final String NO_ROWS = "com.thonners.crosswordmaker.rows" ;
+    static final String AUTO_GRID_GENERATION = "com.thonners.crosswordmaker.autoGeneration" ;
 //    static final String SCREEN_WIDTH = "com.thonners.crosswordmaker.screenx" ;
 //    static final String SCREEN_HEIGHT = "com.thonners.crosswordmaker.screeny" ;
 
@@ -65,7 +66,7 @@ public class NewCrossword extends ActionBarActivity {
     }
 
 
-    public void enterClicked(View view) {
+    public void manualEnterClicked(View view) {
         // Pass grid size to GenerateGrid activity
 
         // Get number entered
@@ -74,8 +75,21 @@ public class NewCrossword extends ActionBarActivity {
         // Pass to new activity
         Intent intent = new Intent(this, GridMaker.class);
         intent.putExtra(NO_ROWS, rows);
+        intent.putExtra(AUTO_GRID_GENERATION,false);
         startActivity(intent);
 
+    }
+
+    public void autoEnterClicked(View view) {
+        // Work out the grid from a photo. Put the boolean value into the gridmaker intent and have that deal with getting the image
+        // Get number entered
+        int rows = numberPicker.getValue();
+
+        // Pass to new activity
+        Intent intent = new Intent(this, GridMaker.class);
+        intent.putExtra(NO_ROWS, rows);
+        intent.putExtra(AUTO_GRID_GENERATION,true);
+        startActivity(intent);
     }
 
 

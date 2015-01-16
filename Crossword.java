@@ -126,6 +126,7 @@ public class Crossword {
     private void createGrid() {
         grid.setRowCount(rowCount);
         grid.setColumnCount(rowCount);
+        grid.setBackground(context.getResources().getDrawable(R.drawable.cell_white));
     }
 
     private void createCells() {
