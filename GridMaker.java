@@ -1,5 +1,7 @@
 package com.thonners.crosswordmaker;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,7 +21,9 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.GridLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,9 +35,15 @@ public class GridMaker extends ActionBarActivity {
     private static final String LOG_TAG = "GridMaker";
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
+    EditText publicationNameInput ;
+    EditText publicationDateInput ;
+
+    String publicationSelected ;
+    CharSequence[] publications ;
+
     int n = 20 ;    // Number of sample of image to take to find grid
     double gridCoverage = 0.5 ; // % of image covered by the grid
-    int blackColorThreshold = 128 ; // Value below which colours will be deemed to mean a black cell, above which implies a white cell
+    int blackColorThreshold = 100 ; // Value below which colours will be deemed to mean a black cell, above which implies a white cell
 
     private int screenWidth ;
     private int screenHeight ;
@@ -41,7 +51,7 @@ public class GridMaker extends ActionBarActivity {
     Crossword crossword ;
 
     File tempImageFile = null;  // Temporary file in which to store the image of the crossword grid if auto-grid generation is selected
-
+    Bitmap gridImageBW;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,8 +59,8 @@ public class GridMaker extends ActionBarActivity {
         setContentView(R.layout.activity_grid_maker);
 
         getScreenDetails();
+        initialise();
 
-        grid = (GridLayout) findViewById(R.id.main_grid);
 
         if(getIntent().getBooleanExtra(NewCrossword.AUTO_GRID_GENERATION,false)) {
             // Get a photo to do the auto grid generation
@@ -61,6 +71,112 @@ public class GridMaker extends ActionBarActivity {
         }
     }
 
+    private void initialise() {
+        // Get instances of the views in the layout.xml
+        grid = (GridLayout) findViewById(R.id.main_grid);
+        publicationNameInput = (EditText) findViewById(R.id.crossword_publication_input);
+        publicationDateInput = (EditText) findViewById(R.id.crossword_date_input);
+        publications = getResources().getTextArray(R.array.publications);
+
+        View.OnFocusChangeListener pubNameInputListener = new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    // pop up dialog box to give possible options
+                    popupPublicationDialog();
+                }
+            }
+        } ;
+        publicationNameInput.setOnFocusChangeListener(pubNameInputListener);
+
+        View.OnFocusChangeListener pubDateInputListener = new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                // pop up dialog box to give possible options
+                    popupDateDialog();
+            }
+        } ;
+    }
+
+    private void popupPublicationDialog() {
+        // Pop up dialog pox with radio buttons of common publications
+        // Auto-fill the input EditText with the selected option. Do nothing if 'other' is selected
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        // Set the dialog title
+        builder.setTitle(R.string.pub_name_dialog_title) ;
+
+        // Specify the list array, the items to be selected by default,
+        // and the listener through which to receive callbacks when items are selected
+        builder.setSingleChoiceItems(publications, -1,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int pub) {
+
+                        switch (pub) {
+
+                            // Set publicationSelected equal to the string displayed
+                            case 0:
+                                publicationSelected = publications[0].toString();
+                                break;
+                            case 1:
+                                publicationSelected = publications[1].toString();
+                                break;
+                            case 2:
+                                publicationSelected = publications[2].toString();
+                                break;
+                            case 3:
+                                publicationSelected = publications[3].toString();
+                                break;
+                            case 4:
+                                publicationSelected = publications[4].toString();
+                                break;
+                            case 5:
+                                publicationSelected = publications[5].toString();
+                                break;
+
+                        }
+                    }
+                });
+
+
+        // Set the action buttons
+        builder.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick (DialogInterface dialog,int id){
+                        // User clicked OK, so save the publicationSelected result somewhere
+                        // or return it to the component that opened the dialog
+                            publicationNameInput.setText(publicationSelected) ;
+
+                    }
+                }
+
+        ) ;
+        builder.setNeutralButton(R.string.pub_other, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Do nothing
+            }
+        });
+        builder.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick (DialogInterface dialog,int id){
+                        // Do nothing
+                    }
+                }
+
+        );
+
+        AlertDialog namePopup = builder.create();
+        namePopup.show();
+
+        return ;
+    }
+        private void popupDateDialog() {
+        // Pop up dialog pox with NumberPickers for the date
+        // Auto-fill the input EditText with the selected option. Do nothing if user presses cancel
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -97,7 +213,7 @@ public class GridMaker extends ActionBarActivity {
 
     public void enterClicked(View view){
         // Freeze crossword grid and progress to next stage
-        String crosswordTitle = ((TextView) findViewById(R.id.crossword_title_input)).getText().toString() ;
+        String crosswordTitle = ((TextView) findViewById(R.id.crossword_publication_input)).getText().toString() ;
         String crosswordDate = ((TextView) findViewById(R.id.crossword_date_input)).getText().toString() ;
         Log.d("CWM","Enter clicked (GridMaker activity)");
         Log.d(LOG_TAG,"Setting crossword title to: " + crosswordTitle );
@@ -142,6 +258,10 @@ public class GridMaker extends ActionBarActivity {
     {
         // Called when camera intent returns. Now try to generate the grid automatically
         generateGrid(tempImageFile);
+
+        ImageView iv = new ImageView(this) ;
+        iv.setImageBitmap(Bitmap.createScaledBitmap(gridImageBW, 4000, 4000, false));
+        grid.addView(iv,0);
 
     }
 
@@ -197,7 +317,7 @@ public class GridMaker extends ActionBarActivity {
         }
 
         // Convert bitmap to black and white
-        Bitmap gridImageBW = convertToBlackAndWhite(gridImageOriginal);
+        gridImageBW = convertToBlackAndWhite(gridImageOriginal);
 
         Log.d(LOG_TAG,"Storing pixel values in int array...");
 
@@ -254,18 +374,9 @@ public class GridMaker extends ActionBarActivity {
                     Log.d(LOG_TAG, "Setting probe(" + i + "," + j + ") to white.");
                     probeBlack[i][j] = false ;
                 }
+                gridImageBW.setPixel(probeX[j],probeY[i],Color.RED);
+
             }
-        }
-
-
-
-        int[][] probes = new int[n][n];     // Value of probeFullColor[m][n] = coords in x and y
-
-        // If width is always > height, will need to manually switch orientation. Probably easiest to create the grid 90deg out, then rotate at the end.
-
-        // Loop through horizontally
-        for (int i=0 ; i < n ; i++) {
-            // Loop through width
         }
 
 
@@ -294,4 +405,6 @@ public class GridMaker extends ActionBarActivity {
 
         return blackAndWhiteBitmap;
     }
+
+
 }
