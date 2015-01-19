@@ -94,12 +94,13 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
         //TODO: list all files
         // TODO: create specific drawable for the background
         for (int i = 0 ; i < savedCrosswords.length ; i++ ) {
-            String[] crosswordDetails = savedCrosswords[i].getName().split("-");
-            String crosswordDateSaveFormat = crosswordDetails[0] ;
-            String crosswordName = crosswordDetails[1].replaceAll("__","-").replaceAll("_"," ") ;   // Replace all used to restore any hyphens/spaces that were taken out during the fileName assignment in Crossword.initialiseSaveFiles
+            if (savedCrosswords[i].isDirectory()) {
+                String[] crosswordDetails = savedCrosswords[i].getName().split("-");
+                String crosswordDateSaveFormat = crosswordDetails[0];
+                String crosswordName = crosswordDetails[1].replaceAll("__", "-").replaceAll("_", " ");   // Replace all used to restore any hyphens/spaces that were taken out during the fileName assignment in Crossword.initialiseSaveFiles
 
-            addCrosswordToLayout(i, "Name: " + crosswordName + "; Date: " + getNiceDate(crosswordDateSaveFormat));
-
+                addCrosswordToLayout(i, "Name: " + crosswordName + "; Date: " + getNiceDate(crosswordDateSaveFormat));
+            }
         }
 
     }

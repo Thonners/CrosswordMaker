@@ -116,7 +116,7 @@ public class GridMaker extends ActionBarActivity {
 
                         switch (pub) {
 
-                            // Set publicationSelected equal to the string displayed
+                            // Set publication equal to the string displayed
                             case 0:
                                 publicationSelected = publications[0].toString();
                                 break;
@@ -145,7 +145,7 @@ public class GridMaker extends ActionBarActivity {
         builder.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick (DialogInterface dialog,int id){
-                        // User clicked OK, so save the publicationSelected result somewhere
+                        // User clicked OK, so save the publication result somewhere
                         // or return it to the component that opened the dialog
                             publicationNameInput.setText(publicationSelected) ;
 

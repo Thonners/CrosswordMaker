@@ -34,7 +34,7 @@ public class PublicationNameDialogFragment extends DialogFragment{
 
                                 switch (pub) {
 
-                                    // Set publicationSelected equal to the string displayed
+                                    // Set publication equal to the string displayed
                                     case 0:
                                         publicationSelected = publications[0].toString();
                                         break;
@@ -63,7 +63,7 @@ public class PublicationNameDialogFragment extends DialogFragment{
         builder.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick (DialogInterface dialog,int id){
-                                    // User clicked OK, so save the publicationSelected result somewhere
+                                    // User clicked OK, so save the publication result somewhere
                                     // or return it to the component that opened the dialog
 
                                 }
@@ -71,13 +71,13 @@ public class PublicationNameDialogFragment extends DialogFragment{
 
                             ) ;
         builder.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick (DialogInterface dialog,int id){
-                                    // Do nothing
-                                }
-                            }
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Do nothing
+                    }
+                }
 
-                            );
+        );
 
                             return builder.create();
                         }

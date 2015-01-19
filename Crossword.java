@@ -24,6 +24,9 @@ import java.util.Date;
 public class Crossword {
 
     public static final String CROSSWORD_EXTRA = "com.thonners.crosswordmaker.crossword_extra";
+    public static final String CROSSWORD_EXTRA_TITLE = "com.thonners.crosswordmaker.crossword_title";
+    public static final String CROSSWORD_EXTRA_DATE = "com.thonners.crosswordmaker.crossword_date";
+
     private static final String LOG_TAG = "Crossword" ;
 
     public static final String SAVE_DATE_FORMAT = "yyyyMMdd";

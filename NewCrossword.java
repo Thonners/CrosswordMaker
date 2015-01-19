@@ -1,14 +1,11 @@
 package com.thonners.crosswordmaker;
 
 import android.content.Intent;
-import android.graphics.Point;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.NumberPicker;
 
 
@@ -19,21 +16,31 @@ public class NewCrossword extends ActionBarActivity {
 //    static final String SCREEN_WIDTH = "com.thonners.crosswordmaker.screenx" ;
 //    static final String SCREEN_HEIGHT = "com.thonners.crosswordmaker.screeny" ;
 
+    String crosswordTitle;
+    String crosswordDate;
+
     NumberPicker numberPicker ;
 
     private int min = 3 ;
     private int max = 20 ;
-    private int defaultValue = 8 ;
+    private int defaultValue = 12 ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_crossword);
 
+        getIntents();
+
         setupNumberPicker();
 
     }
 
+    private void getIntents() {
+        // Reclaim extras passed with the intent
+        crosswordTitle = getIntent().getStringExtra(Crossword.CROSSWORD_EXTRA_TITLE);
+        crosswordDate = getIntent().getStringExtra(Crossword.CROSSWORD_EXTRA_DATE);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -74,6 +81,8 @@ public class NewCrossword extends ActionBarActivity {
 
         // Pass to new activity
         Intent intent = new Intent(this, GridMaker.class);
+        intent.putExtra(Crossword.CROSSWORD_EXTRA_TITLE,crosswordTitle);
+        intent.putExtra(Crossword.CROSSWORD_EXTRA_DATE, crosswordDate);
         intent.putExtra(NO_ROWS, rows);
         intent.putExtra(AUTO_GRID_GENERATION,false);
         startActivity(intent);
@@ -87,6 +96,8 @@ public class NewCrossword extends ActionBarActivity {
 
         // Pass to new activity
         Intent intent = new Intent(this, GridMaker.class);
+        intent.putExtra(Crossword.CROSSWORD_EXTRA_TITLE,crosswordTitle);
+        intent.putExtra(Crossword.CROSSWORD_EXTRA_DATE, crosswordDate);
         intent.putExtra(NO_ROWS, rows);
         intent.putExtra(AUTO_GRID_GENERATION,true);
         startActivity(intent);
