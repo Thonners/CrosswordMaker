@@ -356,9 +356,12 @@ public class Crossword {
         int oppositeRow = (rowCount - 1) - inputCell.getRow();
         int oppositeCol = (rowCount - 1) - inputCell.getColumn();
 
-        Log.d(LOG_TAG,"Toggling blackCell opposite: " + inputCell.getCellName() + ", i.e. toggling: " + cells[oppositeRow][oppositeCol].getCellName());
-        cells[oppositeRow][oppositeCol].toggleBlackCell();
-
+        if (oppositeCol == inputCell.getColumn() && oppositeRow == inputCell.getRow()) {
+            Log.d(LOG_TAG,"Not toggling opposite cell as in this instance it is the same cell!") ;
+        } else {
+            Log.d(LOG_TAG, "Toggling blackCell opposite: " + inputCell.getCellName() + ", i.e. toggling: " + cells[oppositeRow][oppositeCol].getCellName());
+            cells[oppositeRow][oppositeCol].toggleBlackCell();
+        }
     }
 
     private void getClueNumbers() {
