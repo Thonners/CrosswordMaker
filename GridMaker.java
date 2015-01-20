@@ -41,6 +41,9 @@ public class GridMaker extends ActionBarActivity {
     String publicationSelected ;
     CharSequence[] publications ;
 
+    String crosswordTitle;
+    String crosswordDate;
+
     int n = 20 ;    // Number of sample of image to take to find grid
     double gridCoverage = 0.5 ; // % of image covered by the grid
     int blackColorThreshold = 100 ; // Value below which colours will be deemed to mean a black cell, above which implies a white cell
@@ -74,7 +77,9 @@ public class GridMaker extends ActionBarActivity {
     private void initialise() {
         // Get instances of the views in the layout.xml
         grid = (GridLayout) findViewById(R.id.main_grid);
-        publicationNameInput = (EditText) findViewById(R.id.crossword_publication_input);
+        crosswordTitle = getIntent().getStringExtra(Crossword.CROSSWORD_EXTRA_TITLE);
+        crosswordDate = getIntent().getStringExtra(Crossword.CROSSWORD_EXTRA_DATE);
+/*        publicationNameInput = (EditText) findViewById(R.id.crossword_publication_input);
         publicationDateInput = (EditText) findViewById(R.id.crossword_date_input);
         publications = getResources().getTextArray(R.array.publications);
 
@@ -95,9 +100,9 @@ public class GridMaker extends ActionBarActivity {
                 // pop up dialog box to give possible options
                     popupDateDialog();
             }
-        } ;
+        } ;*/
     }
-
+/*
     private void popupPublicationDialog() {
         // Pop up dialog pox with radio buttons of common publications
         // Auto-fill the input EditText with the selected option. Do nothing if 'other' is selected
@@ -177,7 +182,7 @@ public class GridMaker extends ActionBarActivity {
         // Pop up dialog pox with NumberPickers for the date
         // Auto-fill the input EditText with the selected option. Do nothing if user presses cancel
     }
-
+*/
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -213,8 +218,8 @@ public class GridMaker extends ActionBarActivity {
 
     public void enterClicked(View view){
         // Freeze crossword grid and progress to next stage
-        String crosswordTitle = ((TextView) findViewById(R.id.crossword_publication_input)).getText().toString() ;
-        String crosswordDate = ((TextView) findViewById(R.id.crossword_date_input)).getText().toString() ;
+//        String crosswordTitle = ((TextView) findViewById(R.id.crossword_publication_input)).getText().toString() ;
+//        String crosswordDate = ((TextView) findViewById(R.id.crossword_date_input)).getText().toString() ;
         Log.d("CWM","Enter clicked (GridMaker activity)");
         Log.d(LOG_TAG,"Setting crossword title to: " + crosswordTitle );
         Log.d(LOG_TAG,"Setting crossword date to: " + crosswordDate );
@@ -292,6 +297,7 @@ public class GridMaker extends ActionBarActivity {
         }
     }
 
+    // Auto reading of grid
     private void generateGrid(File crosswordImage) {
         // Start by working out the image orientation and size
         Bitmap gridImageOriginal = BitmapFactory.decodeFile(crosswordImage.getAbsolutePath());

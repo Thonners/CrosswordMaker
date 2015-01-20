@@ -94,7 +94,7 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
         //TODO: list all files
         // TODO: create specific drawable for the background
         for (int i = 0 ; i < savedCrosswords.length ; i++ ) {
-            if (savedCrosswords[i].isDirectory()) {
+            if (savedCrosswords[i].isDirectory() && savedCrosswords[i].getName().contains("-")) {
                 String[] crosswordDetails = savedCrosswords[i].getName().split("-");
                 String crosswordDateSaveFormat = crosswordDetails[0];
                 String crosswordName = crosswordDetails[1].replaceAll("__", "-").replaceAll("_", " ");   // Replace all used to restore any hyphens/spaces that were taken out during the fileName assignment in Crossword.initialiseSaveFiles
@@ -105,19 +105,12 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
 
     }
 
-    public void savedCrosswordSelected(View view) {
-        // TODO: load CrosswordActivity with the save file selected
 
-        // Get
-
-        // Start activity with Intent
-        Intent crosswordActivity = new Intent(this, CrosswordActivity.class);
-
-    }
 
     private String getNiceDate(String dateIn) {
         // Turn date from save file into easier to read date
         SimpleDateFormat sdf = new SimpleDateFormat(Crossword.SAVE_DATE_FORMAT);    // Format of how date is input
+        DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(this); // Locale date format
         Date date ;
 
         try {
@@ -125,12 +118,10 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
         } catch (ParseException e) {
             // handle exception here !
             Log.e(LOG_TAG, "Couldn't parse date into something useful, so returning it as it came in");
-            return dateIn ;
+            return this.getResources().getString(R.string.error_crossword_date); // Return the error message to be displayed.
         }
 
-        DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(this);
         return dateFormat.format(date);
-
     }
 
     private void addCrosswordToLayout(int index, String text) {

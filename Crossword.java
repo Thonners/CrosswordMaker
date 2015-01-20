@@ -45,7 +45,7 @@ public class Crossword {
     private Context context;
 
     public String title = "Default title";   // Add the date to the default title?
-    public String date = getFormattedDate() ;       // Default date
+    public String date ;    // Save date format (yyyyMMdd)          //= getFormattedDate() ;       // Default date
 
     public int rowCount;
     public int totalCells;
@@ -198,7 +198,28 @@ public class Crossword {
         return ;
     }
 
-    public void setDate(String newDate) {
+    public void setDate(String inputDate) {
+        // String inputDate to be provided from HomeActivity intent, which should put it into yyyyMMdd.
+        this.date = inputDate ;
+    }
+
+    public String getDisplayDate() {
+        // Method to use for saving the display date. Not sure this is required
+        SimpleDateFormat sdf = new SimpleDateFormat(SAVE_DATE_FORMAT);      // Save Formatted date
+        DateFormat localeDateFormat = android.text.format.DateFormat.getDateFormat(context);    // Locale date format
+        Date dateProper ;
+
+        try {
+            dateProper = sdf.parse(date) ;
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Couldn't parse Crossword.date (should be in save format) into something useful. This is coming from HomeActivity via intents so check the routing!");
+            return context.getResources().getString(R.string.error_crossword_date); // Return the error message to be displayed.
+        }
+
+        return localeDateFormat.format(dateProper) ;
+    }
+
+    public void setDateRedacted(String newDate) {
         // Turn date from save file into easier to read date
         SimpleDateFormat saveDateFormat = new SimpleDateFormat(Crossword.SAVE_DATE_FORMAT);    // Format of how date is input
         DateFormat localeDateFormat = android.text.format.DateFormat.getDateFormat(context);
@@ -426,6 +447,7 @@ public class Crossword {
         }
     }
 
+    // Redundant
     private String getFormattedDate() {
         // Return current date in YYYYMMDD format
         SimpleDateFormat sdf = new SimpleDateFormat(SAVE_DATE_FORMAT);
@@ -434,6 +456,7 @@ public class Crossword {
 
         return formattedDate ;
     }
+
     public int getScreenWidth() {
         return screenWidth;
     }
