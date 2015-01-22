@@ -172,12 +172,12 @@ public class Crossword {
         for (int i = 0; i < rowCount; i++) {
             for (int j = 0; j < rowCount; j++) {
                 tempString = crosswordStringArray[index] ;
-                Log.d(LOG_TAG,"For cell " + cells[i][j].getCellName() + ", read value: " + tempString);
+//                Log.d(LOG_TAG,"For cell " + cells[i][j].getCellName() + ", read value: " + tempString);
                 if (tempString.matches("-")) {
-                    Log.d(LOG_TAG,"Value matched '-', so toggling black cell.");
+//                    Log.d(LOG_TAG,"Value matched '-', so toggling black cell.");
                     cells[i][j].toggleBlackCell();
                 } else {
-                    Log.d(LOG_TAG,"Setting value to: " + tempString);
+//                    Log.d(LOG_TAG,"Setting value to: " + tempString);
                     cells[i][j].setText(tempString);
                 }
                 index++;
@@ -219,6 +219,7 @@ public class Crossword {
         return localeDateFormat.format(dateProper) ;
     }
 
+    // TODO: DELETE THIS FUNCTION: (saveDateRedacted())
     public void setDateRedacted(String newDate) {
         // Turn date from save file into easier to read date
         SimpleDateFormat saveDateFormat = new SimpleDateFormat(Crossword.SAVE_DATE_FORMAT);    // Format of how date is input
@@ -466,13 +467,8 @@ public class Crossword {
     public File getCluePictureFile() {
         return clueImageFile ;
     }
-    public String getCluePictureResource() {
-        //TODO: Once pictures have been taken, find a way to save them and note their location
-
-        // Do stuff / make  a note of its location whilst saving.
-        // Return the location
-
-        return "" ;
+    public String getActivityTitle() {
+        return getDisplayDate()+ ": " + title ;
     }
 
     public String[] getSaveArray() {
@@ -508,7 +504,7 @@ public class Crossword {
                     saveArray[index] = "-" ;
                 }
 
-                Log.d("SAVEARRAY:", "At index = " + index + ", saveArray[index] = " + saveArray[index]);
+//                Log.d("SAVEARRAY:", "At index = " + index + ", saveArray[index] = " + saveArray[index]);  // Don't output this at the moment because it seems to work, but spams the log thread. If saving stops working, uncomment this line.
                 index++ ;
             }
         }
@@ -560,7 +556,7 @@ public class Crossword {
         String[] saveArray = getSaveArray() ;
 
         try {
-            Log.d(LOG_TAG, "Saving crossword...");
+            Log.d(LOG_TAG, "Writing crossword file...");
             FileWriter fileWriter = new FileWriter(crosswordFile);
 
             for (int i = 0 ; i < saveArray.length ; i++) {

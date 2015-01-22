@@ -47,6 +47,8 @@ public class CrosswordActivity extends ActionBarActivity {
 
         crossword = new Crossword(this, grid, crosswordSavedArray);
 
+        setTitle(crossword.getActivityTitle());
+
         loadClueImage() ;
     }
 
