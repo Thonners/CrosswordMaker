@@ -510,7 +510,7 @@ public class Crossword {
         }
 
         for (int k = 0 ; k < saveArray.length ; k++) {
-            Log.d(LOG_TAG, "saveArray[" + k + "] = " + saveArray[k]) ;
+//            Log.d(LOG_TAG, "saveArray[" + k + "] = " + saveArray[k]) ;  // Don't output this at the moment because it seems to work, but spams the log thread. If saving stops working, uncomment this line.
         }
 
 

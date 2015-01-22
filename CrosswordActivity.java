@@ -52,6 +52,14 @@ public class CrosswordActivity extends ActionBarActivity {
         loadClueImage() ;
     }
 
+    // onPause called when activity is being shut down. Use it to save the progress
+    @Override
+    protected void onPause() {
+        super.onPause();    // Always call superclass first
+
+        crossword.saveCrossword();
+    }
+
     private void getViewsByID() {
         grid = (GridLayout) findViewById(R.id.crossword_grid);
         clueImageView = (ImageView) findViewById(R.id.image_view_clues);
