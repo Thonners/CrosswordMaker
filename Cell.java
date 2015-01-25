@@ -117,6 +117,7 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
         } else {
             setWhiteCell();
         }
+
     }
 
     // During grid creation phase toggle black cell. During normal operation, swap clue orientation

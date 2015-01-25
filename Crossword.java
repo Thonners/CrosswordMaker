@@ -26,6 +26,7 @@ public class Crossword {
     public static final String CROSSWORD_EXTRA = "com.thonners.crosswordmaker.crossword_extra";
     public static final String CROSSWORD_EXTRA_TITLE = "com.thonners.crosswordmaker.crossword_title";
     public static final String CROSSWORD_EXTRA_DATE = "com.thonners.crosswordmaker.crossword_date";
+    public static final String CROSSWORD_EXTRA_NO_ROWS = "com.thonners.crosswordmaker.crossword_no_rows";
 
     private static final String LOG_TAG = "Crossword" ;
 
@@ -40,7 +41,7 @@ public class Crossword {
     public static final int SAVED_ARRAY_INDEX_CELL_WIDTH = 3 ;
     public static final int SAVED_ARRAY_INDEX_CROSSWORD_IMAGE = 4 ; // Not required
     public static final int SAVED_ARRAY_INDEX_CLUE_IMAGE = 5 ;  // Not required
-    private final int saveArrayStartIndex = 6 ;       // Update this if format of saveArray changes, i.e. if more fields are added before the grid is saved.
+    public static final int SAVE_ARRAY_START_INDEX = 6 ;       // Update this if format of saveArray changes, i.e. if more fields are added before the grid is saved.
 
     private Context context;
 
@@ -167,7 +168,7 @@ public class Crossword {
       // Fill a grid with pre-existing CellViews
         Log.d(LOG_TAG, "Rebuilding grid from saveArray...");
       // TODO: Make each row in a separate parallel thread
-        int index = saveArrayStartIndex ;
+        int index = SAVE_ARRAY_START_INDEX;
         String tempString ;
         for (int i = 0; i < rowCount; i++) {
             for (int j = 0; j < rowCount; j++) {
@@ -471,6 +472,10 @@ public class Crossword {
         return getDisplayDate()+ ": " + title ;
     }
 
+    public Cell getCell(int row, int column) {
+        return cells[row][column];
+    }
+
     public String[] getSaveArray() {
         // Create String array to save and pass around with intents
         // Format:  array[0]    = Crossword name
@@ -483,7 +488,7 @@ public class Crossword {
 
         Log.d(LOG_TAG, "Saving Crossword...");
 
-        int saveArraySize = saveArrayStartIndex + (rowCount * rowCount);
+        int saveArraySize = SAVE_ARRAY_START_INDEX + (rowCount * rowCount);
         String[] saveArray = new String[saveArraySize];
 
         // Initialise array
@@ -495,7 +500,7 @@ public class Crossword {
  //       saveArray[SAVED_ARRAY_INDEX_CLUE_IMAGE] = "" + saveDir.getAbsolutePath() + "/" + SAVE_CLUE_IMAGE_FILE_NAME;
 
         // Loop through cells and save contents to the array.
-        int index = saveArrayStartIndex ; // For iterating over, and saving current cell to index.
+        int index = SAVE_ARRAY_START_INDEX; // For iterating over, and saving current cell to index.
          for (int i = 0; i < rowCount; i++) {
             for (int j = 0; j < rowCount; j++) {
                 if (!cells[i][j].isBlackCell()) {

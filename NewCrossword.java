@@ -11,7 +11,6 @@ import android.widget.NumberPicker;
 
 public class NewCrossword extends ActionBarActivity {
 
-    static final String NO_ROWS = "com.thonners.crosswordmaker.rows" ;
     static final String AUTO_GRID_GENERATION = "com.thonners.crosswordmaker.autoGeneration" ;
 //    static final String SCREEN_WIDTH = "com.thonners.crosswordmaker.screenx" ;
 //    static final String SCREEN_HEIGHT = "com.thonners.crosswordmaker.screeny" ;
@@ -83,7 +82,7 @@ public class NewCrossword extends ActionBarActivity {
         Intent intent = new Intent(this, GridMaker.class);
         intent.putExtra(Crossword.CROSSWORD_EXTRA_TITLE,crosswordTitle);
         intent.putExtra(Crossword.CROSSWORD_EXTRA_DATE, crosswordDate);
-        intent.putExtra(NO_ROWS, rows);
+        intent.putExtra(Crossword.CROSSWORD_EXTRA_NO_ROWS, rows);
         intent.putExtra(AUTO_GRID_GENERATION,false);
         startActivity(intent);
 
@@ -98,7 +97,7 @@ public class NewCrossword extends ActionBarActivity {
         Intent intent = new Intent(this, GridMaker.class);
         intent.putExtra(Crossword.CROSSWORD_EXTRA_TITLE,crosswordTitle);
         intent.putExtra(Crossword.CROSSWORD_EXTRA_DATE, crosswordDate);
-        intent.putExtra(NO_ROWS, rows);
+        intent.putExtra(Crossword.CROSSWORD_EXTRA_NO_ROWS, rows);
         intent.putExtra(AUTO_GRID_GENERATION,true);
         startActivity(intent);
     }
