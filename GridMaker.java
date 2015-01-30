@@ -102,6 +102,9 @@ public class GridMaker extends ActionBarActivity {
             crossword = new Crossword(getApplicationContext(), crosswordRowCount, grid, screenWidth, screenHeight);
             tutorialToast();
         }
+
+        // Set Activity Title in the action bar
+        setTitle(crossword.getActivityTitle());
     }
 
     @Override
@@ -325,13 +328,20 @@ public class GridMaker extends ActionBarActivity {
             int[] probeY ;
         int[] probeMin = new int[n] ;   //Max and Min here refer to probes along the larger or smaller axis of the image
         int[] probeMax = new int[n] ;
-        int probeSpacing ;
+        int probeSpacingX, probeSpacingY ;
         if ( gridTLX != 0 && gridTLY != 0 && gridBRX != 0 && gridBRY != 0) {
             // Calculate probe spacing in x and y dimensions then average
-            probeSpacing = (Math.abs(gridBRX - gridTLX) / (n - 1)     +     Math.abs(gridBRY - gridTLY) / (n - 1)) / 2 ;
-            Log.d(LOG_TAG,"ProbeSpacing calulated using input from user. probeSpacing = " + probeSpacing) ;
+            probeSpacingX = (Math.abs(gridBRX - gridTLX) / (n - 1)) ;
+            Log.d(LOG_TAG,"ProbeSpacing calulated using input from user. probeSpacingX = " + probeSpacingX) ;
         } else {
-            probeSpacing = (int) ((minDim * gridCoverage) / (n - 1));     // Spacing between probeFullColor is the number of pixels (minDim * %coverage) divided by (n-1) (There are n-1 spaces between n probeFullColor)
+            probeSpacingX = (int) ((minDim * gridCoverage) / (n - 1));     // Spacing between probeFullColor is the number of pixels (minDim * %coverage) divided by (n-1) (There are n-1 spaces between n probeFullColor)
+        }
+        if ( gridTLX != 0 && gridTLY != 0 && gridBRX != 0 && gridBRY != 0) {
+            // Calculate probe spacing in x and y dimensions then average
+            probeSpacingY = ( Math.abs(gridBRY - gridTLY) / (n - 1)) ;
+            Log.d(LOG_TAG,"ProbeSpacing calulated using input from user. probeSpacingY = " + probeSpacingY) ;
+        } else {
+            probeSpacingY = (int) ((minDim * gridCoverage) / (n - 1));     // Spacing between probeFullColor is the number of pixels (minDim * %coverage) divided by (n-1) (There are n-1 spaces between n probeFullColor)
         }
 
         // Should end up with square grid in the middle of the image
@@ -345,7 +355,7 @@ public class GridMaker extends ActionBarActivity {
 
         for (int i = 1 ; i < n ; i++) {
             // Add spacing on to last probe's location to get new probe co-ord.
-            probeMin[i] = probeMin[i-1] + probeSpacing ;
+            probeMin[i] = probeMin[i-1] + probeSpacingX ;
             Log.d(LOG_TAG,"probeMin[" + i + "] = " + probeMin[i]);
         }
         if ( gridTLX != 0 && gridTLY != 0 && gridBRX != 0 && gridBRY != 0) {
@@ -357,7 +367,7 @@ public class GridMaker extends ActionBarActivity {
 
         for (int i = 1 ; i < n ; i++ ) {
             // Add spacing on to last probe's location to get new probe co-ord.
-            probeMax[i] = probeMax[i-1] + probeSpacing ;
+            probeMax[i] = probeMax[i-1] + probeSpacingY ;
             Log.d(LOG_TAG,"probeMax[" + i + "] = " + probeMax[i]);
         }
 
@@ -495,8 +505,12 @@ public class GridMaker extends ActionBarActivity {
             }
         }
 
+        // When testing is complete, uncomment line to hide imageView
+        //iv.setVisibility(View.INVISIBLE);
         grid.setVisibility(View.VISIBLE);
 
+        Toast tutorialCheckGrid = Toast.makeText(this, getResources().getString(R.string.tutorial_toast_auto_grid_check), Toast.LENGTH_SHORT);
+        toastShowCentred(tutorialCheckGrid);
 
 
     }

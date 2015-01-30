@@ -66,6 +66,10 @@ public class HomeActivity extends ActionBarActivity {
     public void oldClicked(View view) {
         // Toast to say do new one
         Intent intent = new Intent(this, SavedCrosswordSelector.class);
+
+        // Test fragment view slider thing
+        intent = new Intent(this, CroswordSliderActivity.class);
+
         startActivity(intent);
 
     }

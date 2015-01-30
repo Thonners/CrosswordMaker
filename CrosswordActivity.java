@@ -47,6 +47,7 @@ public class CrosswordActivity extends ActionBarActivity {
 
         crossword = new Crossword(this, grid, crosswordSavedArray);
 
+
         setTitle(crossword.getActivityTitle());
 
         loadClueImage() ;
@@ -78,11 +79,16 @@ public class CrosswordActivity extends ActionBarActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                // Open some settings menu
+                openSettings();
+                break ;
+            case R.id.action_save:
+                // Save the grid
+                saveGrid();
+                break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -208,10 +214,22 @@ public class CrosswordActivity extends ActionBarActivity {
         return size.x;
     }
     public void saveGrid(View view) {
+        // Save the grid - Was used with old save button. Delete if overflow / action bar button works
+        crossword.saveCrossword();
+
+        Toast toast = Toast.makeText(this,"Crossword progress saved.", Toast.LENGTH_SHORT);
+        toast.show();
+    }
+    public void saveGrid() {
         // Save the grid
         crossword.saveCrossword();
 
         Toast toast = Toast.makeText(this,"Crossword progress saved.", Toast.LENGTH_SHORT);
         toast.show();
+    }
+    private void openSettings() {
+        // TODO: come up with some settings / an activity for settings
+        Toast t = Toast.makeText(this, "Will create a settings option soon", Toast.LENGTH_SHORT);
+        t.show();
     }
 }
