@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 //import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ public class CrosswordPageFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     private static final String ARG_TAB_POSITION = "tabPosition" ;
+    private static final String LOG_TAG = "CrosswordPageFragment";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -33,24 +35,6 @@ public class CrosswordPageFragment extends Fragment {
     private int tabPosition ;
 
     private OnFragmentInteractionListener mListener;
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment CrosswordPageFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static CrosswordPageFragment newInstance(String param1, String param2) {
-        CrosswordPageFragment fragment = new CrosswordPageFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     public static CrosswordPageFragment newInstance(int position) {
         CrosswordPageFragment fragment = new CrosswordPageFragment();
@@ -69,9 +53,7 @@ public class CrosswordPageFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             tabPosition = getArguments().getInt(ARG_TAB_POSITION);
-            /* // DELETE auto created
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);*/
+
         }
     }
 
@@ -82,9 +64,19 @@ public class CrosswordPageFragment extends Fragment {
             switch (tabPosition) {
                 case 0 :
                     return inflater.inflate(R.layout.fragment_crossword_page, container, false);
+                case 1 :
+                    return inflater.inflate(R.layout.fragment_clues, container, false);
+                case 2 :
+                    return inflater.inflate(R.layout.fragment_dictionary, container, false);
+                case 3 :
+                    return inflater.inflate(R.layout.fragment_anagram, container, false);
+                case 4 :
+                    return inflater.inflate(R.layout.fragment_doodle, container,false);
 
             }
-                    return inflater.inflate(R.layout.fragment_dictionary, container, false);
+
+        // Safety net in case tab position is outside of range specified in switch statement
+                    return inflater.inflate(R.layout.fragment_doodle, container, false);
 
     }
 
@@ -126,5 +118,11 @@ public class CrosswordPageFragment extends Fragment {
         // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
     }
+
+    public void searchClicked(View view) {
+        // Search button clicked
+        Log.d(LOG_TAG, "Search button clicked");
+    }
+
 
 }

@@ -13,11 +13,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class CroswordSliderActivity extends ActionBarActivity implements CrosswordPageFragment.OnFragmentInteractionListener {
+public class CrosswordSliderActivity extends ActionBarActivity implements CrosswordPageFragment.OnFragmentInteractionListener {
 
     private static final String LOG_TAG = "CrosswordSliderActivity";
 
-    private static final int NUM_PAGES = 4 ;    // Number of slidable view/pages. Crossword, Anagram, Dictionary, Doodle.
+    private static final int NUM_PAGES = 5 ;    // Number of slidable view/pages. Crossword, Clues, Anagram, Dictionary, Doodle.
 
     private ViewPager pager ;   // This handles the animation/transition between pages
     private PagerAdapter pagerAdapter ;     // This provides the pages for the PagerAdapter.

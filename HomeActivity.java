@@ -68,7 +68,7 @@ public class HomeActivity extends ActionBarActivity {
         Intent intent = new Intent(this, SavedCrosswordSelector.class);
 
         // Test fragment view slider thing
-        intent = new Intent(this, CroswordSliderActivity.class);
+        intent = new Intent(this, CrosswordSliderActivity.class);
 
         startActivity(intent);
 
