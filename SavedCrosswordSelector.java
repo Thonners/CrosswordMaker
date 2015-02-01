@@ -173,7 +173,7 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
 
     private void startNewCrosswordActivity(String[] savedCrossword) {
         // Start new crossword activity
-        Intent crosswordActivity = new Intent(this, CrosswordActivity.class);
+        Intent crosswordActivity = new Intent(this, CrosswordSliderActivity.class);
         crosswordActivity.putExtra(Crossword.CROSSWORD_EXTRA, savedCrossword);
         startActivity(crosswordActivity);
     }

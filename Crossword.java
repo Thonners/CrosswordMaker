@@ -220,26 +220,6 @@ public class Crossword {
         return localeDateFormat.format(dateProper) ;
     }
 
-    // TODO: DELETE THIS FUNCTION: (saveDateRedacted())
-    public void setDateRedacted(String newDate) {
-        // Turn date from save file into easier to read date
-        SimpleDateFormat saveDateFormat = new SimpleDateFormat(Crossword.SAVE_DATE_FORMAT);    // Format of how date is input
-        DateFormat localeDateFormat = android.text.format.DateFormat.getDateFormat(context);
-        Date date ;
-
-        try {
-            date = localeDateFormat.parse(newDate);
-        } catch (ParseException e) {
-            // handle exception here !
-            Log.e(LOG_TAG, "Couldn't parse date into something useful, so setting it to today's date");
-            this.date = saveDateFormat.format(new Date());
-            return ;
-        }
-
-        this.date = saveDateFormat.format(date) ;
-
-    }
-
     public void findClues() {
         // Locate clues by cycling through grid and finding all clues and their numbered square
         // TODO: make horizontal and vertical clue finding happen on different threads
@@ -287,8 +267,8 @@ public class Crossword {
                 hClues.get(horizontalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
                 cells[row][col].setHClue(hClues.get(horizontalClueIndex));          // Tell the cell which clue it belongs to
 
-                Log.d("Clues", "increasing clue length to " + clueLength) ;
-                Log.d("Clues", "horizontalClueIndex = " + horizontalClueIndex + " & hClues.length = " + hClues.size()) ;
+ //               Log.d("Clues", "increasing clue length to " + clueLength) ;
+ //               Log.d("Clues", "horizontalClueIndex = " + horizontalClueIndex + " & hClues.length = " + hClues.size()) ;
             }
 
             // If a black cell is found, reset nextWhiteCellNewClue flag
@@ -328,8 +308,8 @@ public class Crossword {
                 vClues.get(verticalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
                 cells[row][col].setVClue(vClues.get(verticalClueIndex));          // Tell the cell which clue it belongs to
 
-                Log.d("Clues", "increasing clue length to " + clueLength) ;
-                Log.d("Clues", "verticalClueIndex = " + verticalClueIndex + " & vClues.length = " + vClues.size()) ;
+    //            Log.d("Clues", "increasing clue length to " + clueLength) ;
+    //            Log.d("Clues", "verticalClueIndex = " + verticalClueIndex + " & vClues.length = " + vClues.size()) ;
             }
 
             // If a black cell is found, reset nextWhiteCellNewClue flag
@@ -385,7 +365,7 @@ public class Crossword {
         if (oppositeCol == inputCell.getColumn() && oppositeRow == inputCell.getRow()) {
             Log.d(LOG_TAG,"Not toggling opposite cell as in this instance it is the same cell!") ;
         } else {
-            Log.d(LOG_TAG, "Toggling blackCell opposite: " + inputCell.getCellName() + ", i.e. toggling: " + cells[oppositeRow][oppositeCol].getCellName());
+ //           Log.d(LOG_TAG, "Toggling blackCell opposite: " + inputCell.getCellName() + ", i.e. toggling: " + cells[oppositeRow][oppositeCol].getCellName());
             cells[oppositeRow][oppositeCol].toggleBlackCell();
         }
     }
@@ -431,7 +411,7 @@ public class Crossword {
 
             // Check that it isn't the last time through
             if (nextClueStartCellCoords != lastCellCoords) {
-                Log.d(LOG_TAG, "Next Clue Start Cell Coords = (" + nextClueStartCellCoords[0] + "," + nextClueStartCellCoords[1] + ").");
+ //               Log.d(LOG_TAG, "Next Clue Start Cell Coords = (" + nextClueStartCellCoords[0] + "," + nextClueStartCellCoords[1] + ").");
                 startCellCoordsOrdered.add(nextClueStartCellCoords);
                 startCellCoordsGeneral.remove(nextClueStartCellCoords);
 
@@ -496,8 +476,8 @@ public class Crossword {
         saveArray[SAVED_ARRAY_INDEX_DATE] = date ;
         saveArray[SAVED_ARRAY_INDEX_ROW_COUNT] = "" + rowCount ;
         saveArray[SAVED_ARRAY_INDEX_CELL_WIDTH] = "" + cellWidth ;
- //       saveArray[SAVED_ARRAY_INDEX_CROSSWORD_IMAGE] = "" + saveDir.getAbsolutePath()  + "/" + SAVE_CROSSWORD_FILE_NAME;
- //       saveArray[SAVED_ARRAY_INDEX_CLUE_IMAGE] = "" + saveDir.getAbsolutePath() + "/" + SAVE_CLUE_IMAGE_FILE_NAME;
+        saveArray[SAVED_ARRAY_INDEX_CROSSWORD_IMAGE] = "" + saveDir.getAbsolutePath()  + "/" + SAVE_CROSSWORD_FILE_NAME;
+        saveArray[SAVED_ARRAY_INDEX_CLUE_IMAGE] = "" + saveDir.getAbsolutePath() + "/" + SAVE_CLUE_IMAGE_FILE_NAME;
 
         // Loop through cells and save contents to the array.
         int index = SAVE_ARRAY_START_INDEX; // For iterating over, and saving current cell to index.

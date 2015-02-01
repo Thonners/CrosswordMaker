@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridLayout;
 
 
 /**
@@ -26,7 +27,12 @@ public class CrosswordPageFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     private static final String ARG_TAB_POSITION = "tabPosition" ;
+    private static final String ARG_STRING_ARRAY = "crosswordStringArray" ;
     private static final String LOG_TAG = "CrosswordPageFragment";
+
+    private GridLayout crosswordGrid ;
+    Crossword crossword ;
+    String[] crosswordStringArray;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -36,6 +42,7 @@ public class CrosswordPageFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
+    // Can delete this once other fragments created
     public static CrosswordPageFragment newInstance(int position) {
         CrosswordPageFragment fragment = new CrosswordPageFragment();
         Bundle args = new Bundle();
@@ -44,6 +51,14 @@ public class CrosswordPageFragment extends Fragment {
         return fragment ;
     }
 
+    public static CrosswordPageFragment newInstance(int position, String[] crosswordArray) {
+        CrosswordPageFragment fragment = new CrosswordPageFragment();
+        Bundle args = new Bundle();
+        args.putInt(ARG_TAB_POSITION, position);
+        args.putStringArray(ARG_STRING_ARRAY, crosswordArray);
+        fragment.setArguments(args);
+        return fragment ;
+    }
     public CrosswordPageFragment() {
         // Required empty public constructor
     }
@@ -53,6 +68,7 @@ public class CrosswordPageFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             tabPosition = getArguments().getInt(ARG_TAB_POSITION);
+            crosswordStringArray = getArguments().getStringArray(ARG_STRING_ARRAY);
 
         }
     }
@@ -61,31 +77,18 @@ public class CrosswordPageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-            switch (tabPosition) {
-                case 0 :
-                    return inflater.inflate(R.layout.fragment_crossword_page, container, false);
-                case 1 :
-                    return inflater.inflate(R.layout.fragment_clues, container, false);
-                case 2 :
-                    return inflater.inflate(R.layout.fragment_dictionary, container, false);
-                case 3 :
-                    return inflater.inflate(R.layout.fragment_anagram, container, false);
-                case 4 :
-                    return inflater.inflate(R.layout.fragment_doodle, container,false);
+        View view = inflater.inflate(R.layout.fragment_crossword_page, container, false);
+        crosswordGrid = (GridLayout) view.findViewById(R.id.crossword_grid);
 
-            }
+        createCrossword();
 
-        // Safety net in case tab position is outside of range specified in switch statement
-                    return inflater.inflate(R.layout.fragment_doodle, container, false);
+        getActivity().setTitle(crossword.getActivityTitle());
+
+        return view ;
 
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
+
 
     @Override
     public void onAttach(Activity activity) {
@@ -119,10 +122,16 @@ public class CrosswordPageFragment extends Fragment {
         public void onFragmentInteraction(Uri uri);
     }
 
-    public void searchClicked(View view) {
-        // Search button clicked
-        Log.d(LOG_TAG, "Search button clicked");
+    public GridLayout getCrosswordGrid() {
+        return crosswordGrid;
     }
 
+    private void createCrossword() {
+        // Create the crossword
+        crossword = new Crossword(getActivity().getApplicationContext(), crosswordGrid,crosswordStringArray);
+    }
 
+    public Crossword getCrossword() {
+        return crossword;
+    }
 }

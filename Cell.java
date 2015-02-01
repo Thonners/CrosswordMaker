@@ -159,7 +159,6 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
             }
         } else {
             Log.d(logTag, "Cell " + cellName + " has lost focus");
-//            setWhiteCell(); // not required as cleared by crossword.clearCellHighlighting. DELETE LINE ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         }
     }
 
