@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 //import android.app.Fragment;
@@ -13,7 +14,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import java.net.URL;
 
 
 /**
@@ -29,6 +34,7 @@ public class DictionaryPageFragment extends Fragment {
 
     Button searchButton ;
     EditText inputBox ;
+    LinearLayout resultsLinearLayout ;
     String searchTerm;
     String searchPrefix = "define:";
 
@@ -57,6 +63,7 @@ public class DictionaryPageFragment extends Fragment {
             }
         });
         inputBox = (EditText) view.findViewById(R.id.dictionary_search_input);
+        resultsLinearLayout = (LinearLayout) view.findViewById(R.id.dictionary_results_layout);
         return view ;
     }
 
@@ -95,8 +102,12 @@ public class DictionaryPageFragment extends Fragment {
         // check that the EditText isn't blank
         searchTerm = inputBox.getText().toString();
         if(searchTerm.length() > 0) {
-            Log.d(LOG_TAG, "Search button clicked. Starting google search intent");
-            searchGoogle(searchPrefix + searchTerm);
+
+            Log.d(LOG_TAG, "Search button clicked. Trying MW dictionary");
+            searchMWDictionary(searchTerm);
+
+  //          Log.d(LOG_TAG, "Search button clicked. Starting google search intent");
+  //          searchGoogle(searchPrefix + searchTerm);
         } else {
             Toast toast = Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.tutorial_toast_dictionary),Toast.LENGTH_SHORT);
             toast.show();
@@ -110,4 +121,21 @@ public class DictionaryPageFragment extends Fragment {
             startActivity(intent);
         }
     }
+
+    public void searchMWDictionary(String query) {
+        // Search the MerriamWebster dictionary
+        DictionaryMWDownloadDefinition.DictionaryMWDownloadDefinitionListener listener = new DictionaryMWDownloadDefinition.DictionaryMWDownloadDefinitionListener() {
+            @Override
+            public void completionCallBack(String definition) {
+                TextView tv = new TextView(getActivity());
+                tv.setText(definition);
+                resultsLinearLayout.addView(tv);
+
+            }
+        };
+        DictionaryMWDownloadDefinition definition = new DictionaryMWDownloadDefinition(getActivity(),query,listener);
+        definition.execute();
+    }
+
+
 }
