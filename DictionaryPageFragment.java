@@ -2,6 +2,7 @@ package com.thonners.crosswordmaker;
 
 import android.app.Activity;
 import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -97,8 +99,9 @@ public class DictionaryPageFragment extends Fragment {
     }
 
     public void searchClicked() {
-        // Search button clicked
-
+        // Search button clicked. Hide keyboard. & clear any previous results from the results view.
+        hideKeyboard();
+        clearResultsView();
         // check that the EditText isn't blank
         searchTerm = inputBox.getText().toString();
         if(searchTerm.length() > 0) {
@@ -126,16 +129,63 @@ public class DictionaryPageFragment extends Fragment {
         // Search the MerriamWebster dictionary
         DictionaryMWDownloadDefinition.DictionaryMWDownloadDefinitionListener listener = new DictionaryMWDownloadDefinition.DictionaryMWDownloadDefinitionListener() {
             @Override
-            public void completionCallBack(String definition) {
-                TextView tv = new TextView(getActivity());
-                tv.setText(definition);
-                resultsLinearLayout.addView(tv);
+            public void completionCallBack(final ViewGroup theFinalView, final int searchSuccessState) {
+                // Handle what happens to the output from the dictionary here
+                switch (searchSuccessState) {
+                    case DictionaryMWDownloadDefinition.SEARCH_NOT_COMPLETED:
+                        Log.d(LOG_TAG, "Something went wrong with the search. Status returned from DictionaryMWDownloadDefinition as -1");
+                        TextView tv = new TextView(getActivity());
+                        tv.setText(getString(R.string.dictionary_error));
+                        resultsLinearLayout.addView(tv);
+                        break;
+                    case DictionaryMWDownloadDefinition.SEARCH_SUCCESSFUL:
+                        Log.d(LOG_TAG, "Search returned successfully. Showing results...");
+                        resultsLinearLayout.addView(theFinalView);
+                        break;
+                    case DictionaryMWDownloadDefinition.SEARCH_SUGGESTIONS:
+                        Log.d(LOG_TAG, "Search returned with suggestions. Showing prompt...");
+                        // Add the returned view to the answers
+                        resultsLinearLayout.addView(theFinalView);
+                        final TextView promptTV = (TextView) getActivity().findViewById(DictionaryMWDownloadDefinition.PROMPT_TV_ID);
+                        promptTV.setClickable(true);
+                        promptTV.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                // Turn all the hidden TextViews to VISIBLE
+                                Log.d(LOG_TAG, "Prompt clicked. Changing promprt text...");
+                                promptTV.setText(getString(R.string.dictionary_suggestions));
 
+                                Log.d(LOG_TAG, "Setting options to visible");
+                                for (int i = 0; i < theFinalView.getChildCount(); i++) {
+                                    theFinalView.getChildAt(i).setVisibility(View.VISIBLE);
+                                }
+                            }
+                        });
+                        break;
+                    case DictionaryMWDownloadDefinition.SEARCH_NO_SUGGESTIONS:
+                        Log.d(LOG_TAG, "Search returned unsuccessfully, without suggestions. Showing word not found message");
+                        TextView tv2 = new TextView(getActivity());
+                        tv2.setText(getString(R.string.dictionary_word_not_found));
+                        resultsLinearLayout.addView(tv2);
+                        break;
+                }
             }
         };
         DictionaryMWDownloadDefinition definition = new DictionaryMWDownloadDefinition(getActivity(),query,listener);
         definition.execute();
     }
 
+    private void hideKeyboard() {
+    // Method to hide the keyboard
+        InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+    }
+
+    private void clearResultsView() {
+        // Clear any results from the view
+        if (resultsLinearLayout.getChildCount() > 0 ) {
+            resultsLinearLayout.removeAllViews();
+        }
+    }
 
 }
