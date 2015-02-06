@@ -6,17 +6,22 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Space;
 import android.widget.TextView;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by mat on 02/02/15.
@@ -123,8 +128,8 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
         } else if (rawXML.contains(successfulSearchIdentifier)) {
             searchSuccess = SEARCH_SUCCESSFUL;
             // TODO: Properly parse the successful XML
-            TextView newTextView = createTextView(rawXML);
-            view.addView(newTextView);
+            //TextView newTextView = createTextView(rawXML);
+            view.addView(parseSuccessfulXML(rawXML));
         } else {
             searchSuccess = SEARCH_NO_SUGGESTIONS;
         }
@@ -132,11 +137,37 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
         return view ;
     }
 
-    // Default methods for creating hidden and visible TextViews
-    private TextView createHiddenTextView(String textToDisplay) {
-        return createTextView(textToDisplay, false);
+    private ViewGroup parseSuccessfulXML(String xmlRaw) {
+        // Method to turn the raw XML into something useful
+        LinearLayout viewGroup = new LinearLayout(context);
+        viewGroup.setOrientation(LinearLayout.VERTICAL);
+            Log.d(LOG_TAG, "Adding results to the results view");
+
+        XmlParser parser = new XmlParser();
+        try {
+            ArrayList<XmlParser.Entry> entries = parser.parse(xmlRaw);
+            Log.d(LOG_TAG, "Cycling through definitions");
+
+            for (XmlParser.Entry entry : (ArrayList<XmlParser.Entry>) entries) {
+            Log.d(LOG_TAG, "ABABABA");
+                viewGroup.addView(createTextView(entry.getWord()));
+                viewGroup.addView(createTextView(entry.getWordType()));
+                viewGroup.addView(createTextView(entry.getDefinitions().get(0)));
+                viewGroup.addView(createTextView(""));
+            }
+        } catch (Exception e) {
+            Log.d(LOG_TAG, "Was unable to parse the xmlRaw :(");
+            Log.d(LOG_TAG, e.getMessage());
+        }
+
+        return viewGroup;
     }
-    private TextView createTextView(String textToDisplay) {
+
+        // Default methods for creating hidden and visible TextViews
+        private TextView createHiddenTextView(String textToDisplay) {
+            return createTextView(textToDisplay, false);
+        }
+        private TextView createTextView(String textToDisplay) {
         return createTextView(textToDisplay, true);
     }
     // Proper method that creates the TextView and sets its visibility
