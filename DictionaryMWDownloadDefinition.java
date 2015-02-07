@@ -152,7 +152,9 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
             Log.d(LOG_TAG, "ABABABA");
                 viewGroup.addView(createTextView(entry.getWord()));
                 viewGroup.addView(createTextView(entry.getWordType()));
-                viewGroup.addView(createTextView(entry.getDefinitions().get(0)));
+                for (String def : entry.getDefinitions()) {
+                    viewGroup.addView(createTextView(def));
+                }
                 viewGroup.addView(createTextView(""));
             }
         } catch (Exception e) {

@@ -53,6 +53,7 @@ public class XmlParser {
         }
     }
 
+    // DOESN'T WORK ATM
     private String cleanTags(String stringToClean) {
         // Remove any tags that will cause trouble
         ArrayList<String> badTags = new ArrayList<>();
@@ -146,7 +147,10 @@ public class XmlParser {
             if (name.equals(XML_TAG_DEFINITION_NUMBER)) {
                 definitionNumber = readDefinitionNo(parser);
             } else if (name.equals(XML_TAG_DEFINITION)) {
-                definitions.add(definitionNumber + " " + readDefinition(parser));
+                String def = readDefinition(parser);
+                if (!def.matches("")) {
+                    definitions.add(definitionNumber + ": " + def);
+                }
             } else  {
                 skip(parser);
             }
@@ -170,8 +174,24 @@ public class XmlParser {
         String definition = "";
         parser.require(XmlPullParser.START_TAG, ns, XML_TAG_DEFINITION);
         definition = readText(parser);
+         // Skip first character which is always ':'. Put it in manually above to have a space between ':' and definition. If no definition found, return definition to blank so it won't be added to the definitions ArrayList in readDefinitions()
+        if (definition.length() > 1) {
+            definition = definition.substring(1) ; // Skip first character which is always ':'. Put it in manually above to have a space between ':' and definition
+        } else {
+            definition = "";
+        }
+
+        String tagName = parser.getName();
+        while (!tagName.equals(XML_TAG_DEFINITION)) {
+            Log.d(LOG_TAG,"skipping bunf");
+            parser.next();
+            if (parser.getEventType() == XmlPullParser.END_TAG) {
+                tagName = parser.getName();
+            }
+        }
+        Log.d(LOG_TAG,"Definition found: " + definition);
+
         parser.require(XmlPullParser.END_TAG, ns, XML_TAG_DEFINITION);
-        Log.d(LOG_TAG,"Definition for entry found: " + definition);
         return definition ;
     }
 
@@ -181,6 +201,7 @@ public class XmlParser {
         if (parser.next() == XmlPullParser.TEXT) {
             result = parser.getText();
             parser.nextTag();
+            Log.d(LOG_TAG, "Reading text: " + result);
         }
         return result;
     }
