@@ -103,6 +103,7 @@ public class Crossword {
         createGrid();
         createCells();
 
+        initialiseSaveFiles();
     }
 
     public Crossword(Context context, GridLayout gridLayout, String[] savedCrossword) {

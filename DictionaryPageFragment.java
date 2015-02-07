@@ -5,7 +5,6 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 //import android.app.Fragment;
@@ -19,8 +18,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.net.URL;
 
 
 /**
@@ -125,7 +122,7 @@ public class DictionaryPageFragment extends Fragment {
         }
     }
 
-    public void searchMWDictionary(String query) {
+    public void searchMWDictionary(final String query) {
         // Search the MerriamWebster dictionary
         DictionaryMWDownloadDefinition.DictionaryMWDownloadDefinitionListener listener = new DictionaryMWDownloadDefinition.DictionaryMWDownloadDefinitionListener() {
             @Override
@@ -165,7 +162,13 @@ public class DictionaryPageFragment extends Fragment {
                     case DictionaryMWDownloadDefinition.SEARCH_NO_SUGGESTIONS:
                         Log.d(LOG_TAG, "Search returned unsuccessfully, without suggestions. Showing word not found message");
                         TextView tv2 = new TextView(getActivity());
-                        tv2.setText(getString(R.string.dictionary_word_not_found));
+                        tv2.setText(getString(R.string.dictionary_word_not_found) + getString(R.string.dictionary_search_google));
+                        tv2.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                searchGoogle(query);
+                            }
+                        });
                         resultsLinearLayout.addView(tv2);
                         break;
                 }

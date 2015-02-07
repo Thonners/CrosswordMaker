@@ -100,6 +100,8 @@ public class GridMaker extends ActionBarActivity {
         dispatchTakePictureIntent();
         } else {
             crossword = new Crossword(getApplicationContext(), crosswordRowCount, grid, screenWidth, screenHeight);
+            crossword.setTitle(crosswordTitle);
+            crossword.setDate(crosswordDate);
             tutorialToast();
         }
 
@@ -158,7 +160,7 @@ public class GridMaker extends ActionBarActivity {
     private void startCrosswordActivity(){
         // Start the com.thonners.CrosswordMaker.CrosswordActivity
         // Put the crossword in the Intent as an Extra using Crossword.getSaveArray()
-        Intent intent = new Intent(this, CrosswordActivity.class);
+        Intent intent = new Intent(this, CrosswordSliderActivity.class);
         intent.putExtra(Crossword.CROSSWORD_EXTRA, crossword.getSaveArray());
 
         startActivity(intent);
@@ -476,8 +478,8 @@ public class GridMaker extends ActionBarActivity {
         iv.setImageBitmap(scaledBitmap);
 
         crossword = new Crossword(this, crosswordRowCount, grid, screenWidth, screenHeight);
-
-
+        crossword.setTitle(crosswordTitle);
+        crossword.setDate(crosswordDate);
 
         String[] saveArrayTemp = new String[Crossword.SAVE_ARRAY_START_INDEX + (crosswordRowCount * crosswordRowCount)];
         int index = Crossword.SAVE_ARRAY_START_INDEX;   // Index at which to start counting for generating a saveArray

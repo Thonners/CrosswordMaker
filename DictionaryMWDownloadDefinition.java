@@ -127,8 +127,6 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
             }
         } else if (rawXML.contains(successfulSearchIdentifier)) {
             searchSuccess = SEARCH_SUCCESSFUL;
-            // TODO: Properly parse the successful XML
-            //TextView newTextView = createTextView(rawXML);
             view.addView(parseSuccessfulXML(rawXML));
         } else {
             searchSuccess = SEARCH_NO_SUGGESTIONS;
@@ -148,8 +146,7 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
             ArrayList<XmlParser.Entry> entries = parser.parse(xmlRaw);
             Log.d(LOG_TAG, "Cycling through definitions");
 
-            for (XmlParser.Entry entry : (ArrayList<XmlParser.Entry>) entries) {
-            Log.d(LOG_TAG, "ABABABA");
+            for (XmlParser.Entry entry : entries) {
                 viewGroup.addView(createTextView(entry.getWord()));
                 viewGroup.addView(createTextView(entry.getWordType()));
                 for (String def : entry.getDefinitions()) {

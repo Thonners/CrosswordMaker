@@ -27,6 +27,8 @@ public class XmlParser {
     private static final String XML_TAG_DEFINITION_NUMBER = "sn" ;  // Tag which precedes the definition in the XML.
     private static final String XML_TAG_DEFINITION = "dt" ;         // Tag containing the definition
     private static final String XML_TAG_WORD_TYPE = "fl" ;          // Tag denoting verb, noun, etc.
+    private static final String XML_TAG_LINK_1 ="sx";               // Tag with a link to another word. Ignore this in the definition
+    private static final String XML_TAG_LINK_2 ="fw";               // Tag with a link to another word. Ignore this in the definition
 
     // We don't use namespaces
     private static final String ns = null;
@@ -183,8 +185,14 @@ public class XmlParser {
 
         String tagName = parser.getName();
         while (!tagName.equals(XML_TAG_DEFINITION)) {
-            Log.d(LOG_TAG,"skipping bunf");
-            parser.next();
+
+            if(tagName.equals(XML_TAG_LINK_1) || tagName.equals(XML_TAG_LINK_2)) {
+                Log.d(LOG_TAG, "Ignoring link tags, but adding to definition");
+                definition = definition + readText(parser);
+            } else {
+                Log.d(LOG_TAG, "skipping bunf");
+                parser.next();
+            }
             if (parser.getEventType() == XmlPullParser.END_TAG) {
                 tagName = parser.getName();
             }

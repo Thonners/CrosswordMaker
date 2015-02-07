@@ -75,10 +75,23 @@ public class CluePageFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the view
         View view = inflater.inflate(R.layout.fragment_clues, container, false);
+
+        initialise(view);
+
+        return view ;
+    }
+
+    private void initialise(View view) {
         takeCluePhotoButton = (View) view.findViewById(R.id.take_picture_clues_button) ;
+        takeCluePhotoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(LOG_TAG,"Take picture button pressed");
+                dispatchTakePictureIntent();
+            }
+        });
         clueImageView = (ImageView) view.findViewById(R.id.image_view_clues);
         loadClueImage();
-        return view ;
     }
 
     @Override
@@ -114,11 +127,6 @@ public class CluePageFragment extends Fragment {
     }
 
     private void setClueImageInView() {
-        try {
-            clueImageFile = new File(imageFilePath);
-        } catch (Exception e) {
-            Log.e(LOG_TAG,"Couldn't create imageFile. Exception message: " + e.getMessage());
-        }
         Log.d(LOG_TAG, "trying to get the photo from: " + clueImageFile.getAbsolutePath());
         //Show image in clueImageView
         clueImageBitmap = getImage(clueImageFile);
@@ -133,8 +141,14 @@ public class CluePageFragment extends Fragment {
 
     }
     private void loadClueImage() {
+        // Initialise the file required
+        try {
+            clueImageFile = new File(imageFilePath);
+        } catch (Exception e) {
+            Log.e(LOG_TAG,"Couldn't create imageFile. Exception message: " + e.getMessage());
+        }
         // Load clue image if one already exists
-        if (imageFilePath.length() > 10) {
+        if (clueImageFile.length() > 10) {
             setClueImageInView();
         }
     }
