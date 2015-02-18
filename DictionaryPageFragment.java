@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -96,21 +98,27 @@ public class DictionaryPageFragment extends Fragment {
     }
 
     public void searchClicked() {
-        // Search button clicked. Hide keyboard. & clear any previous results from the results view.
-        hideKeyboard();
-        clearResultsView();
-        // check that the EditText isn't blank
-        searchTerm = inputBox.getText().toString();
-        if(searchTerm.length() > 0) {
-
-            Log.d(LOG_TAG, "Search button clicked. Trying MW dictionary");
-            searchMWDictionary(searchTerm);
-
-  //          Log.d(LOG_TAG, "Search button clicked. Starting google search intent");
-  //          searchGoogle(searchPrefix + searchTerm);
+        // Search button clicked. Check internet connected.
+        if (!networkIsAvailable()) {
+            // Toast to say connect to internet
+                Log.d(LOG_TAG, "Search button clicked. Internet connection not detected. Showing toast and doing nothing else...");
+                Toast toast = Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.dictionary_internet_connection_required), Toast.LENGTH_SHORT);
+                toast.show();
         } else {
-            Toast toast = Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.tutorial_toast_dictionary),Toast.LENGTH_SHORT);
-            toast.show();
+            // Hide keyboard. & clear any previous results from the results view.
+            hideKeyboard();
+            clearResultsView();
+            // check that the EditText isn't blank
+            searchTerm = inputBox.getText().toString();
+            if (searchTerm.length() > 0) {
+
+                Log.d(LOG_TAG, "Search button clicked. Trying MW dictionary");
+                searchMWDictionary(searchTerm);
+
+            } else {
+                Toast toast = Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.tutorial_toast_dictionary), Toast.LENGTH_SHORT);
+                toast.show();
+            }
         }
     }
 
@@ -190,5 +198,9 @@ public class DictionaryPageFragment extends Fragment {
             resultsLinearLayout.removeAllViews();
         }
     }
-
+    private boolean networkIsAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
 }

@@ -94,7 +94,7 @@ public class XmlParser {
         parser.require(XmlPullParser.START_TAG, ns, XML_TAG_ENTRY);
         String word = null;
         String wordType = null;
-        String definition = null;
+//        String definition = null; //DELETE ME
         ArrayList<String> definitions = new ArrayList<String>();
 
         while (parser.next() != XmlPullParser.END_TAG) {
@@ -158,7 +158,6 @@ public class XmlParser {
             }
         }
 
-        Log.d(LOG_TAG,"Definitions for entry found: " + definitions.toArray().toString());
         return definitions ;
     }
 

@@ -1,5 +1,6 @@
 package com.thonners.crosswordmaker;
 
+import android.content.Context;
 import android.net.Uri;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -14,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 
@@ -45,6 +47,7 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
         setContentView(R.layout.activity_crosword_slider);
 
         initialise();
+
     }
 
     // onPause called when activity is being shut down. Use it to save the progress
@@ -166,6 +169,11 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
         }
     }
 
+    private void hideKeyboard() {
+        // Method to hide the keyboard
+        InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+    }
 
     public void saveGrid() {
         // Save the grid
