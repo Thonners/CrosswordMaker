@@ -10,8 +10,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,6 +38,7 @@ public class AnagramPageFragment extends Fragment {
 
     Button searchButton ;
     EditText inputBox ;
+    LinearLayout resultsLinearLayout ;
 
     public AnagramPageFragment() {
         // Required empty public constructor
@@ -67,6 +71,7 @@ public class AnagramPageFragment extends Fragment {
             }
         });
         inputBox = (EditText) view.findViewById(R.id.anagram_search_input);
+        resultsLinearLayout = (LinearLayout) view.findViewById(R.id.anagram_results_layout);
         return view ;
     }
 
@@ -101,12 +106,107 @@ public class AnagramPageFragment extends Fragment {
 
     private void toggleSearchButton() {
         //Toggle the function of the search button
-        buttonIsClear = ! buttonIsClear ;
         if (buttonIsClear) {
-            searchButton.setText(getString(R.string.clear));
-        } else {
+            // If button was 'clear' when clicked, clear search/view, and return text to 'search'
+            Log.d(LOG_TAG, "Clearing results and search. ");
+            clearSearchAndResults();
             searchButton.setText(getString(R.string.search));
+        } else {
+            // If button was 'search' when clicked, do search, and change button to 'clear'.
+            Log.d(LOG_TAG, "Searching... ");
+            search();
+            searchButton.setText(getString(R.string.clear));
         }
+        buttonIsClear = ! buttonIsClear ;
+    }
+
+    private void clearSearchAndResults() {
+        // If clear clicked, clear the text from the search, and clear results from the view
+        // Clear text from input box
+        inputBox.setText("");
+        // Clear the results view
+        if (resultsLinearLayout.getChildCount() > 0 ) {
+            resultsLinearLayout.removeAllViews();
+        }
+
+    }
+
+    private void search() {
+        // Search for either anagrams or word fits depending on whether the input text contains a '.'
+
+        Log.d(LOG_TAG, "Checking input... ");
+        // First check input and ignore any non letters or '.'s
+        String searchStringOriginal = inputBox.getText().toString();
+        String searchString = "";
+        boolean containsIllegalCharachters = false ;
+        int j=0;
+        for (int i = 0 ; i < searchStringOriginal.length() ; i++ ) {
+            if (Character.isLetter(searchStringOriginal.toLowerCase().charAt(i)) || searchStringOriginal.substring(i,i+1).matches(".")) {
+                Log.d(LOG_TAG, "Adding '" + searchStringOriginal.substring(i,i+1) + "' to search string (currently = " + searchString + " as this is a valid character for input.");
+                // Acceptable character, so add to array
+                searchString = searchString + searchStringOriginal.substring(i,i+1);
+            } else {
+                Log.d(LOG_TAG, "Illegal character found in input: " + searchStringOriginal.substring(i,i+1));
+                containsIllegalCharachters = true ; // Doesn't matter if this is overwritten multiple times
+            }
+        }
+
+
+        Log.d(LOG_TAG, "Original input string: " + searchStringOriginal + " || Tidied string  = " + searchString);
+
+        if(!containsIllegalCharachters) {
+            if (searchString.contains(".")) {
+                // Search word fit if input contains '.'
+                Log.d(LOG_TAG, "Searching wordFit...");
+                searchWordFit(searchString);
+            } else {
+                Log.d(LOG_TAG, "Searching anagram...");
+                searchAnagram(searchString);
+            }
+        } else {
+            showIllegalCharactersToast();
+        }
+    }
+
+    private void searchWordFit(String input) {
+        // Cycle through dictionary to find it
+        showSearchingToast();
+    }
+
+    private void searchAnagram(String input) {
+        // Order letters, then check if hashset contains a match. If so, print the output options
+        // Sort letters
+        String inputSorted = sortWord(input);
+        // Check if in HashMap
+        if (dictionaryHM.containsKey(inputSorted)) {
+            Log.d(LOG_TAG, "Match found for: " + inputSorted);
+            ArrayList<String> answers = dictionaryHM.get(inputSorted);
+            // Add results to resultsLinearLayout
+            for (String answer : answers) {
+                Log.d(LOG_TAG, "An answer for " + input + " is: " + answer);
+                addToResults(answer);
+            }
+        } else {
+            Log.d(LOG_TAG, "No match found for: " + inputSorted + ", which originally came from " + input);
+            addToResults(getString(R.string.no_match_found));
+        }
+
+    }
+
+    private void addToResults(String result) {
+        Log.d(LOG_TAG, "Adding results TextView for " + result);
+        TextView tv = new TextView(getActivity());
+        tv.setText(result);
+        resultsLinearLayout.addView(tv);
+    }
+
+    private void showSearchingToast() {
+        Toast searchingToast = Toast.makeText(getActivity(),getString(R.string.searching),Toast.LENGTH_LONG);
+        searchingToast.show();
+    }
+    private void showIllegalCharactersToast() {
+        Toast illegalCharactersToast = Toast.makeText(getActivity(), getString(R.string.illegalCharacterToast), Toast.LENGTH_SHORT);
+        illegalCharactersToast.show();
     }
 
     private void loadDictionary() {
@@ -149,12 +249,13 @@ public class AnagramPageFragment extends Fragment {
                 if (word != null) {
                     dictionary.add(word);
                     // Sort the string and add it to the ordered dictionary
-                    char[] wordChars = word.toLowerCase().toCharArray();
+          /*          char[] wordChars = word.toLowerCase().toCharArray();
                     Arrays.sort(wordChars);
                     String sortedWord = new String(wordChars);
                     sortedDictionary.add(sortedWord);
+*/
 
-
+                    String sortedWord = sortWord(word);
                     // Add to the HashMap
                     if (dictionaryHM.containsKey(sortedWord)) {
                         ArrayList<String> possibleWords = dictionaryHM.get(sortedWord);
@@ -171,4 +272,12 @@ public class AnagramPageFragment extends Fragment {
 
         Log.d(LOG_TAG,"Dictionary & HashMap loaded...");
     }
+
+    private String sortWord(String input) {
+        // Sort the letters into alphabetical order
+        char[] wordChars = input.toLowerCase().toCharArray();
+        Arrays.sort(wordChars);
+        return new String(wordChars);
+    }
+
 }
