@@ -1,6 +1,7 @@
 package com.thonners.crosswordmaker;
 
 import android.app.Activity;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -18,6 +20,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 
 public class AnagramPageFragment extends Fragment {
@@ -29,7 +32,7 @@ public class AnagramPageFragment extends Fragment {
 
     private ArrayList<String> dictionary = new ArrayList<String>() ;
     private ArrayList<String[]> dictionaryByLetter= new ArrayList<String[]>() ;
-    private ArrayList<String> sortedDictionary = new ArrayList<String>() ;
+    private ArrayList<ArrayList<String>> dictionaryByLength = new ArrayList<ArrayList<String>>() ;
 
 
     private boolean buttonIsClear  = false ;    // Variable to store whether the button next to the search bar should be 'search' or 'clear'
@@ -99,9 +102,11 @@ public class AnagramPageFragment extends Fragment {
     }
 
     private void searchClicked() {
-        // Do something
-            Log.d(LOG_TAG, "Search button clicked. ");
-        toggleSearchButton();
+        // Clear view ready for results, then search
+        Log.d(LOG_TAG, "Search button clicked. ");
+        hideKeyboard();
+        clearResults();
+        search();
     }
 
     private void toggleSearchButton() {
@@ -109,7 +114,7 @@ public class AnagramPageFragment extends Fragment {
         if (buttonIsClear) {
             // If button was 'clear' when clicked, clear search/view, and return text to 'search'
             Log.d(LOG_TAG, "Clearing results and search. ");
-            clearSearchAndResults();
+            clearSearch() ;
             searchButton.setText(getString(R.string.search));
         } else {
             // If button was 'search' when clicked, do search, and change button to 'clear'.
@@ -120,10 +125,13 @@ public class AnagramPageFragment extends Fragment {
         buttonIsClear = ! buttonIsClear ;
     }
 
-    private void clearSearchAndResults() {
-        // If clear clicked, clear the text from the search, and clear results from the view
+    private void clearSearch() {
+        // If clear clicked, clear the text from the search. Button not yet implemented
         // Clear text from input box
         inputBox.setText("");
+    }
+
+    private void clearResults() {
         // Clear the results view
         if (resultsLinearLayout.getChildCount() > 0 ) {
             resultsLinearLayout.removeAllViews();
@@ -141,7 +149,7 @@ public class AnagramPageFragment extends Fragment {
         boolean containsIllegalCharachters = false ;
         int j=0;
         for (int i = 0 ; i < searchStringOriginal.length() ; i++ ) {
-            if (Character.isLetter(searchStringOriginal.toLowerCase().charAt(i)) || searchStringOriginal.substring(i,i+1).matches(".")) {
+            if (Character.isLetter(searchStringOriginal.toLowerCase().charAt(i)) || searchStringOriginal.charAt(i) == '.') {
                 Log.d(LOG_TAG, "Adding '" + searchStringOriginal.substring(i,i+1) + "' to search string (currently = " + searchString + " as this is a valid character for input.");
                 // Acceptable character, so add to array
                 searchString = searchString + searchStringOriginal.substring(i,i+1);
@@ -158,10 +166,10 @@ public class AnagramPageFragment extends Fragment {
             if (searchString.contains(".")) {
                 // Search word fit if input contains '.'
                 Log.d(LOG_TAG, "Searching wordFit...");
-                searchWordFit(searchString);
+                searchWordFit(searchString.toLowerCase());
             } else {
                 Log.d(LOG_TAG, "Searching anagram...");
-                searchAnagram(searchString);
+                searchAnagram(searchString.toLowerCase());
             }
         } else {
             showIllegalCharactersToast();
@@ -171,6 +179,33 @@ public class AnagramPageFragment extends Fragment {
     private void searchWordFit(String input) {
         // Cycle through dictionary to find it
         showSearchingToast();
+        boolean resultFound = false ;
+
+                Log.d(LOG_TAG, "input = " + input);
+        List<String> dictionaryToSearch ; //= new ArrayList<>();
+        if (input.charAt(0) == '.') {
+            // Search whole dictionary
+                Log.d(LOG_TAG, "searching entire dictionary. Will be slow...");
+            dictionaryToSearch = dictionary ;
+        } else {
+                Log.d(LOG_TAG, "searching words beginning with " + input.charAt(0) + " ...");
+                String[] dic = dictionaryByLetter.get(getLetterIndex(input.charAt(0)));
+
+                dictionaryToSearch = Arrays.asList(dic);
+        }
+        for (String word : dictionaryToSearch) {
+            if (word != null && word.toLowerCase().matches(input)) {
+                Log.d(LOG_TAG, "matched " + word + " to the input: " + input);
+                resultFound = true ;
+                addToResults(word);
+            }
+        }
+
+        if (!resultFound) {
+            Log.d(LOG_TAG, "No match found for: " +  input);
+            addToResults(getString(R.string.no_match_found));
+        }
+
     }
 
     private void searchAnagram(String input) {
@@ -249,12 +284,6 @@ public class AnagramPageFragment extends Fragment {
                 if (word != null) {
                     dictionary.add(word);
                     // Sort the string and add it to the ordered dictionary
-          /*          char[] wordChars = word.toLowerCase().toCharArray();
-                    Arrays.sort(wordChars);
-                    String sortedWord = new String(wordChars);
-                    sortedDictionary.add(sortedWord);
-*/
-
                     String sortedWord = sortWord(word);
                     // Add to the HashMap
                     if (dictionaryHM.containsKey(sortedWord)) {
@@ -278,6 +307,17 @@ public class AnagramPageFragment extends Fragment {
         char[] wordChars = input.toLowerCase().toCharArray();
         Arrays.sort(wordChars);
         return new String(wordChars);
+    }
+
+    private int getLetterIndex(char letter) {
+       String alphabet = "abcdefghijklmnopqrstuvwxyz";
+        return alphabet.indexOf(letter);
+    }
+
+    private void hideKeyboard() {
+    // Method to hide the keyboard
+        InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
 }
