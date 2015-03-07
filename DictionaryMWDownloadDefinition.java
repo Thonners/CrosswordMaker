@@ -1,34 +1,32 @@
 package com.thonners.crosswordmaker;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.Space;
 import android.widget.TextView;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by mat on 02/02/15.
  */
 public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> {
 
-    private static final String LOG_TAG = "DictionaryMWDownloadDefinition" ;
+    private static final String LOG_TAG = "DictionaryMWDownloadDef" ;
     private static final String suggestionIdentifier = "<suggestion>";
     private static final String successfulSearchIdentifier = "<entry id=";
 
@@ -38,6 +36,12 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
     public static final int SEARCH_SUCCESSFUL = 0 ; // For a search which completed successfully
     public static final int SEARCH_SUGGESTIONS = 1; // For an unsuccessful search, but one with suggestions
     public static final int SEARCH_NO_SUGGESTIONS = 2 ; //For an unsuccessful search that's so bad there are no suggestions
+
+    private static final int WORD_NOT_FOUND = -1 ;
+    private static final int WORD = 0 ;
+    private static final int WORD_TYPE = 1 ;
+    private static final int DEFINITION = 2 ;
+    private static final int SUGGESTIONS = 3 ;
 
     public static interface DictionaryMWDownloadDefinitionListener {
         public abstract void completionCallBack(ViewGroup theFinalView, int searchSucessState);
@@ -111,7 +115,7 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
             searchSuccess = SEARCH_SUGGESTIONS ;
             // Make the prompt.
             String wordNotFoundPrompt = context.getResources().getString(R.string.dictionary_word_not_found) + " " + context.getResources().getString(R.string.dictionary_suggestions_prompt);
-            TextView promptTV = createTextView(wordNotFoundPrompt);
+            TextView promptTV = createTextView(wordNotFoundPrompt, WORD_NOT_FOUND);
             promptTV.setId(PROMPT_TV_ID);
             view.addView(promptTV,0);
 
@@ -122,7 +126,7 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
             // Split the results by the <suggestion> tag. First value (at index 0) will not be of interest.
             String[] suggestions = rawXML.split("<suggestion>");
             for (int i = 1 ; i < suggestions.length ; i++ ) {   // Start at 1 as first value is rubbish (see above)
-                TextView newTextView = createHiddenTextView(suggestions[i]);
+                TextView newTextView = createHiddenTextView(suggestions[i], SUGGESTIONS);
                 view.addView(newTextView,i);
             }
         } else if (rawXML.contains(successfulSearchIdentifier)) {
@@ -147,12 +151,12 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
             Log.d(LOG_TAG, "Cycling through definitions");
 
             for (XmlParser.Entry entry : entries) {
-                viewGroup.addView(createTextView(entry.getWord()));
-                viewGroup.addView(createTextView(entry.getWordType()));
+                viewGroup.addView(createTextView(entry.getWord(), WORD));
+                viewGroup.addView(createTextView(entry.getWordType(), WORD_TYPE));
                 for (String def : entry.getDefinitions()) {
-                    viewGroup.addView(createTextView(def));
+                    viewGroup.addView(createTextView(def, DEFINITION));
                 }
-                viewGroup.addView(createTextView(""));
+                viewGroup.addView(createTextView("",DEFINITION));
             }
         } catch (Exception e) {
             Log.d(LOG_TAG, "Was unable to parse the xmlRaw :(");
@@ -163,14 +167,14 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
     }
 
         // Default methods for creating hidden and visible TextViews
-        private TextView createHiddenTextView(String textToDisplay) {
-            return createTextView(textToDisplay, false);
+        private TextView createHiddenTextView(String textToDisplay, int displayType) {
+            return createTextView(textToDisplay, false, displayType);
         }
-        private TextView createTextView(String textToDisplay) {
-        return createTextView(textToDisplay, true);
+        private TextView createTextView(String textToDisplay, int displayType) {
+        return createTextView(textToDisplay, true, displayType);
     }
     // Proper method that creates the TextView and sets its visibility
-    private TextView createTextView(String textToDisplay, boolean createVisible) {
+    private TextView createTextView(String textToDisplay, boolean createVisible, int displayType) {
         TextView tv = new TextView(context);
         tv.setText(textToDisplay);
         // Put other standard settings in here, such as padding, or an xml file to use
@@ -180,6 +184,32 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
         } else {
             tv.setVisibility(View.INVISIBLE);
         }
+
+        float textSize = 0 ;
+
+        // Get settings for each word type
+        switch (displayType) {
+            case WORD:  // Bold
+                tv.setTypeface(null, Typeface.BOLD);
+                textSize = context.getResources().getDimension(R.dimen.dictionary_word);
+                break;
+            case WORD_TYPE: // Italic
+                tv.setTypeface(null, Typeface.ITALIC);
+                textSize = context.getResources().getDimension(R.dimen.dictionary_word_type);
+                break;
+            case DEFINITION: // Normal
+                textSize = context.getResources().getDimension(R.dimen.dictionary_definition);
+                break;
+            case WORD_NOT_FOUND: // Bold + bigger?
+                tv.setTypeface(null, Typeface.BOLD);
+                textSize = context.getResources().getDimension(R.dimen.dictionary_word_not_found);
+                break;
+            case SUGGESTIONS: // Normal?
+                textSize = context.getResources().getDimension(R.dimen.dictionary_suggestion);
+                break;
+        }
+        // Set size
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
 
         return tv ;
     }

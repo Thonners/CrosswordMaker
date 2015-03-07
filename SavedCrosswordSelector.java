@@ -1,16 +1,23 @@
 package com.thonners.crosswordmaker;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -21,16 +28,10 @@ import java.util.Date;
 
 public class SavedCrosswordSelector extends ActionBarActivity  {
 
-    private static final String LOG_TAG = "Saved Crossword Selector" ;
+    private static final String LOG_TAG = "SavedCrosswordSelector" ;
 
     File[] savedCrosswords ;    // Note that this is the directory in which the crossword and images (if they exist) will be saved
     File rootDir;
-
-    int viewIndexCounter;
-    int sidePadding ;
-    int verticalPadding ;
-
-    Drawable defaultBackground ; //= getResources().getDrawable(R.drawable.cell_white) ;    // TODO: change this to specific drawable when created
 
     LinearLayout layout ;
 
@@ -41,15 +42,9 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
 
         layout = (LinearLayout) findViewById(R.id.saved_selector_layout);
 
-        sidePadding = (int) getResources().getDimension(R.dimen.saved_crossword_layout_side_padding);
-        verticalPadding = (int) getResources().getDimension(R.dimen.saved_crossword_layout_vertical_padding);
-
-        defaultBackground = getResources().getDrawable(R.drawable.cell_white) ;    // TODO: change this to specific drawable when created
-
         getSavedFiles();
         displaySavedFiles() ;
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -99,14 +94,11 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
                 String crosswordDateSaveFormat = crosswordDetails[0];
                 String crosswordName = crosswordDetails[1].replaceAll("__", "-").replaceAll("_", " ");   // Replace all used to restore any hyphens/spaces that were taken out during the fileName assignment in Crossword.initialiseSaveFiles
 
-                addCrosswordToLayout(i, "Name: " + crosswordName + "; Date: " + getNiceDate(crosswordDateSaveFormat));
+                addCrosswordToLayout(i, crosswordName, getNiceDate(crosswordDateSaveFormat), getPercentageComplete(savedCrosswords[i]));
             }
         }
 
     }
-
-
-
     private String getNiceDate(String dateIn) {
         // Turn date from save file into easier to read date
         SimpleDateFormat sdf = new SimpleDateFormat(Crossword.SAVE_DATE_FORMAT);    // Format of how date is input
@@ -123,26 +115,88 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
 
         return dateFormat.format(date);
     }
+    private String getPercentageComplete(File crosswordDir) {
+        // Return the percentage of the crossword that's complete (based on number of blanks in the file)
+        File crosswordFile = new File(crosswordDir, Crossword.SAVE_CROSSWORD_FILE_NAME);
+        if (crosswordFile == null) {
+            Log.d(LOG_TAG, "Error finding crossword file in  " + crosswordDir.getName());
+            return "Error finding file" ;
+        }
+        Log.d(LOG_TAG, "Calculating percentage completion for " + crosswordDir.getName());
 
-    private void addCrosswordToLayout(int index, String text) {
+        String[] crosswordArray = Crossword.getSaveArray(crosswordFile);
+        int cells = 0, nonBlanks = 0 ; // Integers to count with
+        for (int i = Crossword.SAVE_ARRAY_START_INDEX ; i < crosswordArray.length ; i++) {
+            // If a black cell, don't include it in the counting
+            if (!crosswordArray[i].matches("-")) {
+                cells++ ;
+                // Check to see whether the cell is empty or filled
+                if (!crosswordArray[i].matches("")) {
+                    nonBlanks++;
+                }
+            }
+        }
 
-        TextView tv = new TextView(this);
+        Log.d(LOG_TAG, "Number of cells: " + cells + " & number of nonBlanks = " + nonBlanks);
 
-        tv.setText(text) ;
-        tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-        tv.setPadding(sidePadding, verticalPadding, sidePadding, verticalPadding);
-        tv.setBackground(defaultBackground);
-        tv.setId(index); // Not sure if this is required or not yet
-        tv.setOnClickListener(new View.OnClickListener() {
+        int percentage = (int) (nonBlanks * 100) / cells ;
+
+        return getString(R.string.completion) + " " + percentage  + "%";
+    }
+    private void addCrosswordToLayout(int index, String name, String date, String percentageComplete) {
+
+        // Card view to hold all the views
+        CardView cardView = new CardView(this);
+        cardView.setId(index);
+        cardView.setMinimumHeight(getResources().getDimensionPixelOffset(R.dimen.card_default_height));
+
+        // Relative layout to allow positioning of the views
+        RelativeLayout rl = new RelativeLayout(this);
+        rl.setPadding(getResources().getDimensionPixelOffset(R.dimen.home_card_padding),getResources().getDimensionPixelOffset(R.dimen.home_card_padding),getResources().getDimensionPixelOffset(R.dimen.home_card_padding),getResources().getDimensionPixelOffset(R.dimen.home_card_padding));
+        cardView.addView(rl);
+
+        // Text views
+        TextView tvName = new TextView(this);       // Title/publication of the crossword
+        TextView tvDate = new TextView(this);       // Date of the crossword
+        TextView tvPcComplete = new TextView(this);   // Percentage complete
+
+        // Name
+        tvName.setText(name) ;
+        tvName.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+        tvName.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.home_card_text_size_main));
+        tvName.setTypeface(null, Typeface.BOLD);
+        tvName.setId(index + 1000); // Unlikely to have 1000 crosswords stored, so should keep ID's unique. Same applies below
+        RelativeLayout.LayoutParams lpName = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
+        lpName.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        // Date
+        tvDate.setText(date);
+        tvDate.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+        tvDate.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.home_card_text_size_minor));
+        tvDate.setId(index + 10000);
+        RelativeLayout.LayoutParams lpDate = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
+        lpDate.addRule(RelativeLayout.BELOW, tvName.getId());
+        // Percentage Complete
+        tvPcComplete.setText(percentageComplete);
+        tvPcComplete.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+        tvPcComplete.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.home_card_text_size_minor));
+        tvPcComplete.setTypeface(null, Typeface.ITALIC);
+        tvPcComplete.setId(index + 100000);
+        RelativeLayout.LayoutParams lpPcComplete = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
+        lpPcComplete.addRule(RelativeLayout.BELOW, tvName.getId());
+        lpPcComplete.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+
+        rl.addView(tvName, lpName);
+        rl.addView(tvDate, lpDate);
+        rl.addView(tvPcComplete, lpPcComplete);
+        cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 crosswordSelected(v);
             }
         });
-        layout.addView(tv);
+        layout.addView(cardView);
 
     }
-
     private void crosswordSelected(View view) {
         int i = view.getId() ;  // get index of save file
 
@@ -172,9 +226,16 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
     }
 
     private void startNewCrosswordActivity(String[] savedCrossword) {
+        showLoadingToast();
         // Start new crossword activity
         Intent crosswordActivity = new Intent(this, CrosswordSliderActivity.class);
         crosswordActivity.putExtra(Crossword.CROSSWORD_EXTRA, savedCrossword);
         startActivity(crosswordActivity);
+    }
+
+    private void showLoadingToast() {
+        // Display loading toast as load can take a while
+        Toast loadingToast = Toast.makeText(this, getString(R.string.loading), Toast.LENGTH_LONG);
+        loadingToast.show();
     }
 }

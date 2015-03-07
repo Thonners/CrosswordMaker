@@ -151,7 +151,12 @@ public class XmlParser {
             } else if (name.equals(XML_TAG_DEFINITION)) {
                 String def = readDefinition(parser);
                 if (!def.matches("")) {
-                    definitions.add(definitionNumber + ": " + def);
+                    if (definitionNumber.matches("")) {
+                        Log.d(LOG_TAG,"No definition number found, so assuming there's only one option");
+                        definitions.add(def);
+                    } else {
+                        definitions.add(definitionNumber + ": " + def);
+                    }
                 }
             } else  {
                 skip(parser);
@@ -229,7 +234,7 @@ public class XmlParser {
             break;
         }
     }
- }
+    }
 
     public static class Entry {
         public String word ;

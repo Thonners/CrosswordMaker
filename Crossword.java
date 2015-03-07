@@ -558,7 +558,7 @@ public class Crossword {
 
     private void initialiseSaveFiles() {
         // Format File name
-        fileName = date + "-" + title.replaceAll(" ","_").replaceAll("-","__").toLowerCase() ;
+        fileName = date + "-" + title.replaceAll(" ","_").replaceAll("-","__"); //.toLowerCase() ; // Delete this if it works
         // Create the save files/directories
         // Directory
         saveDir = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),fileName);

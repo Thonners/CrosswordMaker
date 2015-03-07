@@ -36,7 +36,8 @@ public class HomeActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+      //  setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_home_material);
     }
 
 
@@ -62,8 +63,11 @@ public class HomeActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void toolkitClicked(View view) {
+        // Open just a toolkit activity
+    }
 
-    public void oldClicked(View view) {
+    public void savedClicked(View view) {
         // Toast to say do new one
         Intent intent = new Intent(this, SavedCrosswordSelector.class);
 
@@ -77,6 +81,15 @@ public class HomeActivity extends ActionBarActivity {
         popupPublicationDialogOptions();
 
     }
+
+    public void recentClicked(View view) {
+        // Deal with user clicking on a recent crossword
+    }
+    public void settingsClicked(View view) {
+        // Show some settings options?
+    }
+
+
 
     private void startNewCrossword() {
         Intent intent = new Intent(this, NewCrossword.class);
