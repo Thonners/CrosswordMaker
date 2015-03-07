@@ -65,12 +65,13 @@ public class HomeActivity extends ActionBarActivity {
 
     public void toolkitClicked(View view) {
         // Open just a toolkit activity
+        Intent intent = new Intent(this, ToolkitSliderActivity.class);
+        startActivity(intent);
     }
 
     public void savedClicked(View view) {
         // Toast to say do new one
         Intent intent = new Intent(this, SavedCrosswordSelector.class);
-
         startActivity(intent);
 
     }
@@ -88,8 +89,6 @@ public class HomeActivity extends ActionBarActivity {
     public void settingsClicked(View view) {
         // Show some settings options?
     }
-
-
 
     private void startNewCrossword() {
         Intent intent = new Intent(this, NewCrossword.class);
