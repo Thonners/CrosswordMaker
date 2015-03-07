@@ -115,7 +115,7 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
 
         return dateFormat.format(date);
     }
-    private String getPercentageComplete(File crosswordDir) {
+    public String getPercentageComplete(File crosswordDir) {
         // Return the percentage of the crossword that's complete (based on number of blanks in the file)
         File crosswordFile = new File(crosswordDir, Crossword.SAVE_CROSSWORD_FILE_NAME);
         if (crosswordFile == null) {
