@@ -3,6 +3,7 @@ package com.thonners.crosswordmaker;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -110,6 +111,7 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
         // Turn the raw XML into a view
         LinearLayout view = new LinearLayout(context);
         view.setOrientation(LinearLayout.VERTICAL);
+        //view.setPadding(context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding),context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding),context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding),context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding));
         if (rawXML.contains(suggestionIdentifier)) {
             // Then the word was not found. Create a linear layout with multiple TextViews, one on top of the other. Hide all text views of suggested words to stop accidental cheating.
             searchSuccess = SEARCH_SUGGESTIONS ;
@@ -151,18 +153,24 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
             Log.d(LOG_TAG, "Cycling through definitions");
 
             for (XmlParser.Entry entry : entries) {
-                viewGroup.addView(createTextView(entry.getWord(), WORD));
-                viewGroup.addView(createTextView(entry.getWordType(), WORD_TYPE));
+                CardView card = new CardView(context);
+                LinearLayout linearLayout = new LinearLayout(context);
+                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                linearLayout.addView(createTextView(entry.getWord(), WORD));
+                linearLayout.addView(createTextView(entry.getWordType(), WORD_TYPE));
                 for (String def : entry.getDefinitions()) {
-                    viewGroup.addView(createTextView(def, DEFINITION));
+                    linearLayout.addView(createTextView(def, DEFINITION));
                 }
-                viewGroup.addView(createTextView("",DEFINITION));
+                //linearLayout.addView(createTextView("",DEFINITION));
+                card.addView(linearLayout);
+                viewGroup.addView(card);
             }
         } catch (Exception e) {
             Log.d(LOG_TAG, "Was unable to parse the xmlRaw :(");
             Log.d(LOG_TAG, e.getMessage());
         }
 
+    //    card.setPadding(context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding),context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding),context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding),context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding));
         return viewGroup;
     }
 
