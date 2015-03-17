@@ -161,7 +161,7 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
                 for (String def : entry.getDefinitions()) {
                     linearLayout.addView(createTextView(def, DEFINITION));
                 }
-                //linearLayout.addView(createTextView("",DEFINITION));
+                linearLayout.setPadding(context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding),context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding),context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding),context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding));
                 card.addView(linearLayout);
                 viewGroup.addView(card);
             }
@@ -170,7 +170,7 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
             Log.d(LOG_TAG, e.getMessage());
         }
 
-    //    card.setPadding(context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding),context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding),context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding),context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding));
+
         return viewGroup;
     }
 
