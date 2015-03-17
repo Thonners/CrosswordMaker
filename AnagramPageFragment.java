@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -230,9 +231,12 @@ public class AnagramPageFragment extends Fragment {
 
     private void addToResults(String result) {
         Log.d(LOG_TAG, "Adding results TextView for " + result);
+        CardView cardView = new CardView(getActivity());
         TextView tv = new TextView(getActivity());
         tv.setText(result);
-        resultsLinearLayout.addView(tv);
+        tv.setPadding(getResources().getDimensionPixelOffset(R.dimen.home_card_padding),getResources().getDimensionPixelOffset(R.dimen.home_card_padding),getResources().getDimensionPixelOffset(R.dimen.home_card_padding),getResources().getDimensionPixelOffset(R.dimen.home_card_padding));
+        cardView.addView(tv);
+        resultsLinearLayout.addView(cardView);
     }
 
     private void showSearchingToast() {
