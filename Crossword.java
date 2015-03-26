@@ -556,7 +556,7 @@ public class Crossword {
         }
     }
 
-    private void initialiseSaveFiles() {
+    public void initialiseSaveFiles() {
         // Format File name
         fileName = date + "-" + title.replaceAll(" ","_").replaceAll("-","__"); //.toLowerCase() ; // Delete this if it works
         // Create the save files/directories

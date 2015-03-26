@@ -59,6 +59,12 @@ public class CrosswordPageFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(LOG_TAG,"onResume called. Initialising save Files");
+        crossword.initialiseSaveFiles();
+    }
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
