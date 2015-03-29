@@ -3,6 +3,7 @@ package com.thonners.crosswordmaker;
 import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
@@ -58,7 +59,10 @@ public class AnagramPageFragment extends Fragment {
         // Log how long it takes to load the dictionary
         long startTime = System.currentTimeMillis() ;
         Log.d(LOG_TAG,"AnagramPageFragment onCreate called @ millis: " + startTime);
-        loadDictionary();
+
+        LoadDictionaryTask loadDictionaryTask = new LoadDictionaryTask();
+        loadDictionaryTask.execute();
+
         long stopTime = System.currentTimeMillis();
         Log.d(LOG_TAG,"Dictionary loaded after " + (stopTime - startTime) + " millis");
     }
@@ -339,6 +343,19 @@ public class AnagramPageFragment extends Fragment {
     }
 
 
+    private class LoadDictionaryTask extends AsyncTask<Void,Void,String> {
+        // Load the dictionary in the background to prevent hanging the main thread
+    @Override
+    protected String doInBackground(Void... params) {
+        Log.d(LOG_TAG," Reading the dictionary in background...");
+
+        loadDictionary();
+        Log.d(LOG_TAG, " Dictionary loaded in background!");
+
+        return null ;
+    }
+
+    }
 
 
 }
