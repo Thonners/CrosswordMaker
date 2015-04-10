@@ -16,11 +16,14 @@ import android.widget.Toast;
 /**
  * Created by mat on 07/03/15.
  */
-public class ToolkitSliderActivity extends ActionBarActivity implements DictionaryPageFragment.OnFragmentInteractionListener, AnagramPageFragment.OnFragmentInteractionListener, DoodlePageFragment.OnFragmentInteractionListener {
+public class ToolkitSliderActivity extends ActionBarActivity implements DictionaryPageFragment.OnFragmentInteractionListener, AnagramPageFragment.OnAnagramFragmentListener, DoodlePageFragment.OnFragmentInteractionListener {
 
     private static final String LOG_TAG = "ToolkitSliderActivity";
 
-    private static final int NUM_PAGES = 3;     // Number of pages in the slider
+    private static final int NUM_PAGES      = 3;     // Number of pages in the slider
+    private static final int DICTIONARY_TAB = 0 ;
+    private static final int ANAGRAM_TAB    = 1 ;
+    private static final int DOODLE_TAB     = 2 ;
 
     private ViewPager pager ;               // Handles the transition between fragments
     private PagerAdapter pagerAdapter ;     // Provides the pages for the pager
@@ -101,13 +104,13 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
         public Fragment getItem(int position) {
 
             switch (position) {
-                case 0:
+                case DICTIONARY_TAB:
                     dictionaryPageFragment = new DictionaryPageFragment() ;
                     return dictionaryPageFragment;
-                case 1:
+                case ANAGRAM_TAB:
                     anagramPageFragment = new AnagramPageFragment();
                     return anagramPageFragment;
-                case 2:
+                case DOODLE_TAB:
                     doodlePageFragment = new DoodlePageFragment();
                     return doodlePageFragment;
             }
@@ -125,6 +128,18 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
         public CharSequence getPageTitle(int position) {
             return tabTitles[position];
         }
+    }
+
+    public void searchDictionary(String searchTerm) {
+        // Search the dictionary:
+        Log.d(LOG_TAG, "Searching for dictionary from Slider Activity for word: " + searchTerm);
+
+        // Set text in search box to match that of searchTerm
+        dictionaryPageFragment.setSearchTerm(searchTerm);
+        // Run search
+        dictionaryPageFragment.searchClicked();
+        // Change to dictionary tab
+        pager.setCurrentItem(DICTIONARY_TAB, true);
     }
 
 }

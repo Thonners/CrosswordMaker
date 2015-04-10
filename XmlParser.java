@@ -25,6 +25,7 @@ public class XmlParser {
     private static final String XML_TAG_WORD = "ew" ;               // Word to be defined
     private static final String XML_TAG_DEFINITION_ZONE = "def" ;   // Tag containing the definition
     private static final String XML_TAG_DEFINITION_NUMBER = "sn" ;  // Tag which precedes the definition in the XML.
+    private static final String XML_TAG_DEFINITION_NUMBER2 = "snp" ;  // Tag which precedes the definition in the XML.
     private static final String XML_TAG_DEFINITION = "dt" ;         // Tag containing the definition
     private static final String XML_TAG_WORD_TYPE = "fl" ;          // Tag denoting verb, noun, etc.
     private static final String XML_TAG_LINK_1 ="sx";               // Tag with a link to another word. Ignore this in the definition
@@ -94,7 +95,6 @@ public class XmlParser {
         parser.require(XmlPullParser.START_TAG, ns, XML_TAG_ENTRY);
         String word = null;
         String wordType = null;
-//        String definition = null; //DELETE ME
         ArrayList<String> definitions = new ArrayList<String>();
 
         while (parser.next() != XmlPullParser.END_TAG) {
@@ -168,9 +168,39 @@ public class XmlParser {
 
     private String readDefinitionNo(XmlPullParser parser)throws IOException, XmlPullParserException {
     // Extract the value from within the tag
+      String definitionNo = "" ;
+    while (parser.getEventType() != XmlPullParser.END_TAG && parser.getName() != XML_TAG_DEFINITION_NUMBER) {
+/*
+        Log.d(LOG_TAG,"DefinitionNo search ongoing " );
+        if (parser.getEventType() == XmlPullParser.TEXT) {
+            definitionNo = definitionNo + parser.getText();
+        Log.d(LOG_TAG,"DefinitionNo for entry found: " + definitionNo);
+        }
+
+        try {
+            parser.require(XmlPullParser.END_TAG, ns, XML_TAG_DEFINITION_NUMBER);
+            break ;
+        } catch (Exception e) {
+
+        }
+        parser.next();
+
+    }
+  */
+        if (parser.getEventType() != XmlPullParser.START_TAG) {
+            continue;
+        }
+        String name = parser.getName();
+        if (name.equals(XML_TAG_DEFINITION_NUMBER)) {
+           definitionNo = readText(parser);
+        } else if (name.equals(XML_TAG_DEFINITION_NUMBER2)) {
+           definitionNo = definitionNo + readText(parser);
+        }
+    }
+        /*
         parser.require(XmlPullParser.START_TAG, ns, XML_TAG_DEFINITION_NUMBER);
-        String definitionNo = readText(parser);
-        parser.require(XmlPullParser.END_TAG, ns, XML_TAG_DEFINITION_NUMBER);
+        definitionNo = readText(parser);
+        parser.require(XmlPullParser.END_TAG, ns, XML_TAG_DEFINITION_NUMBER);       //*/
         Log.d(LOG_TAG,"DefinitionNo for entry found: " + definitionNo);
         return definitionNo ;
     }
@@ -181,7 +211,7 @@ public class XmlParser {
         parser.require(XmlPullParser.START_TAG, ns, XML_TAG_DEFINITION);
         definition = readText(parser);
          // Skip first character which is always ':'. Put it in manually above to have a space between ':' and definition. If no definition found, return definition to blank so it won't be added to the definitions ArrayList in readDefinitions()
-        if (definition.length() > 1) {
+        if (definition.startsWith(":")) {
             definition = definition.substring(1) ; // Skip first character which is always ':'. Put it in manually above to have a space between ':' and definition
         } else {
             definition = "";

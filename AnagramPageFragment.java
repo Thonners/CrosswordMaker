@@ -40,7 +40,7 @@ public class AnagramPageFragment extends Fragment {
 
     private boolean buttonIsClear  = false ;    // Variable to store whether the button next to the search bar should be 'search' or 'clear'
 
-    private OnFragmentInteractionListener mListener;
+    private OnAnagramFragmentListener mListener;
 
     Button searchButton ;
     EditText inputBox ;
@@ -89,10 +89,10 @@ public class AnagramPageFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (OnFragmentInteractionListener) activity;
+            mListener = (OnAnagramFragmentListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnAnagramFragmentListener");
         }
     }
 
@@ -102,9 +102,9 @@ public class AnagramPageFragment extends Fragment {
         mListener = null;
     }
 
-    public interface OnFragmentInteractionListener {
+    public interface OnAnagramFragmentListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
+        public void searchDictionary(String searchTerm);
     }
 
     private void searchClicked() {
@@ -339,7 +339,8 @@ public class AnagramPageFragment extends Fragment {
 
     private void searchDictionary(String searchTerm) {
         // Search dictionary in DictionaryFragment
-        Log.d(LOG_TAG,"Searching for: " + searchTerm);
+        Log.d(LOG_TAG,"Try to search for: " + searchTerm);
+        mListener.searchDictionary(searchTerm);
     }
 
 

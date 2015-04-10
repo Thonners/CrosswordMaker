@@ -19,11 +19,16 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 
-public class CrosswordSliderActivity extends ActionBarActivity implements CrosswordPageFragment.OnFragmentInteractionListener, CluePageFragment.OnFragmentInteractionListener, DictionaryPageFragment.OnFragmentInteractionListener, AnagramPageFragment.OnFragmentInteractionListener, DoodlePageFragment.OnFragmentInteractionListener {
+public class CrosswordSliderActivity extends ActionBarActivity implements CrosswordPageFragment.OnFragmentInteractionListener, CluePageFragment.OnFragmentInteractionListener, DictionaryPageFragment.OnFragmentInteractionListener, AnagramPageFragment.OnAnagramFragmentListener, DoodlePageFragment.OnFragmentInteractionListener {
 
     private static final String LOG_TAG = "CrosswordSliderActivity";
 
-    private static final int NUM_PAGES = 5 ;    // Number of slidable view/pages. Crossword, Clues, Anagram, Dictionary, Doodle.
+    private static final int NUM_PAGES      = 5 ;    // Number of slidable view/pages. Crossword, Clues, Anagram, Dictionary, Doodle.
+    private static final int CROSSWORD_TAB  = 0 ;
+    private static final int CLUE_TAB       = 1 ;
+    private static final int DICTIONARY_TAB = 2 ;
+    private static final int ANAGRAM_TAB    = 3 ;
+    private static final int DOODLE_TAB     = 4 ;
 
     private ViewPager pager ;               // This handles the animation/transition between pages
     private PagerAdapter pagerAdapter ;     // This provides the pages for the PagerAdapter.
@@ -137,19 +142,19 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
         public Fragment getItem(int position) {
 
             switch (position) {
-                case 0:
+                case CROSSWORD_TAB:
                     crosswordPageFragment = CrosswordPageFragment.newInstance(position,crosswordStringArray);
                     return crosswordPageFragment ;
-                case 1:
+                case CLUE_TAB:
                     cluePageFragment = CluePageFragment.newInstance(crosswordStringArray[Crossword.SAVED_ARRAY_INDEX_CLUE_IMAGE]);
                     return cluePageFragment ;
-                case 2:
+                case DICTIONARY_TAB:
                     dictionaryPageFragment = new DictionaryPageFragment() ;
                     return dictionaryPageFragment;
-                case 3:
+                case ANAGRAM_TAB:
                     anagramPageFragment = new AnagramPageFragment();
                     return anagramPageFragment;
-                case 4:
+                case DOODLE_TAB:
                     doodlePageFragment = new DoodlePageFragment();
                     return doodlePageFragment;
             }
@@ -187,5 +192,18 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
         Toast t = Toast.makeText(this, "Will create a settings option soon", Toast.LENGTH_SHORT);
         t.show();
     }
+
+    public void searchDictionary(String searchTerm) {
+        // Search the dictionary:
+        Log.d(LOG_TAG, "Searching for dictionary from Slider Activity for word: " + searchTerm);
+
+        // Set text in search box to match that of searchTerm
+        dictionaryPageFragment.setSearchTerm(searchTerm);
+        // Run search
+        dictionaryPageFragment.searchClicked();
+        // Change to dictionary tab
+        pager.setCurrentItem(DICTIONARY_TAB, true);
+    }
+
 
 }

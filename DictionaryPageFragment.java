@@ -113,6 +113,7 @@ public class DictionaryPageFragment extends Fragment {
             if (searchTerm.length() > 0) {
 
                 Log.d(LOG_TAG, "Search button clicked. Trying MW dictionary");
+                showSearchingToast();
                 searchMWDictionary(searchTerm);
 
             } else {
@@ -203,4 +204,14 @@ public class DictionaryPageFragment extends Fragment {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
+
+    public void setSearchTerm(String searchTerm) {
+        inputBox.setText(searchTerm);
+    }
+
+    public void showSearchingToast() {
+        Toast searchingToast = Toast.makeText(getActivity(), getString(R.string.searching), Toast.LENGTH_SHORT);
+        searchingToast.show();
+    }
+
 }

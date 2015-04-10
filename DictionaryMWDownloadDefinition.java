@@ -33,7 +33,7 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
 
     public static final int PROMPT_TV_ID = 2357911 ;
 
-    public static final int SEARCH_NOT_COMPLETED = -1 ; // Initialise to this value, so if cancelled before proper value can be set, it will be known.
+    public static final int SEARCH_NOT_COMPLETED = -1 ; // Initialise to this value, so if cancelled before proper value can be set, it will be known. Also use if search failed for some other reason.
     public static final int SEARCH_SUCCESSFUL = 0 ; // For a search which completed successfully
     public static final int SEARCH_SUGGESTIONS = 1; // For an unsuccessful search, but one with suggestions
     public static final int SEARCH_NO_SUGGESTIONS = 2 ; //For an unsuccessful search that's so bad there are no suggestions
@@ -168,6 +168,7 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
         } catch (Exception e) {
             Log.d(LOG_TAG, "Was unable to parse the xmlRaw :(");
             Log.d(LOG_TAG, e.getMessage());
+            searchSuccess = SEARCH_NOT_COMPLETED;
         }
 
 
