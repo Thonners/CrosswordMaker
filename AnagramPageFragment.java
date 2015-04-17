@@ -209,7 +209,7 @@ public class AnagramPageFragment extends Fragment {
 
         if (!resultFound) {
             Log.d(LOG_TAG, "No match found for: " +  input);
-            addToResults(getString(R.string.no_match_found));
+            addToResults(getString(R.string.no_match_found), false);
         }
 
     }
@@ -229,26 +229,35 @@ public class AnagramPageFragment extends Fragment {
             }
         } else {
             Log.d(LOG_TAG, "No match found for: " + inputSorted + ", which originally came from " + input);
-            addToResults(getString(R.string.no_match_found));
+            addToResults(getString(R.string.no_match_found), false);
         }
 
     }
 
     private void addToResults(String result) {
+        // Default to search dictionary if result returned
+        addToResults(result,true);
+    }
+    private void addToResults(String result, boolean searchDictionary) {
         Log.d(LOG_TAG, "Adding results TextView for " + result);
         CardView cardView = new CardView(getActivity());
         TextView tv = new TextView(getActivity());
-        tv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TextView tv = (TextView) v ;
-                searchDictionary(tv.getText().toString());
-            }
-        });
+
+        if (searchDictionary) {
+            tv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    TextView tv = (TextView) v;
+                    searchDictionary(tv.getText().toString());
+                }
+            });
+        }
+
         tv.setText(result);
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_PX,getResources().getDimension(R.dimen.dictionary_word));
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.dictionary_word));
         tv.setPadding(getResources().getDimensionPixelOffset(R.dimen.home_card_padding), getResources().getDimensionPixelOffset(R.dimen.home_card_padding), getResources().getDimensionPixelOffset(R.dimen.home_card_padding), getResources().getDimensionPixelOffset(R.dimen.home_card_padding));
         cardView.addView(tv);
+
         resultsLinearLayout.addView(cardView);
     }
 
