@@ -147,6 +147,7 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
 
         // Card view to hold all the views
         CardView cardView = new CardView(this);
+        cardView.setUseCompatPadding(true);
         cardView.setId(index);
         cardView.setMinimumHeight(getResources().getDimensionPixelOffset(R.dimen.card_default_height));
 

@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 //import android.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -170,15 +171,19 @@ public class DictionaryPageFragment extends Fragment {
                         break;
                     case DictionaryMWDownloadDefinition.SEARCH_NO_SUGGESTIONS:
                         Log.d(LOG_TAG, "Search returned unsuccessfully, without suggestions. Showing word not found message");
+                        CardView cardView = new CardView(getActivity());
+                        cardView.setUseCompatPadding(true);
                         TextView tv2 = new TextView(getActivity());
-                        tv2.setText(getString(R.string.dictionary_word_not_found) + getString(R.string.dictionary_search_google));
+                        tv2.setText(getString(R.string.dictionary_word_not_found) +" " + getString(R.string.dictionary_search_google));
                         tv2.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 searchGoogle(query);
                             }
                         });
-                        resultsLinearLayout.addView(tv2);
+                        cardView.addView(tv2);
+                        tv2.setPadding(getResources().getDimensionPixelOffset(R.dimen.home_card_padding),getResources().getDimensionPixelOffset(R.dimen.home_card_padding),getResources().getDimensionPixelOffset(R.dimen.home_card_padding),getResources().getDimensionPixelOffset(R.dimen.home_card_padding));
+                        resultsLinearLayout.addView(cardView);
                         break;
                 }
             }

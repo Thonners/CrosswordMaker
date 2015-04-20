@@ -8,6 +8,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -161,8 +162,9 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
                 for (String def : entry.getDefinitions()) {
                     linearLayout.addView(createTextView(def, DEFINITION));
                 }
-                linearLayout.setPadding(context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding),context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding),context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding),context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding));
+                linearLayout.setPadding(context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding), context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding), context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding), context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding));
                 card.addView(linearLayout);
+                card.setUseCompatPadding(true); // Forces same padding on Lollipop as is on pre-L
                 viewGroup.addView(card);
             }
         } catch (Exception e) {

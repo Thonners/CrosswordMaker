@@ -257,6 +257,10 @@ public class AnagramPageFragment extends Fragment {
         tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.dictionary_word));
         tv.setPadding(getResources().getDimensionPixelOffset(R.dimen.home_card_padding), getResources().getDimensionPixelOffset(R.dimen.home_card_padding), getResources().getDimensionPixelOffset(R.dimen.home_card_padding), getResources().getDimensionPixelOffset(R.dimen.home_card_padding));
         cardView.addView(tv);
+        cardView.setUseCompatPadding(true);
+        TypedValue outValue  = new TypedValue();
+        getActivity().getTheme().resolveAttribute(android.R.attr.selectableItemBackground,outValue,true);
+        tv.setBackgroundResource(outValue.resourceId);
 
         resultsLinearLayout.addView(cardView);
     }
