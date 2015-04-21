@@ -62,7 +62,7 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
     public DictionaryMWDownloadDefinition (Context appContext, String aSearchTerm, DictionaryMWDownloadDefinitionListener aListener) {
         context = appContext ;
         listener = aListener;
-        searchTerm = aSearchTerm;
+        searchTerm = aSearchTerm.replaceAll(" ","%20");     // Replace all is to properly handle spaces for the website url
         searchSuccess = SEARCH_NOT_COMPLETED;
 
         url = urlPrefix + searchTerm + urlSuffix + context.getString(R.string.dictionary_mw_api_key);

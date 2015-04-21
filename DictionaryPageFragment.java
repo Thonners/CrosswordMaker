@@ -113,7 +113,6 @@ public class DictionaryPageFragment extends Fragment {
             // check that the EditText isn't blank
             searchTerm = inputBox.getText().toString().trim();
             if (searchTerm.length() > 0) {
-
                 Log.d(LOG_TAG, "Search button clicked. Trying MW dictionary");
                 showSearchingToast();
                 searchMWDictionary(searchTerm);
