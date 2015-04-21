@@ -129,8 +129,11 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
             // Split the results by the <suggestion> tag. First value (at index 0) will not be of interest.
             String[] suggestions = rawXML.split("<suggestion>");
             for (int i = 1 ; i < suggestions.length ; i++ ) {   // Start at 1 as first value is rubbish (see above)
-                TextView newTextView = createHiddenTextView(suggestions[i], SUGGESTIONS);
-                view.addView(newTextView,i);
+                //TextView newTextView = createHiddenTextView(suggestions[i], SUGGESTIONS);
+                //view.addView(newTextView,i);
+
+                Card card = new Card(context,suggestions[i]);
+                view.addView(card, i);
             }
         } else if (rawXML.contains(successfulSearchIdentifier)) {
             searchSuccess = SEARCH_SUCCESSFUL;

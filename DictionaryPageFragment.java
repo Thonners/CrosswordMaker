@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 //import android.app.Fragment;
+import android.support.v4.view.PagerAdapter;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -95,7 +96,7 @@ public class DictionaryPageFragment extends Fragment {
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
+        public void searchDictionary(String searchTerm);
     }
 
     public void searchClicked() {
@@ -110,7 +111,7 @@ public class DictionaryPageFragment extends Fragment {
             hideKeyboard();
             clearResultsView();
             // check that the EditText isn't blank
-            searchTerm = inputBox.getText().toString();
+            searchTerm = inputBox.getText().toString().trim();
             if (searchTerm.length() > 0) {
 
                 Log.d(LOG_TAG, "Search button clicked. Trying MW dictionary");
@@ -163,8 +164,24 @@ public class DictionaryPageFragment extends Fragment {
                                 promptTV.setText(getString(R.string.dictionary_suggestions));
 
                                 Log.d(LOG_TAG, "Setting options to visible");
-                                for (int i = 0; i < theFinalView.getChildCount(); i++) {
-                                    theFinalView.getChildAt(i).setVisibility(View.VISIBLE);
+                                for (int i = 1; i < theFinalView.getChildCount(); i++) {
+                                    if (theFinalView.getChildAt(i) instanceof Card) {
+                                        //Log.d(LOG_TAG,"Child is a Card");
+                                        final Card card = (Card) theFinalView.getChildAt(i);
+                                        card.setVisibility(View.VISIBLE);
+                                        card.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                Log.d(LOG_TAG,"Suggestion clicked. Searching Dictionary for: " + card.getSuggestionText());
+                                                mListener.searchDictionary(card.getSuggestionText());
+                                            }
+                                        });
+
+
+                                    } else {
+                                        Log.d(LOG_TAG,"Child is a " + theFinalView.getChildAt(i).getClass().getName());
+                                        Log.d(LOG_TAG,"Something's gone wrong!");
+                                    }
                                 }
                             }
                         });

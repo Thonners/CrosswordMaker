@@ -59,8 +59,17 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
     @Override
     protected void onPause() {
         super.onPause();    // Always call superclass first
+        Log.d(LOG_TAG, "onPaused called - saving crossword.");
 
         crosswordPageFragment.getCrossword().saveCrossword();
+    }
+
+    //onRestart called only when activity is being restarted after being stopped.Try redirecting here back to home page.
+    @Override
+    protected void onRestart() {
+        super.onRestart();      // Always call superclass first!
+
+        Log.d(LOG_TAG, "onRestart called");
     }
 
 
