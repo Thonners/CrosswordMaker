@@ -2,7 +2,6 @@ package com.thonners.crosswordmaker;
 
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -16,8 +15,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -145,59 +142,18 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
     }
     private void addCrosswordToLayout(int index, String name, String date, String percentageComplete) {
 
-        // Card view to hold all the views
-        CardView cardView = new CardView(this);
-        cardView.setUseCompatPadding(true);
-        cardView.setId(index);
-        cardView.setMinimumHeight(getResources().getDimensionPixelOffset(R.dimen.card_default_height));
-
-        // Relative layout to allow positioning of the views
-        RelativeLayout rl = new RelativeLayout(this);
-        rl.setPadding(getResources().getDimensionPixelOffset(R.dimen.home_card_padding),getResources().getDimensionPixelOffset(R.dimen.home_card_padding),getResources().getDimensionPixelOffset(R.dimen.home_card_padding),getResources().getDimensionPixelOffset(R.dimen.home_card_padding));
-        cardView.addView(rl);
-
-        // Text views
-        TextView tvName = new TextView(this);       // Title/publication of the crossword
-        TextView tvDate = new TextView(this);       // Date of the crossword
-        TextView tvPcComplete = new TextView(this);   // Percentage complete
-
-        // Name
-        tvName.setText(name) ;
-        tvName.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
-        tvName.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.home_card_text_size_main));
-        tvName.setTypeface(null, Typeface.BOLD);
-        tvName.setId(index + 1000); // Unlikely to have 1000 crosswords stored, so should keep ID's unique. Same applies below
-        RelativeLayout.LayoutParams lpName = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
-        lpName.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-        // Date
-        tvDate.setText(date);
-        tvDate.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
-        tvDate.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.home_card_text_size_minor));
-        tvDate.setId(index + 10000);
-        RelativeLayout.LayoutParams lpDate = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
-        lpDate.addRule(RelativeLayout.BELOW, tvName.getId());
-        // Percentage Complete
-        tvPcComplete.setText(percentageComplete);
-        tvPcComplete.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
-        tvPcComplete.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.home_card_text_size_minor));
-        tvPcComplete.setTypeface(null, Typeface.ITALIC);
-        tvPcComplete.setId(index + 100000);
-        RelativeLayout.LayoutParams lpPcComplete = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
-        lpPcComplete.addRule(RelativeLayout.BELOW, tvName.getId());
-        lpPcComplete.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-
-        rl.addView(tvName, lpName);
-        rl.addView(tvDate, lpDate);
-        rl.addView(tvPcComplete, lpPcComplete);
-        cardView.setOnClickListener(new View.OnClickListener() {
+        Card card = new Card(getApplicationContext(),name,date,percentageComplete) ;
+        card.setId(index);
+        card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 crosswordSelected(v);
             }
         });
-        layout.addView(cardView);
+        layout.addView(card);
 
     }
+
     private void crosswordSelected(View view) {
         int i = view.getId() ;  // get index of save file
 
