@@ -87,40 +87,7 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
 
         Log.d(LOG_TAG,"Crossword selected: " + libraryManager.getSavedCrosswords().get(i).getTitle());
 
-        File crossword = null;
-        String[] savedCrosswordArray = null;
-
-        // Get saved crossword
-        // Pretty sure this can come out of the try-catch loop...
-        try {
-            crossword = new File(libraryManager.getSavedCrosswords().get(i).getCrosswordFile(), Crossword.SAVE_CROSSWORD_FILE_NAME);
-
-            if(crossword.exists()) {
-                savedCrosswordArray = Crossword.getSaveArray(crossword);
-            } else {
-                Log.e(LOG_TAG,"Selected 'saved crossword' doesn't seem to exist");
-            }
-        } catch (Exception e) {
-            Log.e(LOG_TAG,"Exception thrown when trying to get file: " + e.getMessage());
-        }
-
-        if (savedCrosswordArray != null) {
-            Log.d(LOG_TAG, "Starting CrosswordActivity with saved crossword: " + savedCrosswordArray[Crossword.SAVED_ARRAY_INDEX_TITLE]);
-            startNewCrosswordActivity(savedCrosswordArray);
-        }
+        libraryManager.openCrossword(libraryManager.getSavedCrosswords().get(i).getCrosswordFile());
     }
 
-    private void startNewCrosswordActivity(String[] savedCrossword) {
-        showLoadingToast();
-        // Start new crossword activity
-        Intent crosswordActivity = new Intent(this, CrosswordSliderActivity.class);
-        crosswordActivity.putExtra(Crossword.CROSSWORD_EXTRA, savedCrossword);
-        startActivity(crosswordActivity);
-    }
-
-    private void showLoadingToast() {
-        // Display loading toast as load can take a while
-        Toast loadingToast = Toast.makeText(this, getString(R.string.loading), Toast.LENGTH_LONG);
-        loadingToast.show();
-    }
 }

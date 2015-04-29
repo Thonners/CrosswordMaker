@@ -1,10 +1,15 @@
 package com.thonners.crosswordmaker;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
 
 /**
@@ -13,23 +18,32 @@ import java.util.ArrayList;
 public class CrosswordLibraryManager {
 
     private static final String LOG_TAG = "CrosswordLibraryManager" ;
+    private static final String RECENT_CROSSWORD_LOG_FILE_NAME = "recent.log";
 
     Context context ;
     File[] foundCrosswordFiles;    // Note that this is the directory in which the crossword and images (if they exist) will be saved
     File rootDir;
 
+    File recentCrosswordsFile ;
+    String recentCrosswordFileName ;
+
     ArrayList<SavedCrossword> savedCrosswords = new ArrayList<SavedCrossword>() ;
     ArrayList<File> savedCrosswordFiles =new ArrayList<File>();
+    ArrayList<SavedCrossword> recentCrosswords = new ArrayList<SavedCrossword>(3);
 
     public CrosswordLibraryManager(Context context) {
         this.context = context;
-
-        getSavedFiles();
-        processSavedFiles();
     }
 
     public ArrayList<SavedCrossword> getSavedCrosswords() {
+        getSavedFiles();
+        processSavedFiles();
         return savedCrosswords;
+    }
+    public ArrayList<SavedCrossword> getRecentCrosswords() {
+        getRecentFile();
+        processRecentFile();
+    return recentCrosswords ;
     }
 
     private void getSavedFiles() {
@@ -56,11 +70,136 @@ public class CrosswordLibraryManager {
         }
 
     }
-
     private void addCrosswordToLibrary(SavedCrossword savedCrossword) {
         savedCrosswords.add(savedCrossword);
         savedCrosswordFiles.add(savedCrossword.getCrosswordFile());
     }
+
+    private void getRecentFile() {
+        // Extract recent file
+        recentCrosswordsFile = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),RECENT_CROSSWORD_LOG_FILE_NAME);
+    }
+    private void processRecentFile() {
+        // Divide recent file into last three crosswords and make each into a SavedCrossword object.
+        if (recentCrosswordsFile.exists()) {
+            Log.d(LOG_TAG,"Trying to open and then read " + recentCrosswordsFile.getAbsolutePath());
+
+            try {
+                // Read file
+                BufferedReader br = new BufferedReader(new FileReader(recentCrosswordsFile));
+                String line ;
+                while ((line = br.readLine()) != null) {
+                    File newRecentCrosswordFile = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),line);
+                    SavedCrossword newRecentSavedCrossword = new SavedCrossword(context, newRecentCrosswordFile);
+                    recentCrosswords.add(newRecentSavedCrossword);
+                    Log.d(LOG_TAG, "Added a new entry to the recent crossword list: " + newRecentSavedCrossword.getTitle() + " " + newRecentSavedCrossword.getDate());
+                }
+                br.close() ;
+
+            }catch (Exception e) {
+                e.printStackTrace();
+                Log.e(LOG_TAG, e.getMessage());
+            }
+        } else {
+            Log.d(LOG_TAG, "No recent crossword file exists...");
+        }
+    }
+    private void addCrosswordToRecents(SavedCrossword newRecentCrossword) {
+
+        ArrayList<SavedCrossword> oldRecentCrosswords = getRecentCrosswords();
+
+        if (oldRecentCrosswords.contains(newRecentCrossword)) {
+            oldRecentCrosswords.remove(newRecentCrossword);
+        }
+
+        switch (recentCrosswords.size()) {
+            case 0:
+                recentCrosswords.add(newRecentCrossword) ;
+                break;
+            case 1:
+                recentCrosswords.set(0,newRecentCrossword);
+                if (oldRecentCrosswords.size() > 0) {
+                    recentCrosswords.add(oldRecentCrosswords.get(0));
+                }
+                break;
+            case 2:
+                recentCrosswords.set(0,newRecentCrossword);
+                if (oldRecentCrosswords.size() > 0) {
+                    recentCrosswords.set(1,oldRecentCrosswords.get(0));
+                    if (oldRecentCrosswords.size() > 1) {
+                        recentCrosswords.add(2, oldRecentCrosswords.get(1));
+                    }
+                }
+                break;
+            case 3:
+                recentCrosswords.set(0,newRecentCrossword);
+                if (oldRecentCrosswords.size() > 0) {
+                    recentCrosswords.set(1,oldRecentCrosswords.get(0));
+                    if (oldRecentCrosswords.size() > 1) {
+                        recentCrosswords.set(2, oldRecentCrosswords.get(1));
+                    }
+                }
+                break;
+        }
+        saveRecentFile();
+    }
+    private void saveRecentFile() {
+        getRecentFile();
+
+        try {
+            Log.d(LOG_TAG, "Writing recent crosswords file...");
+            FileWriter fileWriter = new FileWriter(recentCrosswordsFile);
+
+            for (int i = 0 ; i < recentCrosswords.size() ; i++) {
+                fileWriter.write(recentCrosswords.get(i).getSaveString() + "\n");
+            }
+            fileWriter.close();
+
+
+        }catch (Exception e) {
+            Log.e(LOG_TAG, "Couldn't open fileWriter to save the recent crosswords file.");
+        }
+    }
+
+    public void openCrossword(File savedCrosswordDir) {
+
+        addCrosswordToRecents(new SavedCrossword(context, savedCrosswordDir));
+
+        String[] savedCrosswordArray = null ;
+
+        try {
+            File crossword = new File(savedCrosswordDir, Crossword.SAVE_CROSSWORD_FILE_NAME);
+
+            if(crossword.exists()) {
+                savedCrosswordArray = Crossword.getSaveArray(crossword);
+            } else {
+                Log.e(LOG_TAG,"Selected 'saved crossword' doesn't seem to exist");
+            }
+        } catch (Exception e) {
+            Log.e(LOG_TAG,"Exception thrown when trying to get file: " + e.getMessage());
+        }
+
+        if (savedCrosswordArray != null) {
+            Log.d(LOG_TAG, "Starting CrosswordActivity with saved crossword: " + savedCrosswordArray[Crossword.SAVED_ARRAY_INDEX_TITLE]);
+            openCrossword(savedCrosswordArray);
+        }
+    }
+    private void openCrossword(String[] savedCrossword) {
+
+        showLoadingToast();
+            Log.d(LOG_TAG,"Opening crossword " + savedCrossword[Crossword.SAVED_ARRAY_INDEX_TITLE] + " " + savedCrossword[Crossword.SAVED_ARRAY_INDEX_DATE]);
+        // Start new crossword activity
+        Intent crosswordActivity = new Intent(context, CrosswordSliderActivity.class);
+        crosswordActivity.putExtra(Crossword.CROSSWORD_EXTRA, savedCrossword);
+        context.startActivity(crosswordActivity);
+    }
+    private void showLoadingToast() {
+        // Display loading toast as load can take a while
+        Toast loadingToast = Toast.makeText(context, context.getString(R.string.loading), Toast.LENGTH_LONG);
+        loadingToast.show();
+    }
+
+
 
     static class SavedCrossword {
         Context context ;
@@ -117,6 +256,9 @@ public class CrosswordLibraryManager {
         }
         public String getDisplayPercentageComplete() {
             return context.getString(R.string.completion) + " " + percentageComplete + "%" ;
+        }
+        public String getSaveString() {
+            return Crossword.getSaveDate(context, date) + "-" + title.replaceAll(" ","_").replaceAll("-","__");
         }
         public File getCrosswordFile() {
             return crosswordFile;

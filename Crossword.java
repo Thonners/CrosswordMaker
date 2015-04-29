@@ -221,6 +221,39 @@ public class Crossword {
         return localeDateFormat.format(dateProper) ;
     }
 
+    public static String getDisplayDate(Context context1, String savedDate) {
+        // Method to use for saving the display date. Not sure this is required
+        SimpleDateFormat sdf = new SimpleDateFormat(SAVE_DATE_FORMAT);      // Save Formatted date
+        DateFormat localeDateFormat = android.text.format.DateFormat.getDateFormat(context1);    // Locale date format
+        Date dateProper ;
+
+        try {
+            dateProper = sdf.parse(savedDate) ;
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Couldn't parse Crossword.date (should be in save format) into something useful. This is coming from HomeActivity via intents so check the routing!");
+            return context1.getResources().getString(R.string.error_crossword_date); // Return the error message to be displayed.
+        }
+
+        return localeDateFormat.format(dateProper) ;
+
+    }
+    public static String getSaveDate(Context context1, String displayDate) {
+        // Method to use for saving the display date. Not sure this is required
+        SimpleDateFormat sdf = new SimpleDateFormat(SAVE_DATE_FORMAT);      // Save Formatted date
+        DateFormat localeDateFormat = android.text.format.DateFormat.getDateFormat(context1);    // Locale date format
+        Date date ;
+
+        try {
+            date = localeDateFormat.parse(displayDate) ;
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Couldn't parse Crossword.date (should be in save format) into something useful. This is coming from HomeActivity via intents so check the routing!");
+            return context1.getResources().getString(R.string.error_crossword_date); // Return the error message to be displayed.
+        }
+
+        return sdf.format(date) ;
+
+    }
+
     public void findClues() {
         // Locate clues by cycling through grid and finding all clues and their numbered square
         // TODO: make horizontal and vertical clue finding happen on different threads

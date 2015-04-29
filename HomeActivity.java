@@ -27,6 +27,8 @@ public class HomeActivity extends ActionBarActivity {
     String date ;
     CharSequence[] publications ;
 
+    CrosswordLibraryManager libraryManager ;
+
     // For date picker
     Calendar c = Calendar.getInstance();
     int startYear = c.get(Calendar.YEAR);
@@ -38,6 +40,10 @@ public class HomeActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
       //  setContentView(R.layout.activity_home);
         setContentView(R.layout.activity_home_material);
+
+        Log.d(LOG_TAG,"Searching for recent crossword file... ");
+        libraryManager = new CrosswordLibraryManager(this);
+        libraryManager.getRecentCrosswords();
     }
 
 
