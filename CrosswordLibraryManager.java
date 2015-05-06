@@ -27,9 +27,11 @@ public class CrosswordLibraryManager {
     File recentCrosswordsFile ;
     String recentCrosswordFileName ;
 
+    int noRecentCrosswords = 3 ;    // Number of recent crosswords to track
+
     ArrayList<SavedCrossword> savedCrosswords = new ArrayList<SavedCrossword>() ;
     ArrayList<File> savedCrosswordFiles =new ArrayList<File>();
-    ArrayList<SavedCrossword> recentCrosswords = new ArrayList<SavedCrossword>(3);
+    ArrayList<SavedCrossword> recentCrosswords = new ArrayList<SavedCrossword>();
 
     public CrosswordLibraryManager(Context context) {
         this.context = context;
@@ -108,39 +110,37 @@ public class CrosswordLibraryManager {
 
         ArrayList<SavedCrossword> oldRecentCrosswords = getRecentCrosswords();
 
-        if (oldRecentCrosswords.contains(newRecentCrossword)) {
-            oldRecentCrosswords.remove(newRecentCrossword);
+        /* Debugging*/
+        for (SavedCrossword s : oldRecentCrosswords) {
+            Log.d(LOG_TAG,"oldRecentCrosswords contains: " + s.getSaveString());
         }
 
-        switch (recentCrosswords.size()) {
-            case 0:
-                recentCrosswords.add(newRecentCrossword) ;
-                break;
-            case 1:
-                recentCrosswords.set(0,newRecentCrossword);
-                if (oldRecentCrosswords.size() > 0) {
-                    recentCrosswords.add(oldRecentCrosswords.get(0));
-                }
-                break;
-            case 2:
-                recentCrosswords.set(0,newRecentCrossword);
-                if (oldRecentCrosswords.size() > 0) {
-                    recentCrosswords.set(1,oldRecentCrosswords.get(0));
-                    if (oldRecentCrosswords.size() > 1) {
-                        recentCrosswords.add(2, oldRecentCrosswords.get(1));
-                    }
-                }
-                break;
-            case 3:
-                recentCrosswords.set(0,newRecentCrossword);
-                if (oldRecentCrosswords.size() > 0) {
-                    recentCrosswords.set(1,oldRecentCrosswords.get(0));
-                    if (oldRecentCrosswords.size() > 1) {
-                        recentCrosswords.set(2, oldRecentCrosswords.get(1));
-                    }
-                }
-                break;
+        if (oldRecentCrosswords.contains(newRecentCrossword)) {
+            Log.d(LOG_TAG,"Removing " + newRecentCrossword + "from oldRecentCrosswords because it was already in there..." );
+            oldRecentCrosswords.remove(newRecentCrossword);
         }
+            Log.d(LOG_TAG,"RecentCrosswords.size() = " + recentCrosswords.size() );
+//*/
+
+        // Reset recent crosswords list
+        recentCrosswords = new ArrayList<SavedCrossword>() ;
+        // Add newest crossword to top of the list
+        recentCrosswords.add(newRecentCrossword);
+        for (SavedCrossword s : oldRecentCrosswords) {
+            if (!s.getSaveString().matches(newRecentCrossword.getSaveString())) {
+                recentCrosswords.add(s);
+            } else {
+                Log.d(LOG_TAG, "ignoring " + s.getSaveString() + "in old crosswords, as it is the latest");
+            }
+        }
+        //recentCrosswords.addAll(oldRecentCrosswords);
+
+         /* Debugging */
+        for (SavedCrossword s : recentCrosswords) {
+            Log.d(LOG_TAG,"recentCrosswords now contains: " + s.getSaveString());
+        }
+
+
         saveRecentFile();
     }
     private void saveRecentFile() {
@@ -150,7 +150,7 @@ public class CrosswordLibraryManager {
             Log.d(LOG_TAG, "Writing recent crosswords file...");
             FileWriter fileWriter = new FileWriter(recentCrosswordsFile);
 
-            for (int i = 0 ; i < recentCrosswords.size() ; i++) {
+            for (int i = 0 ; i < Math.min(recentCrosswords.size(),noRecentCrosswords) ; i++) {
                 fileWriter.write(recentCrosswords.get(i).getSaveString() + "\n");
             }
             fileWriter.close();

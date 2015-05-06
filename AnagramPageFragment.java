@@ -356,6 +356,10 @@ public class AnagramPageFragment extends Fragment {
         mListener.searchDictionary(searchTerm);
     }
 
+    public void inputBoxRequestFocus() {
+        inputBox.requestFocus();
+    }
+
 
     private class LoadDictionaryTask extends AsyncTask<Void,Void,String> {
         // Load the dictionary in the background to prevent hanging the main thread

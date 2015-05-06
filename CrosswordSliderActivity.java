@@ -82,6 +82,42 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
         pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
         pager.setOffscreenPageLimit(NUM_PAGES);
+        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrollStateChanged(int state)
+            {
+                if (state == ViewPager.SCROLL_STATE_IDLE)
+                {
+                    switch (pager.getCurrentItem()) {
+                        case CROSSWORD_TAB:
+                            hideKeyboard();
+                            break;
+                        case CLUE_TAB:
+                            hideKeyboard();
+                            break;
+                        case DICTIONARY_TAB:
+                            dictionaryPageFragment.inputBoxRequestFocus();
+                            showKeyboard();
+                            break;
+                        case ANAGRAM_TAB:
+                            anagramPageFragment.inputBoxRequestFocus();
+                            showKeyboard();
+                            break;
+                        case DOODLE_TAB:
+                            break;
+                    }
+
+                }
+            }
+            @Override
+            public void onPageSelected(int position) {
+                // Empty required method
+            }
+            @Override
+            public void onPageScrolled(int position, float offset, int offsetPixels) {
+                // Empty required method
+            }
+        });
 
         // Get tab titles
         tabTitles = getResources().getTextArray(R.array.tab_titles);
@@ -189,6 +225,14 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
         inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
+    private void showKeyboard() {
+        Log.d(LOG_TAG,"Show keyboard called");
+        // Method to hide the keyboard
+        InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if(!inputManager.isActive()) {
+            inputManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+        }
+    }
     public void saveGrid() {
         // Save the grid
         crosswordPageFragment.getCrossword().saveCrossword();

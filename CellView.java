@@ -45,6 +45,7 @@ public class CellView extends RelativeLayout implements Serializable {
         TextView clueNumberDisplay = new TextView(getContext()) ;
         clueNumberDisplay.setText("" + clueNumber);
         clueNumberDisplay.setPadding(5,0,0,0);
+        clueNumberDisplay.setTextColor(getContext().getResources().getColor(R.color.dark_grey));
         float clueNumberTextSize = (float) (cell.getTextSize() * 0.5) ;
         clueNumberDisplay.setTextSize(TypedValue.COMPLEX_UNIT_PX, clueNumberTextSize);
 

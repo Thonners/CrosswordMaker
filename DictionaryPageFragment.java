@@ -230,6 +230,10 @@ public class DictionaryPageFragment extends Fragment {
         inputBox.setText(searchTerm);
     }
 
+    public void inputBoxRequestFocus() {
+        inputBox.requestFocus();
+    }
+
     public void showSearchingToast() {
         Toast searchingToast = Toast.makeText(getActivity(), getString(R.string.searching), Toast.LENGTH_SHORT);
         searchingToast.show();
