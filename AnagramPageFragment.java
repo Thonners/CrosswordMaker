@@ -358,6 +358,7 @@ public class AnagramPageFragment extends Fragment {
 
     public void inputBoxRequestFocus() {
         inputBox.requestFocus();
+        inputBox.selectAll();
     }
     public EditText getInputBox() {
         return inputBox;

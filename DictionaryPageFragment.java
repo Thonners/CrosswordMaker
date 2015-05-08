@@ -40,6 +40,7 @@ public class DictionaryPageFragment extends Fragment {
     LinearLayout resultsLinearLayout ;
     String searchTerm;
     String searchPrefix = "define:";
+    boolean searchMWUnderway = false ;
 
     private OnFragmentInteractionListener mListener;
 
@@ -106,6 +107,10 @@ public class DictionaryPageFragment extends Fragment {
                 Log.d(LOG_TAG, "Search button clicked. Internet connection not detected. Showing toast and doing nothing else...");
                 Toast toast = Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.dictionary_internet_connection_required), Toast.LENGTH_SHORT);
                 toast.show();
+        } else if (searchMWUnderway) {
+            // Show searching toast
+            Log.d(LOG_TAG, "SearchMWUnderway = true, implying search hasn't yet returned, so not submitting new search yet.");
+            //showAlreadySearchingToast();
         } else {
             // Hide keyboard. & clear any previous results from the results view.
             hideKeyboard();
@@ -133,79 +138,83 @@ public class DictionaryPageFragment extends Fragment {
     }
 
     public void searchMWDictionary(final String query) {
-        // Search the MerriamWebster dictionary
-        DictionaryMWDownloadDefinition.DictionaryMWDownloadDefinitionListener listener = new DictionaryMWDownloadDefinition.DictionaryMWDownloadDefinitionListener() {
-            @Override
-            public void completionCallBack(final ViewGroup theFinalView, final int searchSuccessState) {
-                // Handle what happens to the output from the dictionary here
-                switch (searchSuccessState) {
-                    case DictionaryMWDownloadDefinition.SEARCH_NOT_COMPLETED:
-                        Log.d(LOG_TAG, "Something went wrong with the search. Status returned from DictionaryMWDownloadDefinition as -1");
-                        TextView tv = new TextView(getActivity());
-                        tv.setText(getString(R.string.dictionary_error));
-                        resultsLinearLayout.addView(tv);
-                        break;
-                    case DictionaryMWDownloadDefinition.SEARCH_SUCCESSFUL:
-                        Log.d(LOG_TAG, "Search returned successfully. Showing results...");
-                        resultsLinearLayout.addView(theFinalView);
-                        break;
-                    case DictionaryMWDownloadDefinition.SEARCH_SUGGESTIONS:
-                        Log.d(LOG_TAG, "Search returned with suggestions. Showing prompt...");
-                        // Add the returned view to the answers
-                        resultsLinearLayout.addView(theFinalView);
-                        final TextView promptTV = (TextView) getActivity().findViewById(DictionaryMWDownloadDefinition.PROMPT_TV_ID);
-                        promptTV.setClickable(true);
-                        promptTV.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                // Turn all the hidden TextViews to VISIBLE
-                                Log.d(LOG_TAG, "Prompt clicked. Changing promprt text...");
-                                promptTV.setText(getString(R.string.dictionary_suggestions));
+            Log.d(LOG_TAG, "SearchMW called");
+            // Set to prevent multiple searches running at once
+            searchMWUnderway = true;
+            // Search the MerriamWebster dictionary
+            DictionaryMWDownloadDefinition.DictionaryMWDownloadDefinitionListener listener = new DictionaryMWDownloadDefinition.DictionaryMWDownloadDefinitionListener() {
+                @Override
+                public void completionCallBack(final ViewGroup theFinalView, final int searchSuccessState) {
+                    // Handle what happens to the output from the dictionary here
+                    switch (searchSuccessState) {
+                        case DictionaryMWDownloadDefinition.SEARCH_NOT_COMPLETED:
+                            Log.d(LOG_TAG, "Something went wrong with the search. Status returned from DictionaryMWDownloadDefinition as -1");
+                            TextView tv = new TextView(getActivity());
+                            tv.setText(getString(R.string.dictionary_error));
+                            resultsLinearLayout.addView(tv);
+                            break;
+                        case DictionaryMWDownloadDefinition.SEARCH_SUCCESSFUL:
+                            Log.d(LOG_TAG, "Search returned successfully. Showing results...");
+                            resultsLinearLayout.addView(theFinalView);
+                            break;
+                        case DictionaryMWDownloadDefinition.SEARCH_SUGGESTIONS:
+                            Log.d(LOG_TAG, "Search returned with suggestions. Showing prompt...");
+                            // Add the returned view to the answers
+                            resultsLinearLayout.addView(theFinalView);
+                            final TextView promptTV = (TextView) getActivity().findViewById(DictionaryMWDownloadDefinition.PROMPT_TV_ID);
+                            promptTV.setClickable(true);
+                            promptTV.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    // Turn all the hidden TextViews to VISIBLE
+                                    Log.d(LOG_TAG, "Prompt clicked. Changing promprt text...");
+                                    promptTV.setText(getString(R.string.dictionary_suggestions));
 
-                                Log.d(LOG_TAG, "Setting options to visible");
-                                for (int i = 1; i < theFinalView.getChildCount(); i++) {
-                                    if (theFinalView.getChildAt(i) instanceof Card) {
-                                        //Log.d(LOG_TAG,"Child is a Card");
-                                        final Card card = (Card) theFinalView.getChildAt(i);
-                                        card.setVisibility(View.VISIBLE);
-                                        card.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                Log.d(LOG_TAG,"Suggestion clicked. Searching Dictionary for: " + card.getSuggestionText());
-                                                mListener.searchDictionary(card.getSuggestionText());
-                                            }
-                                        });
+                                    Log.d(LOG_TAG, "Setting options to visible");
+                                    for (int i = 1; i < theFinalView.getChildCount(); i++) {
+                                        if (theFinalView.getChildAt(i) instanceof Card) {
+                                            //Log.d(LOG_TAG,"Child is a Card");
+                                            final Card card = (Card) theFinalView.getChildAt(i);
+                                            card.setVisibility(View.VISIBLE);
+                                            card.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View v) {
+                                                    Log.d(LOG_TAG, "Suggestion clicked. Searching Dictionary for: " + card.getSuggestionText());
+                                                    mListener.searchDictionary(card.getSuggestionText());
+                                                }
+                                            });
 
 
-                                    } else {
-                                        Log.d(LOG_TAG,"Child is a " + theFinalView.getChildAt(i).getClass().getName());
-                                        Log.d(LOG_TAG,"Something's gone wrong!");
+                                        } else {
+                                            Log.d(LOG_TAG, "Child is a " + theFinalView.getChildAt(i).getClass().getName());
+                                            Log.d(LOG_TAG, "Something's gone wrong!");
+                                        }
                                     }
                                 }
-                            }
-                        });
-                        break;
-                    case DictionaryMWDownloadDefinition.SEARCH_NO_SUGGESTIONS:
-                        Log.d(LOG_TAG, "Search returned unsuccessfully, without suggestions. Showing word not found message");
-                        CardView cardView = new CardView(getActivity());
-                        cardView.setUseCompatPadding(true);
-                        TextView tv2 = new TextView(getActivity());
-                        tv2.setText(getString(R.string.dictionary_word_not_found) +" " + getString(R.string.dictionary_search_google));
-                        tv2.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                searchGoogle(query);
-                            }
-                        });
-                        cardView.addView(tv2);
-                        tv2.setPadding(getResources().getDimensionPixelOffset(R.dimen.home_card_padding),getResources().getDimensionPixelOffset(R.dimen.home_card_padding),getResources().getDimensionPixelOffset(R.dimen.home_card_padding),getResources().getDimensionPixelOffset(R.dimen.home_card_padding));
-                        resultsLinearLayout.addView(cardView);
-                        break;
+                            });
+                            break;
+                        case DictionaryMWDownloadDefinition.SEARCH_NO_SUGGESTIONS:
+                            Log.d(LOG_TAG, "Search returned unsuccessfully, without suggestions. Showing word not found message");
+                            CardView cardView = new CardView(getActivity());
+                            cardView.setUseCompatPadding(true);
+                            TextView tv2 = new TextView(getActivity());
+                            tv2.setText(getString(R.string.dictionary_word_not_found) + " " + getString(R.string.dictionary_search_google));
+                            tv2.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    searchGoogle(query);
+                                }
+                            });
+                            cardView.addView(tv2);
+                            tv2.setPadding(getResources().getDimensionPixelOffset(R.dimen.home_card_padding), getResources().getDimensionPixelOffset(R.dimen.home_card_padding), getResources().getDimensionPixelOffset(R.dimen.home_card_padding), getResources().getDimensionPixelOffset(R.dimen.home_card_padding));
+                            resultsLinearLayout.addView(cardView);
+                            break;
+                    }
+                    searchMWUnderway = false ;  // Reset to allow future searches
                 }
-            }
-        };
-        DictionaryMWDownloadDefinition definition = new DictionaryMWDownloadDefinition(getActivity(),query,listener);
-        definition.execute();
+            };
+            DictionaryMWDownloadDefinition definition = new DictionaryMWDownloadDefinition(getActivity(), query, listener);
+            definition.execute();
     }
 
     private void hideKeyboard() {
@@ -234,10 +243,17 @@ public class DictionaryPageFragment extends Fragment {
     }
     public void inputBoxRequestFocus() {
         inputBox.requestFocus();
+        inputBox.selectAll();
     }
 
+    public void showAlreadySearchingToast() {
+        showToast(getString(R.string.already_searching));
+    }
     public void showSearchingToast() {
-        Toast searchingToast = Toast.makeText(getActivity(), getString(R.string.searching), Toast.LENGTH_SHORT);
+        showToast(getString(R.string.searching));
+    }
+    private void showToast(String toastString) {
+        Toast searchingToast = Toast.makeText(getActivity(), toastString, Toast.LENGTH_SHORT);
         searchingToast.show();
     }
 

@@ -1,5 +1,6 @@
 package com.thonners.crosswordmaker;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 /**
@@ -27,6 +30,8 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
 
     private ViewPager pager ;               // Handles the transition between fragments
     private PagerAdapter pagerAdapter ;     // Provides the pages for the pager
+
+    private boolean dontShowKeyboard = false ;
 
     private CharSequence[] tabTitles ;
 
@@ -82,9 +87,60 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
         pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
         pager.setOffscreenPageLimit(NUM_PAGES);
+        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrollStateChanged(int state)
+            {
+                if (state == ViewPager.SCROLL_STATE_IDLE)
+                {
+                    switch (pager.getCurrentItem()) {
+                        case DICTIONARY_TAB:
+                            dictionaryPageFragment.inputBoxRequestFocus();
+                            if (dontShowKeyboard) {
+                                dontShowKeyboard = false ;  // Reset for next time
+                            } else {
+                                showKeyboard(dictionaryPageFragment.getInputBox());
+                            }
+                            break;
+                        case ANAGRAM_TAB:
+                            anagramPageFragment.inputBoxRequestFocus();
+                            if (dontShowKeyboard) {
+                                dontShowKeyboard = false ;  // Reset for next time
+                            } else {
+                                showKeyboard(anagramPageFragment.getInputBox());
+                            }
+                            break;
+                        case DOODLE_TAB:
+                            hideKeyboard();
+                            break;
+                    }
+
+                }
+            }
+            @Override
+            public void onPageSelected(int position) {
+                // Empty required method
+            }
+            @Override
+            public void onPageScrolled(int position, float offset, int offsetPixels) {
+                // Empty required method
+            }
+        });
 
         tabTitles = getResources().getTextArray(R.array.tab_titles_toolkit);
 
+    }
+    private void hideKeyboard() {
+        // Method to hide the keyboard
+        InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+    }
+
+    private void showKeyboard(View view) {
+        Log.d(LOG_TAG, "Show keyboard called");
+        // Method to hide the keyboard
+        InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.showSoftInput(view, inputManager.SHOW_IMPLICIT);
     }
     private void openSettings() {
         // TODO: come up with some settings / an activity for settings
@@ -138,6 +194,8 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
         dictionaryPageFragment.setSearchTerm(searchTerm);
         // Run search
         dictionaryPageFragment.searchClicked();
+        // Make sure keyboard isn't shown, as search term is already in box
+        dontShowKeyboard = true ;
         // Change to dictionary tab
         pager.setCurrentItem(DICTIONARY_TAB, true);
     }

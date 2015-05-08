@@ -34,6 +34,8 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
     private PagerAdapter pagerAdapter ;     // This provides the pages for the PagerAdapter.
     private CrosswordPageFragment.OnFragmentInteractionListener onFragmentInteractionListener ;
 
+    private boolean dontShowKeyboard = false ;
+
     private CharSequence[] tabTitles ;
 
     // Fragments
@@ -97,11 +99,19 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
                             break;
                         case DICTIONARY_TAB:
                             dictionaryPageFragment.inputBoxRequestFocus();
-                            showKeyboard(dictionaryPageFragment.getInputBox());
+                            if (dontShowKeyboard) {
+                                dontShowKeyboard = false ;  // Reset for next time
+                            } else {
+                                showKeyboard(dictionaryPageFragment.getInputBox());
+                            }
                             break;
                         case ANAGRAM_TAB:
                             anagramPageFragment.inputBoxRequestFocus();
-                            showKeyboard(anagramPageFragment.getInputBox());
+                            if (dontShowKeyboard) {
+                                dontShowKeyboard = false ;  // Reset for next time
+                            } else {
+                                showKeyboard(anagramPageFragment.getInputBox());
+                            }
                             break;
                         case DOODLE_TAB:
                             break;
@@ -252,6 +262,8 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
         dictionaryPageFragment.setSearchTerm(searchTerm);
         // Run search
         dictionaryPageFragment.searchClicked();
+        // Make sure keyboard isn't shown, as search term is already in box
+        dontShowKeyboard = true ;
         // Change to dictionary tab
         pager.setCurrentItem(DICTIONARY_TAB, true);
     }
