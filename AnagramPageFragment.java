@@ -359,6 +359,9 @@ public class AnagramPageFragment extends Fragment {
     public void inputBoxRequestFocus() {
         inputBox.requestFocus();
     }
+    public EditText getInputBox() {
+        return inputBox;
+    }
 
 
     private class LoadDictionaryTask extends AsyncTask<Void,Void,String> {

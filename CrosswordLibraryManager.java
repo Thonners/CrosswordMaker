@@ -120,7 +120,6 @@ public class CrosswordLibraryManager {
             oldRecentCrosswords.remove(newRecentCrossword);
         }
             Log.d(LOG_TAG,"RecentCrosswords.size() = " + recentCrosswords.size() );
-//*/
 
         // Reset recent crosswords list
         recentCrosswords = new ArrayList<SavedCrossword>() ;
@@ -133,12 +132,11 @@ public class CrosswordLibraryManager {
                 Log.d(LOG_TAG, "ignoring " + s.getSaveString() + "in old crosswords, as it is the latest");
             }
         }
-        //recentCrosswords.addAll(oldRecentCrosswords);
 
          /* Debugging */
         for (SavedCrossword s : recentCrosswords) {
             Log.d(LOG_TAG,"recentCrosswords now contains: " + s.getSaveString());
-        }
+        } //*/
 
 
         saveRecentFile();

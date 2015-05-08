@@ -229,7 +229,9 @@ public class DictionaryPageFragment extends Fragment {
     public void setSearchTerm(String searchTerm) {
         inputBox.setText(searchTerm);
     }
-
+    public EditText getInputBox() {
+        return inputBox;
+    }
     public void inputBoxRequestFocus() {
         inputBox.requestFocus();
     }

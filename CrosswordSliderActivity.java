@@ -97,11 +97,11 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
                             break;
                         case DICTIONARY_TAB:
                             dictionaryPageFragment.inputBoxRequestFocus();
-                            showKeyboard();
+                            showKeyboard(dictionaryPageFragment.getInputBox());
                             break;
                         case ANAGRAM_TAB:
                             anagramPageFragment.inputBoxRequestFocus();
-                            showKeyboard();
+                            showKeyboard(anagramPageFragment.getInputBox());
                             break;
                         case DOODLE_TAB:
                             break;
@@ -225,13 +225,11 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
         inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
-    private void showKeyboard() {
+    private void showKeyboard(View view) {
         Log.d(LOG_TAG,"Show keyboard called");
         // Method to hide the keyboard
         InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        if(!inputManager.isActive()) {
-            inputManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-        }
+        inputManager.showSoftInput(view, inputManager.SHOW_IMPLICIT);
     }
     public void saveGrid() {
         // Save the grid
