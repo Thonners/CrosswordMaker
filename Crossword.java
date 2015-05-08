@@ -129,6 +129,8 @@ public class Crossword {
     }
 
     private void createGrid() {
+        grid.setFocusable(true);
+        grid.setFocusableInTouchMode(true);
         grid.setRowCount(rowCount);
         grid.setColumnCount(rowCount);
         grid.setBackground(context.getResources().getDrawable(R.drawable.cell_white));
