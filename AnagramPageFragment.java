@@ -150,7 +150,7 @@ public class AnagramPageFragment extends Fragment {
 
         Log.d(LOG_TAG, "Checking input... ");
         // First check input and ignore any non letters or '.'s
-        String searchStringOriginal = inputBox.getText().toString();
+        String searchStringOriginal = inputBox.getText().toString().replaceAll(" ",""); // Remove all spaces
         String searchString = "";
         boolean containsIllegalCharachters = false ;
         int j=0;

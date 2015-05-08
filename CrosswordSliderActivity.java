@@ -107,11 +107,7 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
                             break;
                         case ANAGRAM_TAB:
                             anagramPageFragment.inputBoxRequestFocus();
-                            if (dontShowKeyboard) {
-                                dontShowKeyboard = false ;  // Reset for next time
-                            } else {
                                 showKeyboard(anagramPageFragment.getInputBox());
-                            }
                             break;
                         case DOODLE_TAB:
                             break;

@@ -243,7 +243,9 @@ public class DictionaryPageFragment extends Fragment {
     }
     public void inputBoxRequestFocus() {
         inputBox.requestFocus();
-        inputBox.selectAll();
+        if(!searchMWUnderway) {
+            inputBox.selectAll();
+        }
     }
 
     public void showAlreadySearchingToast() {

@@ -104,11 +104,7 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
                             break;
                         case ANAGRAM_TAB:
                             anagramPageFragment.inputBoxRequestFocus();
-                            if (dontShowKeyboard) {
-                                dontShowKeyboard = false ;  // Reset for next time
-                            } else {
-                                showKeyboard(anagramPageFragment.getInputBox());
-                            }
+                            showKeyboard(anagramPageFragment.getInputBox());
                             break;
                         case DOODLE_TAB:
                             hideKeyboard();
