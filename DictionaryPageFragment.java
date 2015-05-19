@@ -41,6 +41,8 @@ public class DictionaryPageFragment extends Fragment {
     String searchTerm;
     String searchPrefix = "define:";
     boolean searchMWUnderway = false ;
+    boolean searchGoogleOnNextClick = false ;
+    String lastSearch = null;
 
     private OnFragmentInteractionListener mListener;
 
@@ -169,6 +171,17 @@ public class DictionaryPageFragment extends Fragment {
                                     // Turn all the hidden TextViews to VISIBLE
                                     Log.d(LOG_TAG, "Prompt clicked. Changing promprt text...");
                                     promptTV.setText(getString(R.string.dictionary_suggestions));
+
+                                    Card searchGoogleCard = new Card(getActivity(), getString(R.string.dictionary_search_google));
+                                    searchGoogleCard.setVisibility(View.VISIBLE);
+                                    searchGoogleCard.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                                    Log.d(LOG_TAG, "Search Google Clicked - Searching for: " + searchTerm);
+                                                    searchGoogle(searchTerm);
+                                        }
+                                    });
+                                    resultsLinearLayout.addView(searchGoogleCard,0);
 
                                     Log.d(LOG_TAG, "Setting options to visible");
                                     for (int i = 1; i < theFinalView.getChildCount(); i++) {

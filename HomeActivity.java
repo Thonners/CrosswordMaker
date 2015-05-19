@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
@@ -15,7 +16,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 
@@ -28,6 +32,7 @@ public class HomeActivity extends ActionBarActivity {
     CharSequence[] publications ;
 
     CrosswordLibraryManager libraryManager ;
+    ArrayList<CrosswordLibraryManager.SavedCrossword> recentCrosswords ;
 
     // For date picker
     Calendar c = Calendar.getInstance();
@@ -41,9 +46,53 @@ public class HomeActivity extends ActionBarActivity {
       //  setContentView(R.layout.activity_home);
         setContentView(R.layout.activity_home_material);
 
+        // Update recent crosswords list
         Log.d(LOG_TAG,"Searching for recent crossword file... ");
         libraryManager = new CrosswordLibraryManager(this);
-        libraryManager.getRecentCrosswords();
+        recentCrosswords = libraryManager.getRecentCrosswords();
+        switch (recentCrosswords.size())  {
+            case 3:
+                TextView recentTV3Title = (TextView) findViewById(R.id.home_card_recent_3_title);
+                TextView recentTV3Date = (TextView) findViewById(R.id.home_card_recent_3_date);
+                CardView recentCard3 = (CardView) findViewById(R.id.home_card_recent_3);
+                recentTV3Title.setText(recentCrosswords.get(2).getTitle());
+                recentTV3Date.setText(recentCrosswords.get(2).getDate());
+          //      recentCard3.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
+            case 2:
+                TextView recentTV2Title = (TextView) findViewById(R.id.home_card_recent_2_title);
+                TextView recentTV2Date = (TextView) findViewById(R.id.home_card_recent_2_date);
+                CardView recentCard2 = (CardView) findViewById(R.id.home_card_recent_2);
+                recentTV2Title.setText(recentCrosswords.get(1).getTitle());
+                recentTV2Date.setText(recentCrosswords.get(1).getDate());
+        //        recentCard2.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
+            case 1:
+                TextView recentTV1Title = (TextView) findViewById(R.id.home_card_recent_1_title);
+                TextView recentTV1Date = (TextView) findViewById(R.id.home_card_recent_1_date);
+                recentTV1Title.setText(recentCrosswords.get(0).getTitle());
+                recentTV1Date.setText(recentCrosswords.get(0).getDate());
+                break;
+        }
+
+
+        RelativeLayout recentLayout = (RelativeLayout) findViewById(R.id.home_card_recent_layout);
+        switch (recentCrosswords.size())  {
+            case 0:
+                // Set no recent text
+                TextView recentTV1Title = (TextView) findViewById(R.id.home_card_recent_1_title);
+                TextView recentTV1Date = (TextView) findViewById(R.id.home_card_recent_1_date);
+                recentTV1Title.setText(getResources().getString(R.string.home_recent_none1));
+                recentTV1Date.setText(getResources().getString(R.string.home_recent_none2));
+            case 1:
+                // Remove 2nd box
+                CardView recentCard2 = (CardView) findViewById(R.id.home_card_recent_2);
+                recentLayout.removeView(recentCard2);
+            case 2:
+                // Remove 3rd box
+                CardView recentCard3 = (CardView) findViewById(R.id.home_card_recent_3);
+                recentLayout.removeView(recentCard3);
+                break;
+        }
+
     }
 
 
