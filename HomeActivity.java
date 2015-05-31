@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.text.InputType;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,14 +28,15 @@ public class HomeActivity extends ActionBarActivity {
 
     private static final String LOG_TAG = "HomeActivity";
 
-    String publication;
-    String date ;
-    CharSequence[] publications ;
+    private String publication;
+    private String date ;
+    private CharSequence[] publications ;
+    private boolean safeToOverwrite = false ;
 
-    CrosswordLibraryManager libraryManager ;
-    ArrayList<CrosswordLibraryManager.SavedCrossword> recentCrosswords ;
+    private CrosswordLibraryManager libraryManager ;
+    private ArrayList<CrosswordLibraryManager.SavedCrossword> recentCrosswords ;
 
-    // For date picker
+    // For displayDate picker
     Calendar c = Calendar.getInstance();
     int startYear = c.get(Calendar.YEAR);
     int startMonth = c.get(Calendar.MONTH);
@@ -43,56 +45,13 @@ public class HomeActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-      //  setContentView(R.layout.activity_home);
         setContentView(R.layout.activity_home_material);
+    }
 
-        // Update recent crosswords list
-        Log.d(LOG_TAG,"Searching for recent crossword file... ");
-        libraryManager = new CrosswordLibraryManager(this);
-        recentCrosswords = libraryManager.getRecentCrosswords();
-        switch (recentCrosswords.size())  {
-            case 3:
-                TextView recentTV3Title = (TextView) findViewById(R.id.home_card_recent_3_title);
-                TextView recentTV3Date = (TextView) findViewById(R.id.home_card_recent_3_date);
-                CardView recentCard3 = (CardView) findViewById(R.id.home_card_recent_3);
-                recentTV3Title.setText(recentCrosswords.get(2).getTitle());
-                recentTV3Date.setText(recentCrosswords.get(2).getDate());
-          //      recentCard3.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
-            case 2:
-                TextView recentTV2Title = (TextView) findViewById(R.id.home_card_recent_2_title);
-                TextView recentTV2Date = (TextView) findViewById(R.id.home_card_recent_2_date);
-                CardView recentCard2 = (CardView) findViewById(R.id.home_card_recent_2);
-                recentTV2Title.setText(recentCrosswords.get(1).getTitle());
-                recentTV2Date.setText(recentCrosswords.get(1).getDate());
-        //        recentCard2.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
-            case 1:
-                TextView recentTV1Title = (TextView) findViewById(R.id.home_card_recent_1_title);
-                TextView recentTV1Date = (TextView) findViewById(R.id.home_card_recent_1_date);
-                recentTV1Title.setText(recentCrosswords.get(0).getTitle());
-                recentTV1Date.setText(recentCrosswords.get(0).getDate());
-                break;
-        }
-
-
-        RelativeLayout recentLayout = (RelativeLayout) findViewById(R.id.home_card_recent_layout);
-        switch (recentCrosswords.size())  {
-            case 0:
-                // Set no recent text
-                TextView recentTV1Title = (TextView) findViewById(R.id.home_card_recent_1_title);
-                TextView recentTV1Date = (TextView) findViewById(R.id.home_card_recent_1_date);
-                recentTV1Title.setText(getResources().getString(R.string.home_recent_none1));
-                recentTV1Date.setText(getResources().getString(R.string.home_recent_none2));
-            case 1:
-                // Remove 2nd box
-                CardView recentCard2 = (CardView) findViewById(R.id.home_card_recent_2);
-                recentLayout.removeView(recentCard2);
-            case 2:
-                // Remove 3rd box
-                CardView recentCard3 = (CardView) findViewById(R.id.home_card_recent_3);
-                recentLayout.removeView(recentCard3);
-                break;
-        }
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateRecentCrosswords();
     }
 
 
@@ -116,6 +75,74 @@ public class HomeActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void updateRecentCrosswords() {
+        // Update recent crosswords list
+        Log.d(LOG_TAG,"Searching for recent crossword file... ");
+        libraryManager = new CrosswordLibraryManager(this);
+        recentCrosswords = libraryManager.getRecentCrosswords();
+        switch (recentCrosswords.size())  {
+            case 3:
+                TextView recentTV3Title = (TextView) findViewById(R.id.home_card_recent_3_title);
+                TextView recentTV3Date = (TextView) findViewById(R.id.home_card_recent_3_date);
+                CardView recentCard3 = (CardView) findViewById(R.id.home_card_recent_3);
+                recentTV3Title.setText(recentCrosswords.get(2).getTitle());
+                recentTV3Date.setText(recentCrosswords.get(2).getDisplayDate());
+                recentCard3.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        libraryManager.openCrossword(recentCrosswords.get(2).crosswordFile);
+                    }
+                });
+                //      recentCard3.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
+            case 2:
+                TextView recentTV2Title = (TextView) findViewById(R.id.home_card_recent_2_title);
+                TextView recentTV2Date = (TextView) findViewById(R.id.home_card_recent_2_date);
+                CardView recentCard2 = (CardView) findViewById(R.id.home_card_recent_2);
+                recentTV2Title.setText(recentCrosswords.get(1).getTitle());
+                recentTV2Date.setText(recentCrosswords.get(1).getDisplayDate());
+                recentCard2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        libraryManager.openCrossword(recentCrosswords.get(1).crosswordFile);
+                    }
+                });
+                //        recentCard2.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
+            case 1:
+                TextView recentTV1Title = (TextView) findViewById(R.id.home_card_recent_1_title);
+                TextView recentTV1Date = (TextView) findViewById(R.id.home_card_recent_1_date);
+                recentTV1Title.setText(recentCrosswords.get(0).getTitle());
+                recentTV1Date.setText(recentCrosswords.get(0).getDisplayDate());
+                CardView recentCard1 = (CardView) findViewById(R.id.home_card_recent_1);
+                recentCard1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        libraryManager.openCrossword(recentCrosswords.get(0).crosswordFile);
+                    }
+                });
+                break;
+        }
+
+
+        RelativeLayout recentLayout = (RelativeLayout) findViewById(R.id.home_card_recent_layout);
+        switch (recentCrosswords.size())  {
+            case 0:
+                // Set no recent text
+                TextView recentTV1Title = (TextView) findViewById(R.id.home_card_recent_1_title);
+                TextView recentTV1Date = (TextView) findViewById(R.id.home_card_recent_1_date);
+                recentTV1Title.setText(getResources().getString(R.string.home_recent_none1));
+                recentTV1Date.setText(getResources().getString(R.string.home_recent_none2));
+            case 1:
+                // Remove 2nd box
+                CardView recentCard2 = (CardView) findViewById(R.id.home_card_recent_2);
+                recentLayout.removeView(recentCard2);
+            case 2:
+                // Remove 3rd box
+                CardView recentCard3 = (CardView) findViewById(R.id.home_card_recent_3);
+                recentLayout.removeView(recentCard3);
+                break;
+        }
     }
 
     public void toolkitClicked(View view) {
@@ -146,15 +173,65 @@ public class HomeActivity extends ActionBarActivity {
     }
 
     private void startNewCrossword() {
-        Intent intent = new Intent(this, NewCrossword.class);
-        Log.d(LOG_TAG,"Crossword publication selected: " + publication);
-        Log.d(LOG_TAG,"Crossword date entered: " + date);
+        CrosswordLibraryManager clm = new CrosswordLibraryManager(this) ;
+        boolean safeToWrite = false ;
 
-        intent.putExtra(Crossword.CROSSWORD_EXTRA_TITLE,publication) ;
-        intent.putExtra(Crossword.CROSSWORD_EXTRA_DATE,date) ;
-        startActivity(intent);
+        if (clm.crosswordAlreadyExists(publication, date)) {
+            Log.d(LOG_TAG, "Crossword file already exists for: " + publication + " - " + date + ". Checking if it's safe to overwrite...");
+            safeToWrite = confirmOverwrite() ;
+        } else {
+            safeToWrite = true;
+        }
+
+        if (safeToWrite) {
+            Intent intent = new Intent(this, NewCrossword.class);
+            Log.d(LOG_TAG, "Crossword publication selected: " + publication);
+            Log.d(LOG_TAG, "Crossword displayDate entered: " + date);
+
+            intent.putExtra(Crossword.CROSSWORD_EXTRA_TITLE, publication);
+            intent.putExtra(Crossword.CROSSWORD_EXTRA_DATE, date);
+            startActivity(intent);
+        }
     }
 
+    private boolean confirmOverwrite() {
+        // Popup with confirmation that the previously saved crossword with this publication(i.e. name) and date will be overwritten
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        // Set the dialog title
+        builder.setTitle(publication + " - " + Crossword.getDisplayDate(this, date)) ;
+        // Set the action buttons
+        builder.setPositiveButton(R.string.dialog_overwrite, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User clicked OK, so allow previous file to be overwritten
+                        safeToOverwrite = true;
+
+                    }
+                }
+
+        ) ;
+        builder.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Should already be false, but just make sure
+                        safeToOverwrite = false;
+                        // Do nothing
+                        dialog.cancel();
+                    }
+                }
+
+        );
+        // Warning Message:
+        TextView dialogMessage = new TextView(this) ;
+        dialogMessage.setText(R.string.dialog_overwrite_message);
+        dialogMessage.setGravity(Gravity.CENTER);
+        builder.setView(dialogMessage);
+
+        AlertDialog overwritePopup = builder.create();
+        overwritePopup.show();
+
+        return safeToOverwrite ;
+    }
     private void popupPublicationDialogOptions() {
         // Pop up dialog pox with radio buttons of common publications
         // Auto-fill the input EditText with the selected option. Do nothing if 'other' is selected
@@ -247,7 +324,7 @@ public class HomeActivity extends ActionBarActivity {
         builder.show() ;
     }
     private void popupDateDialog() {
-        // Pop up dialog pox with NumberPickers for the date
+        // Pop up dialog pox with NumberPickers for the displayDate
         // Auto-fill the input EditText with the selected option. Do nothing if user presses cancel
         DialogFragment dialogFragment = new StartDatePicker();
         dialogFragment.show(getFragmentManager(), "start_date_picker");
@@ -257,18 +334,17 @@ public class HomeActivity extends ActionBarActivity {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
-        // Use the current date as the default date in the picker
+        // Use the current displayDate as the default displayDate in the picker
         DatePickerDialog dialog = new DatePickerDialog(HomeActivity.this, this, startYear, startMonth, startDay);
         return dialog ;
     }
     public void onDateSet(DatePicker view, int year, int monthOfYear,
             int dayOfMonth) {
-        // TODO Auto-generated method stub
         String yr = year + "" ;
         String month = (monthOfYear + 1) + "" ;   // Add 1 to the month so that it displays normally. Calendar returns months 0-11.
         String day = dayOfMonth + "";
 
-                // Do something with the date chosen by the user
+                // Do something with the displayDate chosen by the user
         if (month.length() == 1) {
             month = "0" + month;
         }
@@ -279,7 +355,7 @@ public class HomeActivity extends ActionBarActivity {
         // Date in save format (yyyyMMdd)
         date = yr + month + day ;
 
-        Log.d(LOG_TAG,"Starting date set, so starting new crossword...");
+        Log.d(LOG_TAG,"Starting displayDate set, so starting new crossword...");
         startNewCrossword();
     }
 

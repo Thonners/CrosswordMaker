@@ -38,7 +38,7 @@ public class Clue {
     }
 
     public void addCellToClue(Cell newCell) {
-        Log.d(logTag , "Adding new cell to clue that starts in " + startCell.getRow() + ", "  + startCell.getColumn());
+ //       Log.d(logTag , "Adding new cell to clue that starts in " + startCell.getRow() + ", "  + startCell.getColumn());
         clueCells.add(newCell);
     }
 
@@ -52,15 +52,15 @@ public class Clue {
 
     public void highlightClue(Cell focusCell) {
         // Highlight the cells in the clue
-        Log.d(logTag, "Highlighting clue with start cell " + startCell.getCellName());
+        //Log.d(logTag, "Highlighting clue with start cell " + startCell.getCellName());
         setIsHighlighted();
         for (Cell cell : clueCells ) {
             cell.setActiveClue(this);
             if (cell.equals(focusCell)) {
-                Log.d(logTag, "Setting cell " + cell.getCellName() + " to major highlight");
+          //      Log.d(logTag, "Setting cell " + cell.getCellName() + " to major highlight");
                 cell.setFocusedMajor();
             } else {
-                Log.d(logTag, "Setting cell " + cell.getCellName() + " to minor highlight");
+          //      Log.d(logTag, "Setting cell " + cell.getCellName() + " to minor highlight");
                 cell.setFocusedMinor();
             }
         }
@@ -85,7 +85,7 @@ public class Clue {
     }
     public void highlightNextCell(Cell currentCell) {
         // Method to highlight the next cell in the clue
-        Log.d(logTag, "Call to highlightNextCell made from cell: " + currentCell.getCellName());
+//        Log.d(logTag, "Call to highlightNextCell made from cell: " + currentCell.getCellName());
         if (clueCells.indexOf(currentCell) < clueCells.size() - 1) {
             //highlight clue using cell from next in index. Should always be next one due to direction
             // in which cells are searched for and added to clues in findHorizontal/VerticalClues

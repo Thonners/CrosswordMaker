@@ -1,26 +1,12 @@
 package com.thonners.crosswordmaker;
 
-import android.content.Intent;
-import android.graphics.Typeface;
-import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.support.v7.widget.CardView;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import java.io.File;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 
 public class SavedCrosswordSelector extends ActionBarActivity  {
@@ -71,7 +57,7 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
 
     private void addCrosswordToLayout(int index, CrosswordLibraryManager.SavedCrossword savedCrossword) {
 
-        Card card = new Card(getApplicationContext(),savedCrossword.getTitle(),savedCrossword.getDate(),savedCrossword.getDisplayPercentageComplete()) ;
+        Card card = new Card(getApplicationContext(),savedCrossword.getTitle(),savedCrossword.getDisplayDate(),savedCrossword.getDisplayPercentageComplete()) ;
         card.setId(index);
         card.setOnClickListener(new View.OnClickListener() {
             @Override

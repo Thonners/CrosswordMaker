@@ -45,8 +45,8 @@ public class Crossword {
 
     private Context context;
 
-    public String title = "Default title";   // Add the date to the default title?
-    public String date ;    // Save date format (yyyyMMdd)          //= getFormattedDate() ;       // Default date
+    public String title = "Default title";   // Add the displayDate to the default title?
+    public String date ;    // Save displayDate format (yyyyMMdd)          //= getFormattedDate() ;       // Default displayDate
 
     public int rowCount;
     public int totalCells;
@@ -91,12 +91,14 @@ public class Crossword {
 
     GridLayout grid;
 
-    public Crossword(Context context, int rows, GridLayout gridLayout, int screenWidth, int screenHeight) {
+    public Crossword(Context context, int rows, GridLayout gridLayout, int screenWidth, int screenHeight, String title, String date) {
         this.context = context;
         rowCount = rows;
         grid = gridLayout;
         this.screenWidth = screenWidth ;
         this.screenHeight = screenHeight ;
+        this.title = title;
+        this.date = date ;
 
         calculateCellWidth() ;
         calculateFontSize();
@@ -135,7 +137,6 @@ public class Crossword {
         grid.setColumnCount(rowCount);
         grid.setBackground(context.getResources().getDrawable(R.drawable.cell_white));
     }
-
     private void createCells() {
         //Generate all the cells in the crossword grid
 
@@ -166,7 +167,6 @@ public class Crossword {
             }
         }
     }
-
     private void fillCells() {
       // Fill a grid with pre-existing CellViews
         Log.d(LOG_TAG, "Rebuilding grid from saveArray...");
@@ -191,69 +191,73 @@ public class Crossword {
 
     }
 
-    private int getTotalCells(int rowCountIn) {
-        return rowCountIn * rowCountIn;
-    }
-
     public void setTitle(String newTitle) {
         if(newTitle.length() > 0 ) {
             this.title = newTitle;
         }
         return ;
     }
-
     public void setDate(String inputDate) {
         // String inputDate to be provided from HomeActivity intent, which should put it into yyyyMMdd.
         this.date = inputDate ;
     }
 
     public String getDisplayDate() {
-        // Method to use for saving the display date. Not sure this is required
-        SimpleDateFormat sdf = new SimpleDateFormat(SAVE_DATE_FORMAT);      // Save Formatted date
-        DateFormat localeDateFormat = android.text.format.DateFormat.getDateFormat(context);    // Locale date format
+        // Method to use for saving the display displayDate. Not sure this is required
+        SimpleDateFormat sdf = new SimpleDateFormat(SAVE_DATE_FORMAT);      // Save Formatted displayDate
+        DateFormat localeDateFormat = android.text.format.DateFormat.getDateFormat(context);    // Locale displayDate format
         Date dateProper ;
 
         try {
             dateProper = sdf.parse(date) ;
         } catch (Exception e) {
-            Log.e(LOG_TAG, "Couldn't parse Crossword.date (should be in save format) into something useful. This is coming from HomeActivity via intents so check the routing!");
+            Log.e(LOG_TAG, "Couldn't parse Crossword.displayDate (should be in save format) into something useful. This is coming from HomeActivity via intents so check the routing!");
             return context.getResources().getString(R.string.error_crossword_date); // Return the error message to be displayed.
         }
 
         return localeDateFormat.format(dateProper) ;
     }
-
     public static String getDisplayDate(Context context1, String savedDate) {
-        // Method to use for saving the display date. Not sure this is required
-        SimpleDateFormat sdf = new SimpleDateFormat(SAVE_DATE_FORMAT);      // Save Formatted date
-        DateFormat localeDateFormat = android.text.format.DateFormat.getDateFormat(context1);    // Locale date format
+        // Method to use for saving the display displayDate. Not sure this is required
+        SimpleDateFormat sdf = new SimpleDateFormat(SAVE_DATE_FORMAT);      // Save Formatted displayDate
+        DateFormat localeDateFormat = android.text.format.DateFormat.getDateFormat(context1);    // Locale displayDate format
         Date dateProper ;
 
         try {
             dateProper = sdf.parse(savedDate) ;
         } catch (Exception e) {
-            Log.e(LOG_TAG, "Couldn't parse Crossword.date (should be in save format) into something useful. This is coming from HomeActivity via intents so check the routing!");
+            Log.e(LOG_TAG, "Couldn't parse Crossword.displayDate (should be in save format) into something useful. This is coming from HomeActivity via intents so check the routing!");
             return context1.getResources().getString(R.string.error_crossword_date); // Return the error message to be displayed.
         }
 
         return localeDateFormat.format(dateProper) ;
 
     }
-    public static String getSaveDate(Context context1, String displayDate) {
-        // Method to use for saving the display date. Not sure this is required
-        SimpleDateFormat sdf = new SimpleDateFormat(SAVE_DATE_FORMAT);      // Save Formatted date
-        DateFormat localeDateFormat = android.text.format.DateFormat.getDateFormat(context1);    // Locale date format
+
+/*    public static String getSaveDate(Context context1, String displayDate) {
+        // Method to use for saving the display displayDate. Not sure this is required
+        SimpleDateFormat sdf = new SimpleDateFormat(SAVE_DATE_FORMAT);      // Save Formatted displayDate
+        DateFormat localeDateFormat = android.text.format.DateFormat.getDateFormat(context1);    // Locale displayDate format
         Date date ;
 
         try {
             date = localeDateFormat.parse(displayDate) ;
         } catch (Exception e) {
-            Log.e(LOG_TAG, "Couldn't parse Crossword.date (should be in save format) into something useful. This is coming from HomeActivity via intents so check the routing!");
-            return context1.getResources().getString(R.string.error_crossword_date); // Return the error message to be displayed.
+            try {
+                date = sdf.parse(displayDate) ;
+            } catch (Exception ex) {
+                Log.e(LOG_TAG, "Couldn't parse Crossword.displayDate (should be in save format) into something useful. The value is: " + displayDate);
+                return context1.getResources().getString(R.string.error_crossword_date); // Return the error message to be displayed.
+            }
         }
 
         return sdf.format(date) ;
 
+    }
+//*/
+
+    public Cell getCell(int row, int column) {
+        return cells[row][column];
     }
 
     public void findClues() {
@@ -275,7 +279,6 @@ public class Crossword {
         Log.d(LOG_TAG, "");
         getClueNumbers();
     }
-
     private void findHorizontalClues(int row) {
         // Method to find all clues in row
 
@@ -293,8 +296,8 @@ public class Crossword {
                 hClues.get(horizontalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
                 cells[row][col].setHClue(hClues.get(horizontalClueIndex));          // Tell the cell which clue it belongs to
 
-                Log.d("Clues", "New clue found at: r = " + row + " & c = " + col) ;
-                Log.d("Clues", "horizontalClueIndex = " + horizontalClueIndex + " & hClues.length = " + hClues.size()) ;
+//                Log.d("Clues", "New clue found at: r = " + row + " & c = " + col) ;
+//                Log.d("Clues", "horizontalClueIndex = " + horizontalClueIndex + " & hClues.length = " + hClues.size()) ;
 
             } else if (! nextWhiteCellNewClue && ! cells[row][col].isBlackCell()) {
             // If white cell, augment clue count. If not, reset nextWhiteCellNewClue
@@ -315,7 +318,6 @@ public class Crossword {
 
         }
     }
-
     private void findVerticalClues(int col) {
         // Method to find all clues in col
 
@@ -334,8 +336,8 @@ public class Crossword {
                 vClues.get(verticalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
                 cells[row][col].setVClue(vClues.get(verticalClueIndex));          // Tell the cell which clue it belongs to
 
-                Log.d("Clues", "New clue found at: r = " + row + " & c = " + col) ;
-                Log.d("Clues", "verticalClueIndex = " + verticalClueIndex + " & vClues.length = " + vClues.size()) ;
+//                Log.d("Clues", "New clue found at: r = " + row + " & c = " + col) ;
+//                Log.d("Clues", "verticalClueIndex = " + verticalClueIndex + " & vClues.length = " + vClues.size()) ;
 
             } else if (! nextWhiteCellNewClue && ! cells[row][col].isBlackCell()) {
             // If white cell, augment clue count. If not, reset nextWhiteCellNewClue
@@ -354,6 +356,18 @@ public class Crossword {
             }
         }
     }
+    private void calculateCellWidth() {
+        // Use screen width to calculate cell size.
+        // Make cell size (screenWidth / (rowCount + 1)). This allows half a cellWidth on each side to keep the borders nice
+        cellWidth = (int) screenWidth / (rowCount + 1) - (borderWidth * 2) ;
+        gridPadding = (int) cellWidth / 2 ;
+
+        Log.d("Sizes","cellWidth = " + cellWidth);
+    }
+    private void calculateFontSize() {
+        fontSize = (float) cellWidth / 2 ;
+        Log.d("Sizes","fontSize = " + fontSize);
+    }
 
     public void clearCellHighlights() {
         // Set all (non black) cells back to white backgrounds
@@ -365,21 +379,6 @@ public class Crossword {
             }
         }
     }
-
-    private void calculateCellWidth() {
-        // Use screen width to calculate cell size.
-        // Make cell size (screenWidth / (rowCount + 1)). This allows half a cellWidth on each side to keep the borders nice
-        cellWidth = (int) screenWidth / (rowCount + 1) - (borderWidth * 2) ;
-        gridPadding = (int) cellWidth / 2 ;
-
-        Log.d("Sizes","cellWidth = " + cellWidth);
-    }
-
-    private void calculateFontSize() {
-        fontSize = (float) cellWidth / 2 ;
-        Log.d("Sizes","fontSize = " + fontSize);
-    }
-
     public void freezeGrid() {
         // Locks the grid so that black cells stay black and white cells stay white
         for (int i = 0; i < rowCount; i++) {
@@ -405,7 +404,6 @@ public class Crossword {
             cells[oppositeRow][oppositeCol].toggleBlackCell();
         }
     }
-
     private void getClueNumbers() {
         ArrayList<Cell> startCells = new ArrayList<Cell>();
         ArrayList<Integer[]> startCellCoordsGeneral = new ArrayList<Integer[]>();
@@ -465,21 +463,17 @@ public class Crossword {
         }
     }
 
-    // Redundant
-    private String getFormattedDate() {
-        // Return current date in YYYYMMDD format
-        SimpleDateFormat sdf = new SimpleDateFormat(SAVE_DATE_FORMAT);
-        String formattedDate = sdf.format(new Date());
-        Log.d(LOG_TAG, "Date being input to saveArray[1] = " + formattedDate);
-
-        return formattedDate ;
-    }
-
     public int getScreenWidth() {
         return screenWidth;
     }
     public File getCrosswordPictureFile() {
         return crosswordImageFile ;
+    }
+    public File getSaveDir() {
+        return saveDir ;
+    }
+    public File getCrosswordFile() {
+        return crosswordFile ;
     }
     public File getCluePictureFile() {
         return clueImageFile ;
@@ -488,14 +482,10 @@ public class Crossword {
         return getDisplayDate()+ ": " + title ;
     }
 
-    public Cell getCell(int row, int column) {
-        return cells[row][column];
-    }
-
     public String[] getSaveArray() {
         // Create String array to save and pass around with intents
         // Format:  array[0]    = Crossword name
-        //          array[1]    = crossword date
+        //          array[1]    = crossword displayDate
         //          array[2]    = crossword rowCount
         //          array[3]    = cell width
         //          array[4]    = crossword picture resource
@@ -537,7 +527,6 @@ public class Crossword {
 
         return saveArray ;
     }
-
     public static String[] getSaveArray(File savedFile) {
         // Return the save array so that the app may continue as normal from a saved file
         String[] saveArray ;

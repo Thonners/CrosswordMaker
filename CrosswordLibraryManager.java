@@ -22,6 +22,7 @@ public class CrosswordLibraryManager {
 
     Context context ;
     File[] foundCrosswordFiles;    // Note that this is the directory in which the crossword and images (if they exist) will be saved
+    ArrayList<String> foundCrosswordFilePaths = new ArrayList<String>() ;
     File rootDir;
 
     File recentCrosswordsFile ;
@@ -59,8 +60,9 @@ public class CrosswordLibraryManager {
         }
 
         // Output what files were found
-        Log.d(LOG_TAG,"Directory searched: " + rootDir);
+        Log.d(LOG_TAG, "Directory searched: " + rootDir);
         for (int i =0 ; i < foundCrosswordFiles.length ; i++) {
+            foundCrosswordFilePaths.add(foundCrosswordFiles[i].getName());
             Log.d(LOG_TAG,"File at index " + i + " is " + foundCrosswordFiles[i].getName());
         }
     }
@@ -75,6 +77,21 @@ public class CrosswordLibraryManager {
     private void addCrosswordToLibrary(SavedCrossword savedCrossword) {
         savedCrosswords.add(savedCrossword);
         savedCrosswordFiles.add(savedCrossword.getCrosswordFile());
+    }
+
+    public boolean crosswordAlreadyExists(String crosswordName, String crosswordDate) {
+        String directoryName = crosswordDate + "-" + crosswordName.replaceAll(" ","_").replaceAll("-","__");
+        getSavedFiles();
+        Log.d(LOG_TAG, "Checking crossword file doesn't already exist for: " + directoryName);
+
+        if (foundCrosswordFilePaths.contains(directoryName)) {
+        Log.d(LOG_TAG, "Crossword file found for: " + directoryName);
+            return true ;
+        } else {
+        Log.d(LOG_TAG, "No crossword file found for: " + directoryName);
+            return false ;
+        }
+
     }
 
     private void getRecentFile() {
@@ -94,7 +111,7 @@ public class CrosswordLibraryManager {
                     File newRecentCrosswordFile = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),line);
                     SavedCrossword newRecentSavedCrossword = new SavedCrossword(context, newRecentCrosswordFile);
                     recentCrosswords.add(newRecentSavedCrossword);
-                    Log.d(LOG_TAG, "Added a new entry to the recent crossword list: " + newRecentSavedCrossword.getTitle() + " " + newRecentSavedCrossword.getDate());
+                    Log.d(LOG_TAG, "Added a new entry to the recent crossword list: " + newRecentSavedCrossword.getTitle() + " " + newRecentSavedCrossword.getDisplayDate());
                 }
                 br.close() ;
 
@@ -203,14 +220,16 @@ public class CrosswordLibraryManager {
         Context context ;
         File crosswordFile;
         String title ;
-        String date ;
+        String saveDate ;
+        String displayDate;
         String percentageComplete ;
 
         public SavedCrossword(Context context, File crosswordDir) {
             this.context = context ;
             this.crosswordFile = crosswordDir ;
             String[] crosswordDetails = crosswordDir.getName().split("-");
-            this.date = Crossword.getDisplayDate(context, crosswordDetails[0]) ; // Convert date from saved YYYYMMDD format into locale display date
+            this.saveDate = crosswordDetails[0] ;   // Date extracted from saved file name
+            this.displayDate = Crossword.getDisplayDate(context, crosswordDetails[0]) ; // Convert displayDate from saved YYYYMMDD format into locale display displayDate
             this.title = crosswordDetails[1].replaceAll("__", "-").replaceAll("_", " ");   // Replace all used to restore any hyphens/spaces that were taken out during the fileName assignment in Crossword.initialiseSaveFiles
             this.percentageComplete = calculatePercentageComplete(crosswordDir);
         }
@@ -246,8 +265,8 @@ public class CrosswordLibraryManager {
         public String getTitle() {
             return title;
         }
-        public String getDate() {
-            return date;
+        public String getDisplayDate() {
+            return displayDate;
         }
         public String getPercentageComplete() {
             return percentageComplete;
@@ -256,7 +275,8 @@ public class CrosswordLibraryManager {
             return context.getString(R.string.completion) + " " + percentageComplete + "%" ;
         }
         public String getSaveString() {
-            return Crossword.getSaveDate(context, date) + "-" + title.replaceAll(" ","_").replaceAll("-","__");
+            return saveDate + "-" + title.replaceAll(" ","_").replaceAll("-","__");
+           // return Crossword.getSaveDate(context, displayDate) + "-" + title.replaceAll(" ","_").replaceAll("-","__");
         }
         public File getCrosswordFile() {
             return crosswordFile;
