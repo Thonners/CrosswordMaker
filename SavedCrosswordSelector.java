@@ -1,5 +1,6 @@
 package com.thonners.crosswordmaker;
 
+import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -65,15 +66,34 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
                 crosswordSelected(v);
             }
         });
+        card.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                    toggleChangeCardElevation(v);
+                return true;
+            }
+        });
         layout.addView(card);
 
     }
     private void crosswordSelected(View view) {
         int i = view.getId() ;  // get index of save file
 
-        Log.d(LOG_TAG,"Crossword selected: " + libraryManager.getSavedCrosswords().get(i).getTitle());
+        Log.d(LOG_TAG, "Crossword selected: " + libraryManager.getSavedCrosswords().get(i).getTitle());
 
         libraryManager.openCrossword(libraryManager.getSavedCrosswords().get(i).getCrosswordFile());
+    }
+
+    private void toggleChangeCardElevation(View view) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (view.getElevation() == getResources().getDimension(R.dimen.z_card_default)) {
+                view.setElevation(getResources().getDimension(R.dimen.z_library_card_highlighted));
+            } else {
+                view.setElevation(getResources().getDimension(R.dimen.z_card_default));
+            }
+        } else  {
+            view.setBackgroundColor(getResources().getColor(R.color.light_grey));
+        }
     }
 
 }
