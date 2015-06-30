@@ -70,6 +70,7 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
             @Override
             public boolean onLongClick(View v) {
                     toggleChangeCardElevation(v);
+
                 return true;
             }
         });
@@ -85,6 +86,7 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
     }
 
     private void toggleChangeCardElevation(View view) {
+        // Method to toggle whether card is highlighted (i.e. raised) after long click
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (view.getElevation() == getResources().getDimension(R.dimen.z_card_default)) {
                 view.setElevation(getResources().getDimension(R.dimen.z_library_card_highlighted));
@@ -94,6 +96,11 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
         } else  {
             view.setBackgroundColor(getResources().getColor(R.color.light_grey));
         }
+    }
+
+    private void toggleEditDeleteButtons(View view) {
+        // Method to show or hide the edit and delete buttons
+
     }
 
 }

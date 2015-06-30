@@ -22,7 +22,7 @@ public class NewCrossword extends ActionBarActivity {
 
     private int min = 3 ;
     private int max = 20 ;
-    private int defaultValue = 12 ;
+    private int defaultValue = 13 ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
