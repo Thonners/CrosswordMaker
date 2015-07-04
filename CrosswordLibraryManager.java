@@ -214,7 +214,22 @@ public class CrosswordLibraryManager {
         loadingToast.show();
     }
 
-
+    public void openEditCrossword(File savedCrosswordDir) {
+        Log.d(LOG_TAG,"Opening crossword for editing from file: " + savedCrosswordDir.getPath());
+        try {
+            File crossword = new File(savedCrosswordDir, Crossword.SAVE_CROSSWORD_FILE_NAME);
+            openEditCrossword(Crossword.getSaveArray(crossword));
+        } catch (Exception e) {
+            Log.e(LOG_TAG,"Exception thrown when trying to get file: " + e.getMessage());
+        }
+    }
+    private void openEditCrossword(String[] savedCrossword) {
+            Log.d(LOG_TAG,"Opening crossword for editing" + savedCrossword[Crossword.SAVED_ARRAY_INDEX_TITLE] + " " + savedCrossword[Crossword.SAVED_ARRAY_INDEX_DATE]);
+        // Start new crossword activity
+        Intent editCrosswordActivity = new Intent(context, CrosswordGridEditor.class);
+        editCrosswordActivity.putExtra(Crossword.CROSSWORD_EXTRA, savedCrossword);
+        context.startActivity(editCrosswordActivity);
+    }
 
     static class SavedCrossword {
         Context context ;

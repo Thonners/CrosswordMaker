@@ -17,6 +17,7 @@ public class Card extends CardView {
     private Context context;
     private RelativeLayout layout;
     private int padding;
+    private boolean cardSelected = false ;
 
     private static final int DICTIONARY_WORD_NOT_FOUND  = -1 ;
     private static final int DICTIONARY_WORD            = 0;
@@ -161,5 +162,18 @@ public class Card extends CardView {
     }
     public RelativeLayout getRelativeLayout() {
         return layout;
+    }
+    public boolean getCardSelected() {
+        return cardSelected ;
+    }
+    public void toggleCardSelected() {
+        if (cardSelected) {
+            cardSelected = false ;
+        } else {
+            cardSelected = true ;
+        }
+    }
+    public void setCardDeselected() {
+        cardSelected = false ;
     }
 }

@@ -1,13 +1,19 @@
 package com.thonners.crosswordmaker;
 
+import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 
 public class SavedCrosswordSelector extends ActionBarActivity  {
@@ -15,14 +21,19 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
     private static final String LOG_TAG = "SavedCrosswordSelector" ;
 
     CrosswordLibraryManager libraryManager ;
-    LinearLayout layout ;
+    RelativeLayout mainLayout ;
+    RelativeLayout layout ;
+    CardView editButton;
+    int editCrosswordIndex = -1 ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_saved_crossword_selector);
 
-        layout = (LinearLayout) findViewById(R.id.saved_selector_layout);
+        mainLayout = (RelativeLayout) findViewById(R.id.saved_crossword_main_layout);
+        layout = (RelativeLayout) findViewById(R.id.saved_crosswords_r_layout)  ;
+        createEditButton();
 
         libraryManager = new CrosswordLibraryManager(this);
 
@@ -69,11 +80,18 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
         card.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                    toggleChangeCardElevation(v);
+                toggleCardSelection(v);
 
                 return true;
             }
         });
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT );
+        if(index == 1) {
+            layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        } else {
+            layoutParams.addRule(RelativeLayout.BELOW, index - 1);
+        }
+        card.setLayoutParams(layoutParams);
         layout.addView(card);
 
     }
@@ -85,22 +103,88 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
         libraryManager.openCrossword(libraryManager.getSavedCrosswords().get(i).getCrosswordFile());
     }
 
-    private void toggleChangeCardElevation(View view) {
+    private void toggleCardSelection(View view) {
         // Method to toggle whether card is highlighted (i.e. raised) after long click
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (view.getElevation() == getResources().getDimension(R.dimen.z_card_default)) {
-                view.setElevation(getResources().getDimension(R.dimen.z_library_card_highlighted));
+        Card card = (Card) view ;
+        card.toggleCardSelected();
+
+        if (card.getCardSelected()) {
+            // Get index of selected card
+            editCrosswordIndex = view.getId() ;
+            Log.d(LOG_TAG, "editCardIndex = " + view.getId());
+
+            selectCard(card);
+        } else {
+            // Set index to <0 to imply that no card is selected
+            editCrosswordIndex = -1 ;
+            Log.d(LOG_TAG, "editCardIndex = -1");
+
+            deselectCard(card);
+
+        }
+
+    toggleEditDeleteButtons();
+
+    }
+
+    private void selectCard(Card card) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                // Lower all views (in case another was selected)
+                for (int i = 0; i < layout.getChildCount(); i++) {
+                    View v = layout.getChildAt(i);
+                    if (v instanceof Card) {
+                        v.setElevation(getResources().getDimension(R.dimen.z_card_default));
+                        ((Card) v).setCardDeselected();
+                    }
+                }
+                // Set selected view to raised elevation
+                card.setElevation(getResources().getDimension(R.dimen.z_library_card_highlighted));
+                card.toggleCardSelected();  // Put it back to selected as it's turned off by the for loop above
             } else {
-                view.setElevation(getResources().getDimension(R.dimen.z_card_default));
+                card.setBackgroundColor(getResources().getColor(R.color.light_grey));
             }
-        } else  {
-            view.setBackgroundColor(getResources().getColor(R.color.light_grey));
+    }
+    private void deselectCard(Card card) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                // Lower selected view as it's already raised
+                card.setElevation(getResources().getDimension(R.dimen.z_card_default));
+            } else {
+                card.setBackgroundColor(getResources().getColor(R.color.white));
+            }
+
+    }
+
+    private void toggleEditDeleteButtons() {
+        // Method to show or hide the edit and delete buttons
+        if (editCrosswordIndex < 0) {
+            editButton.setVisibility(View.INVISIBLE);
+        } else {
+            editButton.setVisibility(View.VISIBLE);
         }
     }
 
-    private void toggleEditDeleteButtons(View view) {
-        // Method to show or hide the edit and delete buttons
+    private void createEditButton() {
+        editButton = new FooterButton(this, getResources().getString(R.string.edit));
+        editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editCrossword();
+            }
+        });
 
+        mainLayout.addView(editButton);
+    }
+
+    private void editCrossword() {
+        // Launch new activity to edit the selected crossword
+        if (editCrosswordIndex < 0) {
+            Log.d(LOG_TAG, "editCrosswordIndex < 0 - not doing anything (why is this method being called???!?!?!");
+        } else {
+            // TODO: Launch edit activity
+            Log.d(LOG_TAG, "Opening edit task for: " + libraryManager.getSavedCrosswords().get(editCrosswordIndex).getTitle());
+            libraryManager.openEditCrossword(libraryManager.getSavedCrosswords().get(editCrosswordIndex).getCrosswordFile());
+
+        }
     }
 
 }

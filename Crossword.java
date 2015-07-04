@@ -641,4 +641,19 @@ public class Crossword {
         saveCrossword();
     }
 
+    public void deleteCrossword() {
+        Log.d(LOG_TAG, "Call to delete crossword received. Looping through & deleting files.") ;
+        // Delete crossword save directory and all files contained within
+        File[] files = saveDir.listFiles();
+        for (File f : files) {
+            if (f != null) {
+                Log.d(LOG_TAG,"Deleting file at: " + f.getPath());
+                f.delete();
+            }
+        }
+        Log.d(LOG_TAG,"Deleting parent directory: " + saveDir.getPath());
+        saveDir.delete() ;
+
+    }
+
 }
