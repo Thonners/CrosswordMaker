@@ -14,7 +14,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Toast;
 
 /**
  * Created by mat on 07/03/15.
@@ -61,12 +60,19 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
         switch (item.getItemId()) {
+            case R.id.action_feedback:
+                // Send an email
+                HomeActivity.emailDeveloperFeedback(this);
+                break;
+            case R.id.action_about:
+                // Show 'About' Dialog
+                 HomeActivity.showAboutDialog(this);
+                break;
             case R.id.action_settings:
                 // Open some settings menu
-                openSettings();
+                 HomeActivity.openSettings(this);
                 break ;
         }
 
@@ -137,11 +143,6 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
         // Method to hide the keyboard
         InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.showSoftInput(view, inputManager.SHOW_IMPLICIT);
-    }
-    private void openSettings() {
-        // TODO: come up with some settings / an activity for settings
-        Toast t = Toast.makeText(this, "Will create a settings option soon", Toast.LENGTH_SHORT);
-        t.show();
     }
     /**
      * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in

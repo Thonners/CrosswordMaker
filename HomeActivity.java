@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
@@ -19,6 +20,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -69,9 +71,19 @@ public class HomeActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_feedback:
+                // Send an email
+                emailDeveloperFeedback(this);
+                break;
+            case R.id.action_about:
+                // Show 'About' Dialog
+                showAboutDialog(this);
+                break;
+            case R.id.action_settings:
+                // Open some settings menu
+                openSettings(this);
+                break ;
         }
 
         return super.onOptionsItemSelected(item);
@@ -331,33 +343,75 @@ public class HomeActivity extends ActionBarActivity {
     }
 
     public class StartDatePicker extends DialogFragment implements DatePickerDialog.OnDateSetListener{
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        // TODO Auto-generated method stub
-        // Use the current displayDate as the default displayDate in the picker
-        DatePickerDialog dialog = new DatePickerDialog(HomeActivity.this, this, startYear, startMonth, startDay);
-        return dialog ;
-    }
-    public void onDateSet(DatePicker view, int year, int monthOfYear,
-            int dayOfMonth) {
-        String yr = year + "" ;
-        String month = (monthOfYear + 1) + "" ;   // Add 1 to the month so that it displays normally. Calendar returns months 0-11.
-        String day = dayOfMonth + "";
-
-                // Do something with the displayDate chosen by the user
-        if (month.length() == 1) {
-            month = "0" + month;
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // TODO Auto-generated method stub
+            // Use the current displayDate as the default displayDate in the picker
+            DatePickerDialog dialog = new DatePickerDialog(HomeActivity.this, this, startYear, startMonth, startDay);
+            return dialog ;
         }
-        if (day.length() == 1) {
-            day = "0" + day ;
+        public void onDateSet(DatePicker view, int year, int monthOfYear,
+                              int dayOfMonth) {
+            String yr = year + "" ;
+            String month = (monthOfYear + 1) + "" ;   // Add 1 to the month so that it displays normally. Calendar returns months 0-11.
+            String day = dayOfMonth + "";
+
+            // Do something with the displayDate chosen by the user
+            if (month.length() == 1) {
+                month = "0" + month;
+            }
+            if (day.length() == 1) {
+                day = "0" + day ;
+            }
+
+            // Date in save format (yyyyMMdd)
+            date = yr + month + day ;
+
+            Log.d(LOG_TAG,"Starting displayDate set, so starting new crossword...");
+            startNewCrossword();
         }
 
-        // Date in save format (yyyyMMdd)
-        date = yr + month + day ;
-
-        Log.d(LOG_TAG,"Starting displayDate set, so starting new crossword...");
-        startNewCrossword();
     }
 
-}
+    public static void emailDeveloperFeedback(Context context) {
+        // Create an email to me with specific subject heading. Outsource actual email sending.
+        Log.d(LOG_TAG,"Trying to launch email to developer");
+        Log.d(LOG_TAG,"email_type: " + context.getString(R.string.email_type));
+
+        // Create Intent & let email client send the message
+        Intent i = new Intent(Intent.ACTION_SEND);
+        i.setType(context.getResources().getString(R.string.email_type));
+        i.putExtra(Intent.EXTRA_EMAIL  , new String[]{context.getResources().getString(R.string.email_target)});
+        i.putExtra(Intent.EXTRA_SUBJECT, context.getResources().getString(R.string.email_subject));
+        i.putExtra(Intent.EXTRA_TEXT   , context.getResources().getString(R.string.email_body));
+        try {
+            context.startActivity(Intent.createChooser(i, "Send mail..."));
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(context, context.getResources().getString(R.string.email_error), Toast.LENGTH_SHORT).show();
+        }
+    }
+    public static void showAboutDialog(Context context) {
+        // Show a dialog containing an 'about' section
+        // Text view (probably should move this to a layout resource later)
+        TextView aboutTV = new TextView(context);
+        aboutTV.setText(context.getString(R.string.about_text));
+        aboutTV.setGravity(View.TEXT_ALIGNMENT_CENTER);
+        aboutTV.setPadding(context.getResources().getDimensionPixelOffset(R.dimen.about_dialog_padding), context.getResources().getDimensionPixelOffset(R.dimen.about_dialog_padding), context.getResources().getDimensionPixelOffset(R.dimen.about_dialog_padding), context.getResources().getDimensionPixelOffset(R.dimen.about_dialog_padding));
+        // Dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(context.getString(R.string.about_title));
+        builder.setView(aboutTV);
+        builder.setNegativeButton(R.string.about_dismiss, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Do nothing
+                        dialog.cancel();
+                    }
+                }
+        );
+        builder.show();
+    }
+    public static void openSettings(Context context) {
+        Toast.makeText(context, "Will create a settings option soon", Toast.LENGTH_SHORT).show();
+    }
 }

@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.GridLayout;
 
+import java.io.File;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -124,5 +126,8 @@ public class CrosswordPageFragment extends Fragment {
 
     public Crossword getCrossword() {
         return crossword;
+    }
+    public File getCrosswordSaveDir() {
+        return crossword.getSaveDir() ;
     }
 }

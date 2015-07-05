@@ -1,6 +1,9 @@
 package com.thonners.crosswordmaker;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -10,12 +13,11 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -86,10 +88,8 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
         pager.setOffscreenPageLimit(NUM_PAGES);
         pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onPageScrollStateChanged(int state)
-            {
-                if (state == ViewPager.SCROLL_STATE_IDLE)
-                {
+            public void onPageScrollStateChanged(int state) {
+                if (state == ViewPager.SCROLL_STATE_IDLE) {
                     switch (pager.getCurrentItem()) {
                         case CROSSWORD_TAB:
                             hideKeyboard();
@@ -100,14 +100,14 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
                         case DICTIONARY_TAB:
                             dictionaryPageFragment.inputBoxRequestFocus();
                             if (dontShowKeyboard) {
-                                dontShowKeyboard = false ;  // Reset for next time
+                                dontShowKeyboard = false;  // Reset for next time
                             } else {
                                 showKeyboard(dictionaryPageFragment.getInputBox());
                             }
                             break;
                         case ANAGRAM_TAB:
                             anagramPageFragment.inputBoxRequestFocus();
-                                showKeyboard(anagramPageFragment.getInputBox());
+                            showKeyboard(anagramPageFragment.getInputBox());
                             break;
                         case DOODLE_TAB:
                             break;
@@ -115,10 +115,12 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
 
                 }
             }
+
             @Override
             public void onPageSelected(int position) {
                 // Empty required method
             }
+
             @Override
             public void onPageScrolled(int position, float offset, int offsetPixels) {
                 // Empty required method
@@ -147,14 +149,31 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
         int id = item.getItemId();
 
         switch (item.getItemId()) {
-            case R.id.action_settings:
-                // Open some settings menu
-                openSettings();
-                break ;
             case R.id.action_save:
                 // Save the grid
                 saveGrid();
                 break;
+            case R.id.action_edit:
+                // Launch a CrosswordGridEditor activity
+                launchEditorActivity();
+                break;
+            case R.id.action_retake_clues:
+                // Retake the clues picture
+                retakeCluesPicture();
+                break;
+            case R.id.action_feedback:
+                // Send an email
+                emailDeveloperFeedback();
+                break;
+            case R.id.action_about:
+                // Show 'About' Dialog
+                showAboutDialog();
+                break;
+            case R.id.action_settings:
+                // Open some settings menu
+                openSettings();
+                break ;
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -237,18 +256,6 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
         InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.showSoftInput(view, inputManager.SHOW_IMPLICIT);
     }
-    public void saveGrid() {
-        // Save the grid
-        crosswordPageFragment.getCrossword().saveCrossword();
-
-        Toast toast = Toast.makeText(this,"Crossword progress saved.", Toast.LENGTH_SHORT);
-        toast.show();
-    }
-    private void openSettings() {
-        // TODO: come up with some settings / an activity for settings
-        Toast t = Toast.makeText(this, "Will create a settings option soon", Toast.LENGTH_SHORT);
-        t.show();
-    }
 
     public void searchDictionary(String searchTerm) {
         // Search the dictionary:
@@ -264,5 +271,34 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
         pager.setCurrentItem(DICTIONARY_TAB, true);
     }
 
+
+    // ------------------------- Menu button presses --------------------------------------
+
+    public void saveGrid() {
+        // Save the grid
+        crosswordPageFragment.getCrossword().saveCrossword();
+
+        Toast toast = Toast.makeText(this,"Crossword progress saved.", Toast.LENGTH_SHORT);
+        toast.show();
+    }
+    private void showAboutDialog() {
+        HomeActivity.showAboutDialog(this);
+    }
+    private void emailDeveloperFeedback() {
+        HomeActivity.emailDeveloperFeedback(this);
+    }
+    private void launchEditorActivity() {
+        // Launch activitiy to edit the grid
+        CrosswordLibraryManager clm = new CrosswordLibraryManager(this);
+        clm.openEditCrossword(crosswordPageFragment.getCrosswordSaveDir());
+    }
+    private void retakeCluesPicture() {
+        cluePageFragment.dispatchTakePictureIntent();
+    }
+    private void openSettings() {
+        // TODO: come up with some settings / an activity for settings
+        Toast t = Toast.makeText(this, "Will create a settings option soon", Toast.LENGTH_SHORT);
+        t.show();
+    }
 
 }
