@@ -2,6 +2,8 @@ package com.thonners.crosswordmaker;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,19 +20,24 @@ public class CrosswordGridEditor extends ActionBarActivity {
 
     private RelativeLayout mainLayout ;
     private FooterButton deleteButton ;
+    private FloatingActionButton saveFab ;
 
     private GridLayout crosswordGrid ;
     private Crossword crossword ;
-    private String[] crosswordStringArray;
+    private String[] originalCrosswordStringArray;
+    private String[] newCrossworyStringArray ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crossword_grid_editor);
-        crosswordStringArray = getIntent().getStringArrayExtra(Crossword.CROSSWORD_EXTRA);
+        originalCrosswordStringArray = getIntent().getStringArrayExtra(Crossword.CROSSWORD_EXTRA);
+        newCrossworyStringArray = new String[originalCrosswordStringArray.length];
         initialise();
 
         createCrossword();
+
+        positionSaveFAB();
 
         this.setTitle(crossword.getActivityTitle());
     }
@@ -60,6 +67,7 @@ public class CrosswordGridEditor extends ActionBarActivity {
     private void initialise() {
         mainLayout = (RelativeLayout) findViewById(R.id.editor_main_layout);
         crosswordGrid = (GridLayout) findViewById(R.id.main_grid_editor);
+        saveFab = (FloatingActionButton) findViewById(R.id.fab_edit_save);
 
         deleteButton = new FooterButton(this, getString(R.string.delete));
         deleteButton.setOnClickListener(new View.OnClickListener() {
@@ -73,10 +81,19 @@ public class CrosswordGridEditor extends ActionBarActivity {
         deleteButton.setVisibility(View.VISIBLE);
     }
 
+    private void positionSaveFAB() {
+        RelativeLayout.LayoutParams saveFabLP = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        saveFabLP.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        saveFabLP.addRule(RelativeLayout.BELOW, R.id.main_grid_editor);
+        saveFab.setLayoutParams(saveFabLP);
+
+    }
+
     private void createCrossword() {
         // Create the crossword
-        crossword = new Crossword(this, crosswordGrid,crosswordStringArray);
+        crossword = new Crossword(this, crosswordGrid, originalCrosswordStringArray,true);
     }
+
 
     private void showDeleteDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -103,6 +120,45 @@ public class CrosswordGridEditor extends ActionBarActivity {
         builder.show();
     }
 
+    public void saveClicked(View view) {
+        Log.d(LOG_TAG, "Save clicked, so saving crossword now...");
+        saveCrosswordGrid();
+
+        Log.d(LOG_TAG,"Crossword saved, opening new activity...");
+        CrosswordLibraryManager crosswordLibraryManager = new CrosswordLibraryManager(this);
+        crosswordLibraryManager.openCrossword(crossword.getSaveDir());
+    }
+
+    private void saveCrosswordGrid() {
+        // Save the new grid to the crossword
+        // Save admin details to newCrosswordStringArray
+        for (int i=0 ; i < Crossword.SAVE_ARRAY_START_INDEX ; i++) {
+            Log.d(LOG_TAG,"Setting value at index position " + i + " of newCrosswordSA to: " + originalCrosswordStringArray[i]);
+            newCrossworyStringArray[i] = originalCrosswordStringArray[i] ;
+        }
+
+        getNewGrid();
+
+        // Loop through original and new grids and find where they differ to the original
+        for (int i=Crossword.SAVE_ARRAY_START_INDEX ; i < originalCrosswordStringArray.length ; i++) {
+            if (!newCrossworyStringArray[i].matches("-")) {
+                // If new array isn't a black cell, carryover value from old array, unless it used to be a black cell, in which case set it blank
+                String oldValue = originalCrosswordStringArray[i] ;
+                if (oldValue.matches("-")) {
+                    newCrossworyStringArray[i] = "" ;
+                } else {
+                    newCrossworyStringArray[i] = originalCrosswordStringArray[i] ;
+                }
+            }
+            Log.d(LOG_TAG, "Setting value at index: " + i  + " to " + newCrossworyStringArray[i]);
+        }
+        Log.d(LOG_TAG,"Setting new string array in crossword");
+        crossword.setSaveArray(newCrossworyStringArray);
+        crossword.saveCrossword();
+    }
+    private void getNewGrid() {
+        newCrossworyStringArray = crossword.getSaveArray() ;
+    }
     private void deleteCrossword() {
         crossword.deleteCrossword();
     }

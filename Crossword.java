@@ -49,9 +49,6 @@ public class Crossword {
     public String date ;    // Save displayDate format (yyyyMMdd)          //= getFormattedDate() ;       // Default displayDate
 
     public int rowCount;
-    public int totalCells;
-
-    private int padding = 2 ;
 
     private int screenWidth ;
     private int screenHeight ;
@@ -61,6 +58,7 @@ public class Crossword {
 
     private float fontSize ;
 
+    private boolean editMode = false ;
 
     private ArrayList<Clue> hClues = new ArrayList<Clue>() ;     // Storage for all the horizontal clues
     private ArrayList<Clue> vClues = new ArrayList<Clue>() ;     // Storage for all the vertical clues
@@ -91,6 +89,9 @@ public class Crossword {
 
     GridLayout grid;
 
+
+    //---------------------------------------------- Constructors --------------------------------------------------
+
     public Crossword(Context context, int rows, GridLayout gridLayout, int screenWidth, int screenHeight, String title, String date) {
         this.context = context;
         rowCount = rows;
@@ -107,8 +108,7 @@ public class Crossword {
 
         initialiseSaveFiles();
     }
-
-    public Crossword(Context context, GridLayout gridLayout, String[] savedCrossword) {
+    public Crossword(Context context, GridLayout gridLayout, String[] savedCrossword, boolean editMode) {
         // Constructor for a saved crossword
         this.context = context ;
         this.grid = gridLayout;
@@ -123,13 +123,23 @@ public class Crossword {
         createGrid();
         calculateFontSize();
         createCells();
-        fillCells();
-        freezeGrid();
-        findClues();
+        if (editMode) {
+            toggleBlackCells() ;
+        } else {
+            fillCells();
+            freezeGrid();
+            findClues();
+        }
 
         initialiseSaveFiles();
+
+    }
+    public Crossword(Context context, GridLayout gridLayout, String[] savedCrossword) {
+        // Default constructor for saved crossword - don't use edit mode.
+        this(context, gridLayout, savedCrossword, false);
     }
 
+    // --------------------------------------- Crossword Creation - private methods --------------------------------
     private void createGrid() {
         grid.setFocusable(true);
         grid.setFocusableInTouchMode(true);
@@ -187,77 +197,19 @@ public class Crossword {
                 index++;
             }
         }
-
-
     }
-
-    public void setTitle(String newTitle) {
-        if(newTitle.length() > 0 ) {
-            this.title = newTitle;
-        }
-        return ;
-    }
-    public void setDate(String inputDate) {
-        // String inputDate to be provided from HomeActivity intent, which should put it into yyyyMMdd.
-        this.date = inputDate ;
-    }
-
-    public String getDisplayDate() {
-        // Method to use for saving the display displayDate. Not sure this is required
-        SimpleDateFormat sdf = new SimpleDateFormat(SAVE_DATE_FORMAT);      // Save Formatted displayDate
-        DateFormat localeDateFormat = android.text.format.DateFormat.getDateFormat(context);    // Locale displayDate format
-        Date dateProper ;
-
-        try {
-            dateProper = sdf.parse(date) ;
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "Couldn't parse Crossword.displayDate (should be in save format) into something useful. This is coming from HomeActivity via intents so check the routing!");
-            return context.getResources().getString(R.string.error_crossword_date); // Return the error message to be displayed.
-        }
-
-        return localeDateFormat.format(dateProper) ;
-    }
-    public static String getDisplayDate(Context context1, String savedDate) {
-        // Method to use for saving the display displayDate. Not sure this is required
-        SimpleDateFormat sdf = new SimpleDateFormat(SAVE_DATE_FORMAT);      // Save Formatted displayDate
-        DateFormat localeDateFormat = android.text.format.DateFormat.getDateFormat(context1);    // Locale displayDate format
-        Date dateProper ;
-
-        try {
-            dateProper = sdf.parse(savedDate) ;
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "Couldn't parse Crossword.displayDate (should be in save format) into something useful. This is coming from HomeActivity via intents so check the routing!");
-            return context1.getResources().getString(R.string.error_crossword_date); // Return the error message to be displayed.
-        }
-
-        return localeDateFormat.format(dateProper) ;
-
-    }
-
-/*    public static String getSaveDate(Context context1, String displayDate) {
-        // Method to use for saving the display displayDate. Not sure this is required
-        SimpleDateFormat sdf = new SimpleDateFormat(SAVE_DATE_FORMAT);      // Save Formatted displayDate
-        DateFormat localeDateFormat = android.text.format.DateFormat.getDateFormat(context1);    // Locale displayDate format
-        Date date ;
-
-        try {
-            date = localeDateFormat.parse(displayDate) ;
-        } catch (Exception e) {
-            try {
-                date = sdf.parse(displayDate) ;
-            } catch (Exception ex) {
-                Log.e(LOG_TAG, "Couldn't parse Crossword.displayDate (should be in save format) into something useful. The value is: " + displayDate);
-                return context1.getResources().getString(R.string.error_crossword_date); // Return the error message to be displayed.
+    private void toggleBlackCells(){
+      // Fill a grid with pre-existing CellViews
+        Log.d(LOG_TAG, "Rebuilding grid from saveArray in editMode...");
+        int index = SAVE_ARRAY_START_INDEX;
+        for (int i = 0; i < rowCount; i++) {
+            for (int j = 0; j < rowCount; j++) {
+                if (crosswordStringArray[index].matches("-")) {
+                    cells[i][j].toggleBlackCell();
+                }
+                index++;
             }
         }
-
-        return sdf.format(date) ;
-
-    }
-//*/
-
-    public Cell getCell(int row, int column) {
-        return cells[row][column];
     }
 
     public void findClues() {
@@ -367,6 +319,51 @@ public class Crossword {
     private void calculateFontSize() {
         fontSize = (float) cellWidth / 2 ;
         Log.d("Sizes","fontSize = " + fontSize);
+    }
+    // ---------------------------------------------------- Public get/set methods ------------------------------------------
+    public void setTitle(String newTitle) {
+        if(newTitle.length() > 0 ) {
+            this.title = newTitle;
+        }
+        return ;
+    }
+    public void setDate(String inputDate) {
+        // String inputDate to be provided from HomeActivity intent, which should put it into yyyyMMdd.
+        this.date = inputDate ;
+    }
+    public String getDisplayDate() {
+        // Method to use for saving the display displayDate. Not sure this is required
+        SimpleDateFormat sdf = new SimpleDateFormat(SAVE_DATE_FORMAT);      // Save Formatted displayDate
+        DateFormat localeDateFormat = android.text.format.DateFormat.getDateFormat(context);    // Locale displayDate format
+        Date dateProper ;
+
+        try {
+            dateProper = sdf.parse(date) ;
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Couldn't parse Crossword.displayDate (should be in save format) into something useful. This is coming from HomeActivity via intents so check the routing!");
+            return context.getResources().getString(R.string.error_crossword_date); // Return the error message to be displayed.
+        }
+
+        return localeDateFormat.format(dateProper) ;
+    }
+    public static String getDisplayDate(Context context1, String savedDate) {
+        // Method to use for saving the display displayDate. Not sure this is required
+        SimpleDateFormat sdf = new SimpleDateFormat(SAVE_DATE_FORMAT);      // Save Formatted displayDate
+        DateFormat localeDateFormat = android.text.format.DateFormat.getDateFormat(context1);    // Locale displayDate format
+        Date dateProper ;
+
+        try {
+            dateProper = sdf.parse(savedDate) ;
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Couldn't parse Crossword.displayDate (should be in save format) into something useful. This is coming from HomeActivity via intents so check the routing!");
+            return context1.getResources().getString(R.string.error_crossword_date); // Return the error message to be displayed.
+        }
+
+        return localeDateFormat.format(dateProper) ;
+
+    }
+    public Cell getCell(int row, int column) {
+        return cells[row][column];
     }
 
     public void clearCellHighlights() {
@@ -482,6 +479,9 @@ public class Crossword {
         return getDisplayDate()+ ": " + title ;
     }
 
+    public void setSaveArray(String[] newStringArray) {
+        saveCrossword(newStringArray);
+    }
     public String[] getSaveArray() {
         // Create String array to save and pass around with intents
         // Format:  array[0]    = Crossword name
@@ -561,10 +561,13 @@ public class Crossword {
         return saveArray ;
     }
 
+    // ------------------------------------------- Save / Delete / Initialise methods --------------------------------------------
     public void saveCrossword() {
         // Save file to memory. Use files created by initialiseSaveFiles
-        String[] saveArray = getSaveArray() ;
-
+        String[] saveArray = getSaveArray();
+        saveCrossword(saveArray);
+    }
+    public void saveCrossword(String[] saveArray) {
         try {
             Log.d(LOG_TAG, "Writing crossword file...");
             FileWriter fileWriter = new FileWriter(crosswordFile);
@@ -579,7 +582,6 @@ public class Crossword {
             Log.e(LOG_TAG, "Couldn't open fileWriter to save the crossword file.");
         }
     }
-
     public void initialiseSaveFiles() {
         // Format File name
         fileName = date + "-" + title.replaceAll(" ","_").replaceAll("-","__"); //.toLowerCase() ; // Delete this if it works
@@ -640,7 +642,6 @@ public class Crossword {
         // Save the grid
         saveCrossword();
     }
-
     public void deleteCrossword() {
         Log.d(LOG_TAG, "Call to delete crossword received. Looping through & deleting files.") ;
         // Delete crossword save directory and all files contained within

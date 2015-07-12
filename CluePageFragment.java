@@ -1,6 +1,8 @@
 package com.thonners.crosswordmaker;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,13 +12,13 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 //import android.app.Fragment;
 import android.provider.MediaStore;
-import android.support.v4.view.PagerAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.io.File;
 
@@ -82,16 +84,40 @@ public class CluePageFragment extends Fragment {
     }
 
     private void initialise(View view) {
+
         takeCluePhotoButton = (View) view.findViewById(R.id.take_picture_clues_button) ;
-        takeCluePhotoButton.setOnClickListener(new View.OnClickListener() {
+        clueImageView = (ImageView) view.findViewById(R.id.image_view_clues);
+        clueImageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
-                Log.d(LOG_TAG,"Take picture button pressed");
-                dispatchTakePictureIntent();
+            public boolean onLongClick(View v) {
+                // Offer option to retake clues picture if user long-clicks
+                Log.d(LOG_TAG,"Long-click on clue image detected");
+                retakePicture();
+                return true;
             }
         });
-        clueImageView = (ImageView) view.findViewById(R.id.image_view_clues);
-        loadClueImage();
+
+
+        if (clueImageFileExists()) {
+            setClueImageInView();
+            removePhotoButton();
+        } else {
+            if (HomeActivity.deviceHasCameraCapability(getActivity())) {
+                takeCluePhotoButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.d(LOG_TAG, "Take picture button pressed");
+                        dispatchTakePictureIntent();
+                    }
+                });
+            } else {
+                // If no picture file found and device doesn't have camera availability, display error message
+                TextView textView = (TextView) view.findViewById(R.id.take_picture_clues_text_view);
+                textView.setText(getResources().getString(R.string.take_clue_picture_error));
+            }
+        }
+
+     //   loadClueImage();
     }
 
     @Override
@@ -133,23 +159,33 @@ public class CluePageFragment extends Fragment {
 
         Log.d(LOG_TAG, "Setting image");
         clueImageView.setImageBitmap(clueImageBitmap);
-
+    }
+    private void removePhotoButton() {
         //Remove button from view
         //Check image exists
-        Log.d(LOG_TAG, "Removing photo button");
-        ((ViewGroup) takeCluePhotoButton.getParent()).removeView(takeCluePhotoButton);
-
+        if (takeCluePhotoButton != null) {
+            Log.d(LOG_TAG, "Removing photo button");
+            ((ViewGroup) takeCluePhotoButton.getParent()).removeView(takeCluePhotoButton);
+            takeCluePhotoButton = null ;    // Force to null. Not sure what it would be without this.
+        }
     }
+    /*
     private void loadClueImage() {
-        // Initialise the file required
+        // Load clue image if one already exists
+        if (clueImageFileExists()) {
+            setClueImageInView();
+        }
+    }//*/
+    private boolean clueImageFileExists() {        // Initialise the file required
         try {
             clueImageFile = new File(imageFilePath);
         } catch (Exception e) {
             Log.e(LOG_TAG,"Couldn't create imageFile. Exception message: " + e.getMessage());
         }
-        // Load clue image if one already exists
         if (clueImageFile.length() > 10) {
-            setClueImageInView();
+            return true ;
+        } else {
+            return false ;
         }
     }
 
@@ -175,8 +211,12 @@ public class CluePageFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         // Called when camera intent returns. Now load image just taken
-
-        setClueImageInView();
+        if(resultCode != Activity.RESULT_CANCELED) {
+            setClueImageInView();
+            removePhotoButton();
+        } else {
+            Log.d(LOG_TAG,"resultCode = RESULT_CANCELLED, so not doing anything.") ;
+        }
 
     }
 
@@ -203,7 +243,7 @@ public class CluePageFragment extends Fragment {
         return BitmapFactory.decodeFile(bitmapFile.getAbsolutePath(), options);
     }
     public int calculateInSampleSize(BitmapFactory.Options options, int reqWidth) {
-        Log.d(LOG_TAG,"Calculating bitmap sample size...");
+        Log.d(LOG_TAG, "Calculating bitmap sample size...");
         // Check that reqWidth is sensible
         if (reqWidth < MIN_CLUE_IMAGE_RES) {
             reqWidth = getScreenWidth();
@@ -232,5 +272,30 @@ public class CluePageFragment extends Fragment {
         getActivity().getWindowManager().getDefaultDisplay().getSize(size);
 
         return size.x;
+    }
+
+    private void showOverwriteClueImageFileDialog() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(getResources().getString(R.string.dialog_overwrite_clue_image_message));
+        builder.setPositiveButton(getResources().getString(R.string.dialog_overwrite), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dispatchTakePictureIntent();
+            }
+        });
+        builder.setNegativeButton(getResources().getString(R.string.dialog_cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
+    public void retakePicture() {
+        if (clueImageFileExists()) {
+            showOverwriteClueImageFileDialog();
+        } else {
+            dispatchTakePictureIntent();
+        }
     }
 }

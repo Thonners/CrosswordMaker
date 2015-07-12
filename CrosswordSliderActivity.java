@@ -1,9 +1,6 @@
 package com.thonners.crosswordmaker;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -17,11 +14,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
-public class CrosswordSliderActivity extends ActionBarActivity implements CrosswordPageFragment.OnFragmentInteractionListener, CluePageFragment.OnFragmentInteractionListener, DictionaryPageFragment.OnFragmentInteractionListener, AnagramPageFragment.OnAnagramFragmentListener, DoodlePageFragment.OnFragmentInteractionListener {
+public class CrosswordSliderActivity extends ActionBarActivity implements CrosswordPageFragment.OnFragmentInteractionListener, CluePageFragment.OnFragmentInteractionListener, DictionaryPageFragment.OnFragmentInteractionListener, AnagramPageFragment.OnAnagramFragmentListener, WikiPageFragment.OnFragmentInteractionListener {
 
     private static final String LOG_TAG = "CrosswordSliderActivity";
 
@@ -45,7 +41,7 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
     CluePageFragment cluePageFragment ;
     DictionaryPageFragment dictionaryPageFragment;
     AnagramPageFragment anagramPageFragment;
-    DoodlePageFragment doodlePageFragment;
+    WikiPageFragment wikiPageFragment;
 
     String[] crosswordStringArray;
     Crossword crossword ;
@@ -146,7 +142,6 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
         switch (item.getItemId()) {
             case R.id.action_save:
@@ -225,12 +220,12 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
                     anagramPageFragment = new AnagramPageFragment();
                     return anagramPageFragment;
                 case DOODLE_TAB:
-                    doodlePageFragment = new DoodlePageFragment();
-                    return doodlePageFragment;
+                    wikiPageFragment = new WikiPageFragment();
+                    return wikiPageFragment;
             }
 
             // Safety net - in case position is out of range shown above. Should never be needed
-            return doodlePageFragment;
+            return wikiPageFragment;
         }
 
         @Override
@@ -293,6 +288,8 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
         clm.openEditCrossword(crosswordPageFragment.getCrosswordSaveDir());
     }
     private void retakeCluesPicture() {
+
+        pager.setCurrentItem(CLUE_TAB,true);
         cluePageFragment.dispatchTakePictureIntent();
     }
     private void openSettings() {

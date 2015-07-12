@@ -7,6 +7,7 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
@@ -235,7 +236,7 @@ public class HomeActivity extends ActionBarActivity {
         );
         // Warning Message:
         TextView dialogMessage = new TextView(this) ;
-        dialogMessage.setText(R.string.dialog_overwrite_message);
+        dialogMessage.setText(R.string.dialog_overwrite_crossword_message);
         dialogMessage.setGravity(Gravity.CENTER);
         builder.setView(dialogMessage);
 
@@ -413,5 +414,14 @@ public class HomeActivity extends ActionBarActivity {
     }
     public static void openSettings(Context context) {
         Toast.makeText(context, "Will create a settings option soon", Toast.LENGTH_SHORT).show();
+    }
+    public static boolean deviceHasCameraCapability(Context context) {
+        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+            // this device has a camera
+            return true;
+        } else {
+            // no camera on this device
+            return false;
+        }
     }
 }

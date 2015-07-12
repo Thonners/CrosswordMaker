@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 public class SavedCrosswordSelector extends ActionBarActivity  {
@@ -57,13 +58,26 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (item.getItemId()) {
+            case R.id.action_edit_delete:
+                // Show the tutorial toast
+                showEditTutorialToast();
+                break;
+            case R.id.action_feedback:
+                // Send an email
+                HomeActivity.emailDeveloperFeedback(this);
+                break;
+            case R.id.action_about:
+                // Show 'About' Dialog
+                HomeActivity.showAboutDialog(this);
+                break;
+            case R.id.action_settings:
+                // Open some settings menu
+                HomeActivity.openSettings(this);
+                break ;
+
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -185,6 +199,10 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
             libraryManager.openEditCrossword(libraryManager.getSavedCrosswords().get(editCrosswordIndex).getCrosswordFile());
 
         }
+    }
+
+    private void showEditTutorialToast() {
+        Toast.makeText(this,getResources().getString(R.string.edit_delete_tutorial),Toast.LENGTH_LONG).show();
     }
 
 }

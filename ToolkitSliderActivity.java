@@ -18,7 +18,7 @@ import android.view.inputmethod.InputMethodManager;
 /**
  * Created by mat on 07/03/15.
  */
-public class ToolkitSliderActivity extends ActionBarActivity implements DictionaryPageFragment.OnFragmentInteractionListener, AnagramPageFragment.OnAnagramFragmentListener, DoodlePageFragment.OnFragmentInteractionListener {
+public class ToolkitSliderActivity extends ActionBarActivity implements DictionaryPageFragment.OnFragmentInteractionListener, AnagramPageFragment.OnAnagramFragmentListener, WikiPageFragment.OnFragmentInteractionListener {
 
     private static final String LOG_TAG = "ToolkitSliderActivity";
 
@@ -37,7 +37,7 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
     // Fragments
     DictionaryPageFragment dictionaryPageFragment ;
     AnagramPageFragment anagramPageFragment ;
-    DoodlePageFragment doodlePageFragment ;
+    WikiPageFragment wikiPageFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -164,12 +164,12 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
                     anagramPageFragment = new AnagramPageFragment();
                     return anagramPageFragment;
                 case DOODLE_TAB:
-                    doodlePageFragment = new DoodlePageFragment();
-                    return doodlePageFragment;
+                    wikiPageFragment = new WikiPageFragment();
+                    return wikiPageFragment;
             }
 
             // Safety net - in case position is out of range shown above. Should never be needed
-            return doodlePageFragment;
+            return wikiPageFragment;
         }
 
         @Override

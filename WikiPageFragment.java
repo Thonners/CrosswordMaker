@@ -7,13 +7,15 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 
 
-public class DoodlePageFragment extends Fragment {
+public class WikiPageFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
+    private WebView webView ;
 
-    public DoodlePageFragment() {
+    public WikiPageFragment() {
         // Required empty public constructor
     }
 
@@ -27,7 +29,9 @@ public class DoodlePageFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_doodle, container, false);
+        View view = inflater.inflate(R.layout.fragment_wiki, container, false);
+        webView = (WebView) view.findViewById(R.id.wiki_webview);
+        webView.loadUrl(getResources().getString(R.string.wiki_url));
         return view;
     }
 
