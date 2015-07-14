@@ -30,9 +30,9 @@ public class CrosswordLibraryManager {
 
     int noRecentCrosswords = 3 ;    // Number of recent crosswords to track
 
-    ArrayList<SavedCrossword> savedCrosswords = new ArrayList<SavedCrossword>() ;
-    ArrayList<File> savedCrosswordFiles =new ArrayList<File>();
-    ArrayList<SavedCrossword> recentCrosswords = new ArrayList<SavedCrossword>();
+    ArrayList<SavedCrossword>   savedCrosswords = new ArrayList<SavedCrossword>() ;
+    ArrayList<File>             savedCrosswordFiles =new ArrayList<File>();
+    ArrayList<SavedCrossword>   recentCrosswords = new ArrayList<SavedCrossword>();
 
     public CrosswordLibraryManager(Context context) {
         this.context = context;
@@ -76,7 +76,7 @@ public class CrosswordLibraryManager {
     }
     private void addCrosswordToLibrary(SavedCrossword savedCrossword) {
         savedCrosswords.add(savedCrossword);
-        savedCrosswordFiles.add(savedCrossword.getCrosswordFile());
+        savedCrosswordFiles.add(savedCrossword.getCrosswordDir());
     }
 
     public boolean crosswordAlreadyExists(String crosswordName, String crosswordDate) {
@@ -127,7 +127,7 @@ public class CrosswordLibraryManager {
 
         ArrayList<SavedCrossword> oldRecentCrosswords = getRecentCrosswords();
 
-        /* Debugging*/
+        /* Debugging */
         for (SavedCrossword s : oldRecentCrosswords) {
             Log.d(LOG_TAG,"oldRecentCrosswords contains: " + s.getSaveString());
         }
@@ -215,7 +215,7 @@ public class CrosswordLibraryManager {
     }
 
     public void openEditCrossword(File savedCrosswordDir) {
-        Log.d(LOG_TAG,"Opening crossword for editing from file: " + savedCrosswordDir.getPath());
+        Log.d(LOG_TAG, "Opening crossword for editing from file: " + savedCrosswordDir.getPath());
         try {
             File crossword = new File(savedCrosswordDir, Crossword.SAVE_CROSSWORD_FILE_NAME);
             openEditCrossword(Crossword.getSaveArray(crossword));
@@ -231,9 +231,39 @@ public class CrosswordLibraryManager {
         context.startActivity(editCrosswordActivity);
     }
 
-    static class SavedCrossword {
+    private void removeFromRecents(SavedCrossword crosswordToBeRemoved) {
+        ArrayList<SavedCrossword> oldRecentCrosswords = getRecentCrosswords();
+        recentCrosswords = new ArrayList<SavedCrossword>();
+        for (SavedCrossword saved : oldRecentCrosswords) {
+            if (!saved.getSaveString().matches(crosswordToBeRemoved.getSaveString())) {
+                // save new array without the crossword that's being removed
+                recentCrosswords.add(saved);
+            }
+        }
+        saveRecentFile();
+    }
+    public void deleteSavedCrossword(File savedCrosswordDir) {
+        SavedCrossword savedCrossword = new SavedCrossword(context, savedCrosswordDir);
+
+        Log.d(LOG_TAG, "Call to delete crossword received. Removing from recent crosswords.") ;
+        removeFromRecents(savedCrossword) ;
+
+        savedCrossword.deleteCrossword();
+
+        Log.d(LOG_TAG, "Reopening home activity.") ;
+        returnHome();
+    }
+
+    private void returnHome() {
+        // Reopen home activity after deleting crossword
+        Intent openHome = new Intent(context,HomeActivity.class);
+        openHome.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        context.startActivity(openHome);
+    }
+
+    public static class SavedCrossword {
         Context context ;
-        File crosswordFile;
+        File crosswordDir;
         String title ;
         String saveDate ;
         String displayDate;
@@ -241,7 +271,7 @@ public class CrosswordLibraryManager {
 
         public SavedCrossword(Context context, File crosswordDir) {
             this.context = context ;
-            this.crosswordFile = crosswordDir ;
+            this.crosswordDir = crosswordDir ;
             String[] crosswordDetails = crosswordDir.getName().split("-");
             this.saveDate = crosswordDetails[0] ;   // Date extracted from saved file name
             this.displayDate = Crossword.getDisplayDate(context, crosswordDetails[0]) ; // Convert displayDate from saved YYYYMMDD format into locale display displayDate
@@ -291,10 +321,24 @@ public class CrosswordLibraryManager {
         }
         public String getSaveString() {
             return saveDate + "-" + title.replaceAll(" ","_").replaceAll("-","__");
-           // return Crossword.getSaveDate(context, displayDate) + "-" + title.replaceAll(" ","_").replaceAll("-","__");
+            // return Crossword.getSaveDate(context, displayDate) + "-" + title.replaceAll(" ","_").replaceAll("-","__");
         }
-        public File getCrosswordFile() {
-            return crosswordFile;
+        public void deleteCrossword() {
+            Log.d(LOG_TAG,"Delete called on " + getSaveString());
+            Log.d(LOG_TAG, "Looping through & deleting files.") ;
+            // Delete crossword save directory and all files contained within
+            File[] files = crosswordDir.listFiles();
+            for (File f : files) {
+                if (f != null) {
+                    Log.d(LOG_TAG,"Deleting file at: " + f.getPath());
+                    f.delete();
+                }
+            }
+            Log.d(LOG_TAG, "Deleting parent directory: " + crosswordDir.getPath());
+            crosswordDir.delete() ;
+        }
+        public File getCrosswordDir() {
+            return crosswordDir;
         }
     }
 

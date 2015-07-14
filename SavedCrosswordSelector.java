@@ -1,19 +1,14 @@
 package com.thonners.crosswordmaker;
 
-import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -31,6 +26,7 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_saved_crossword_selector);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mainLayout = (RelativeLayout) findViewById(R.id.saved_crossword_main_layout);
         layout = (RelativeLayout) findViewById(R.id.saved_crosswords_r_layout)  ;
@@ -114,7 +110,7 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
 
         Log.d(LOG_TAG, "Crossword selected: " + libraryManager.getSavedCrosswords().get(i).getTitle());
 
-        libraryManager.openCrossword(libraryManager.getSavedCrosswords().get(i).getCrosswordFile());
+        libraryManager.openCrossword(libraryManager.getSavedCrosswords().get(i).getCrosswordDir());
     }
 
     private void toggleCardSelection(View view) {
@@ -196,7 +192,7 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
         } else {
             // TODO: Launch edit activity
             Log.d(LOG_TAG, "Opening edit task for: " + libraryManager.getSavedCrosswords().get(editCrosswordIndex).getTitle());
-            libraryManager.openEditCrossword(libraryManager.getSavedCrosswords().get(editCrosswordIndex).getCrosswordFile());
+            libraryManager.openEditCrossword(libraryManager.getSavedCrosswords().get(editCrosswordIndex).getCrosswordDir());
 
         }
     }

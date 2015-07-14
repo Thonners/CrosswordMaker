@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.GridLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 
 public class CrosswordGridEditor extends ActionBarActivity {
@@ -31,14 +32,13 @@ public class CrosswordGridEditor extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crossword_grid_editor);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         originalCrosswordStringArray = getIntent().getStringArrayExtra(Crossword.CROSSWORD_EXTRA);
         newCrossworyStringArray = new String[originalCrosswordStringArray.length];
         initialise();
 
         createCrossword();
-
-        positionSaveFAB();
-
+        showWarningToast();
         this.setTitle(crossword.getActivityTitle());
     }
 
@@ -81,20 +81,15 @@ public class CrosswordGridEditor extends ActionBarActivity {
         deleteButton.setVisibility(View.VISIBLE);
     }
 
-    private void positionSaveFAB() {
-        RelativeLayout.LayoutParams saveFabLP = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        saveFabLP.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        saveFabLP.addRule(RelativeLayout.BELOW, R.id.main_grid_editor);
-        saveFab.setLayoutParams(saveFabLP);
-
-    }
-
     private void createCrossword() {
         // Create the crossword
         crossword = new Crossword(this, crosswordGrid, originalCrosswordStringArray,true);
     }
 
 
+    private void showWarningToast() {
+        Toast.makeText(this,getResources().getString(R.string.edit_warning_toast),Toast.LENGTH_LONG).show();
+    }
     private void showDeleteDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         // Set the dialog title
@@ -160,6 +155,7 @@ public class CrosswordGridEditor extends ActionBarActivity {
         newCrossworyStringArray = crossword.getSaveArray() ;
     }
     private void deleteCrossword() {
-        crossword.deleteCrossword();
+        new CrosswordLibraryManager(this).deleteSavedCrossword(crossword.getSaveDir());
+        //crossword.deleteCrossword();
     }
 }

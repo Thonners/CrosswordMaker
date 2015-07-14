@@ -50,6 +50,7 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crosword_slider);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         initialise();
 

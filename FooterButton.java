@@ -33,7 +33,7 @@ public class FooterButton extends CardView{
         this.setBackgroundColor(getResources().getColor(R.color.light_grey));
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        this.setBackgroundColor(getResources().getColor(R.color.dark_grey));
+        this.setBackgroundColor(getResources().getColor(R.color.primary_dark));
         this.setLayoutParams(layoutParams);
 
         // Relative Layout for card

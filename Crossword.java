@@ -520,9 +520,9 @@ public class Crossword {
             }
         }
 
-        for (int k = 0 ; k < saveArray.length ; k++) {
+//        for (int k = 0 ; k < saveArray.length ; k++) {
 //            Log.d(LOG_TAG, "saveArray[" + k + "] = " + saveArray[k]) ;  // Don't output this at the moment because it seems to work, but spams the log thread. If saving stops working, uncomment this line.
-        }
+//        }
 
 
         return saveArray ;
@@ -573,6 +573,7 @@ public class Crossword {
             FileWriter fileWriter = new FileWriter(crosswordFile);
 
             for (int i = 0 ; i < saveArray.length ; i++) {
+            Log.d(LOG_TAG, "value at index i = " + i + " = " + saveArray[i]);
                 fileWriter.write(saveArray[i] + "\n");
             }
             fileWriter.close();
@@ -642,6 +643,7 @@ public class Crossword {
         // Save the grid
         saveCrossword();
     }
+    // Delete this if it works from CLM
     public void deleteCrossword() {
         Log.d(LOG_TAG, "Call to delete crossword received. Looping through & deleting files.") ;
         // Delete crossword save directory and all files contained within

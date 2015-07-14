@@ -43,6 +43,7 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crosword_slider);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         initialise() ;
     }

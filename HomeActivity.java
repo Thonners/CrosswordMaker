@@ -105,7 +105,7 @@ public class HomeActivity extends ActionBarActivity {
                 recentCard3.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        libraryManager.openCrossword(recentCrosswords.get(2).crosswordFile);
+                        libraryManager.openCrossword(recentCrosswords.get(2).crosswordDir);
                     }
                 });
                 //      recentCard3.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
@@ -118,7 +118,7 @@ public class HomeActivity extends ActionBarActivity {
                 recentCard2.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        libraryManager.openCrossword(recentCrosswords.get(1).crosswordFile);
+                        libraryManager.openCrossword(recentCrosswords.get(1).crosswordDir);
                     }
                 });
                 //        recentCard2.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
@@ -131,7 +131,7 @@ public class HomeActivity extends ActionBarActivity {
                 recentCard1.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        libraryManager.openCrossword(recentCrosswords.get(0).crosswordFile);
+                        libraryManager.openCrossword(recentCrosswords.get(0).crosswordDir);
                     }
                 });
                 break;
