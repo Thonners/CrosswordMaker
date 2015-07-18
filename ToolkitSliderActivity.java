@@ -25,7 +25,7 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
     private static final int NUM_PAGES      = 3;     // Number of pages in the slider
     private static final int DICTIONARY_TAB = 0 ;
     private static final int ANAGRAM_TAB    = 1 ;
-    private static final int DOODLE_TAB     = 2 ;
+    private static final int WIKI_TAB = 2 ;
 
     private ViewPager pager ;               // Handles the transition between fragments
     private PagerAdapter pagerAdapter ;     // Provides the pages for the pager
@@ -113,7 +113,7 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
                             anagramPageFragment.inputBoxRequestFocus();
                             showKeyboard(anagramPageFragment.getInputBox());
                             break;
-                        case DOODLE_TAB:
+                        case WIKI_TAB:
                             hideKeyboard();
                             break;
                     }
@@ -164,7 +164,7 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
                 case ANAGRAM_TAB:
                     anagramPageFragment = new AnagramPageFragment();
                     return anagramPageFragment;
-                case DOODLE_TAB:
+                case WIKI_TAB:
                     wikiPageFragment = new WikiPageFragment();
                     return wikiPageFragment;
             }

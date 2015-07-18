@@ -26,7 +26,7 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
     private static final int CLUE_TAB       = 1 ;
     private static final int DICTIONARY_TAB = 2 ;
     private static final int ANAGRAM_TAB    = 3 ;
-    private static final int DOODLE_TAB     = 4 ;
+    private static final int WIKI_TAB = 4 ;
 
     private ViewPager pager ;               // This handles the animation/transition between pages
     private PagerAdapter pagerAdapter ;     // This provides the pages for the PagerAdapter.
@@ -106,7 +106,8 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
                             anagramPageFragment.inputBoxRequestFocus();
                             showKeyboard(anagramPageFragment.getInputBox());
                             break;
-                        case DOODLE_TAB:
+                        case WIKI_TAB:
+                            hideKeyboard();
                             break;
                     }
 
@@ -220,7 +221,7 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
                 case ANAGRAM_TAB:
                     anagramPageFragment = new AnagramPageFragment();
                     return anagramPageFragment;
-                case DOODLE_TAB:
+                case WIKI_TAB:
                     wikiPageFragment = new WikiPageFragment();
                     return wikiPageFragment;
             }

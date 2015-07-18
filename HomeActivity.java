@@ -17,6 +17,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -396,6 +397,7 @@ public class HomeActivity extends ActionBarActivity {
         // Text view (probably should move this to a layout resource later)
         TextView aboutTV = new TextView(context);
         aboutTV.setText(context.getString(R.string.about_text));
+        aboutTV.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         aboutTV.setGravity(View.TEXT_ALIGNMENT_CENTER);
         aboutTV.setPadding(context.getResources().getDimensionPixelOffset(R.dimen.about_dialog_padding), context.getResources().getDimensionPixelOffset(R.dimen.about_dialog_padding), context.getResources().getDimensionPixelOffset(R.dimen.about_dialog_padding), context.getResources().getDimensionPixelOffset(R.dimen.about_dialog_padding));
         // Dialog
