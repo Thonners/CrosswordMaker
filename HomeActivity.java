@@ -184,6 +184,7 @@ public class HomeActivity extends ActionBarActivity {
     }
     public void settingsClicked(View view) {
         // Show some settings options?
+        openSettings(this);
     }
 
     private void startNewCrossword() {

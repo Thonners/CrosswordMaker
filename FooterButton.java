@@ -14,8 +14,12 @@ import android.widget.TextView;
 import java.net.ContentHandler;
 
 /**
- * Created by mat on 04/07/15.
+ *  Footer button, to display some text at the bottom of the layout to which it is added.
+ *  Create an instance of the button with the text you'd like to display, then add it to the relevant RelativeLayout.
+ *
+ * Created by Thonners on 04/07/15.
  */
+
 public class FooterButton extends CardView{
     Context context ;
     TextView tv ;

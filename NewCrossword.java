@@ -8,13 +8,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.NumberPicker;
 
+/**
+ * NewCrossword Activity
+ * Shows a NumberPicker to select the number of rows/columns in crossword, and an enter FAB.
+ * When implemented, will also show camera button to auto-generate grid.
+ *
+ *  Created by Thonners on 01/07/15
+ */
+
 
 public class NewCrossword extends ActionBarActivity {
 
     static final String AUTO_GRID_GENERATION = "com.thonners.crosswordmaker.autoGeneration" ;
-//    static final String SCREEN_WIDTH = "com.thonners.crosswordmaker.screenx" ;
-//    static final String SCREEN_HEIGHT = "com.thonners.crosswordmaker.screeny" ;
-
     String crosswordTitle;
     String crosswordDate;
 
@@ -30,7 +35,6 @@ public class NewCrossword extends ActionBarActivity {
         setContentView(R.layout.activity_new_crossword);
 
         getIntents();
-
         setupNumberPicker();
 
     }

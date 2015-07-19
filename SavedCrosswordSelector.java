@@ -11,6 +11,13 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+/**
+ * SavedCrosswordSelector Activity
+ * Shows a list of all the crosswords saved by the user on their device.
+ * Shows completion % of the crossword, calculated as number of filled spaces over total number of white spaces
+ *
+ * Created by Thonners on 06/05/15.
+ */
 
 public class SavedCrosswordSelector extends ActionBarActivity  {
 

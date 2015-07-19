@@ -31,6 +31,14 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.ArrayList;
 
+/**
+ * GridMaker Activity
+ * Shows a blank grid with the number of rows/columns selected by the user in the NewCrossword activity.
+ * The user should touch squares to turn them into black squares, until the grid is properly reflected.
+ * Contains automatic toggling of the rotationally symmetrical square to make grid creation faster.
+ *
+ *  Created by Thonners on 06/05/15
+ */
 
 public class GridMaker extends ActionBarActivity {
 

@@ -11,10 +11,16 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
- * Created by mat on 23/04/15.
+ * CrosswordLibraryManager class
+ * Class to control adding/deleting crosswords, and managing the list of recent crosswords.
+ * Also controls opening crosswords from the Home or SavedCrosswordSelector activities
+ *
+ * Created by Thonners on 23/04/15.
  */
+
 public class CrosswordLibraryManager {
 
     private static final String LOG_TAG = "CrosswordLibraryManager" ;
@@ -55,6 +61,7 @@ public class CrosswordLibraryManager {
             Log.d(LOG_TAG, "Getting list of crossword files.");
             rootDir = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
             foundCrosswordFiles = rootDir.listFiles();
+            Arrays.sort(foundCrosswordFiles);
         } catch (Exception e) {
             Log.e(LOG_TAG, "Error getting file list: " + e.getMessage());
         }
