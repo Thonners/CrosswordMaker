@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 
-public class HomeActivity extends ActionBarActivity {
+public class HomeActivity extends ActionBarActivity implements DatePickerDialog.OnDateSetListener {
 
     private static final String LOG_TAG = "HomeActivity";
 
@@ -39,13 +39,13 @@ public class HomeActivity extends ActionBarActivity {
 
     private CrosswordLibraryManager libraryManager ;
     private ArrayList<CrosswordLibraryManager.SavedCrossword> recentCrosswords ;
-
+/*
     // For displayDate picker
     Calendar c = Calendar.getInstance();
     int startYear = c.get(Calendar.YEAR);
     int startMonth = c.get(Calendar.MONTH);
     int startDay = c.get(Calendar.DAY_OF_MONTH);
-
+*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -187,7 +187,7 @@ public class HomeActivity extends ActionBarActivity {
         openSettings(this);
     }
 
-    private void startNewCrossword() {
+    public void startNewCrossword() {
         CrosswordLibraryManager clm = new CrosswordLibraryManager(this) ;
         boolean safeToWrite = false ;
 
@@ -272,7 +272,7 @@ public class HomeActivity extends ActionBarActivity {
         // Set the action buttons
         builder.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick (DialogInterface dialog,int id){
+                    public void onClick(DialogInterface dialog, int id) {
                         // User clicked OK, so save the publication result somewhere
                         // or return it to the component that opened the dialog
 
@@ -287,12 +287,12 @@ public class HomeActivity extends ActionBarActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // 'Other' Selected, so popup edittext dialog box
-                popupOtherPublicationDialog() ;
+                popupOtherPublicationDialog();
             }
         });
         builder.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick (DialogInterface dialog,int id){
+                    public void onClick(DialogInterface dialog, int id) {
                         // Do nothing
                         dialog.cancel();
                     }
@@ -345,19 +345,54 @@ public class HomeActivity extends ActionBarActivity {
         dialogFragment.show(getFragmentManager(), "start_date_picker");
     }
 
-    public class StartDatePicker extends DialogFragment implements DatePickerDialog.OnDateSetListener{
+    @Override
+    public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
+
+        String yr = year + "" ;
+        String month = (monthOfYear + 1) + "" ;   // Add 1 to the month so that it displays normally. Calendar returns months 0-11.
+        String day = dayOfMonth + "";
+
+        // Do something with the displayDate chosen by the user
+        if (month.length() == 1) {
+            month = "0" + month;
+        }
+        if (day.length() == 1) {
+            day = "0" + day ;
+        }
+
+        // Date in save format (yyyyMMdd)
+        date = yr + month + day ;
+
+        Log.d(LOG_TAG,"Starting displayDate set, so starting new crossword...");
+        startNewCrossword();
+    }
+
+    public static class StartDatePicker extends DialogFragment {
+        // public static class StartDatePicker extends DialogFragment implements DatePickerDialog.OnDateSetListener{
+
+        // For displayDate picker
+        Calendar c = Calendar.getInstance();
+        int startYear = c.get(Calendar.YEAR);
+        int startMonth = c.get(Calendar.MONTH);
+        int startDay = c.get(Calendar.DAY_OF_MONTH);
+
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             // TODO Auto-generated method stub
             // Use the current displayDate as the default displayDate in the picker
-            DatePickerDialog dialog = new DatePickerDialog(HomeActivity.this, this, startYear, startMonth, startDay);
+            DatePickerDialog dialog = new DatePickerDialog(getActivity(), (HomeActivity) getActivity(), startYear, startMonth, startDay);
             return dialog ;
         }
-        public void onDateSet(DatePicker view, int year, int monthOfYear,
+   /*     public void onDateSet(DatePicker view, int year, int monthOfYear,
                               int dayOfMonth) {
+
+
+
+            /* Old code:
             String yr = year + "" ;
             String month = (monthOfYear + 1) + "" ;   // Add 1 to the month so that it displays normally. Calendar returns months 0-11.
             String day = dayOfMonth + "";
+        String date ;
 
             // Do something with the displayDate chosen by the user
             if (month.length() == 1) {
@@ -371,9 +406,9 @@ public class HomeActivity extends ActionBarActivity {
             date = yr + month + day ;
 
             Log.d(LOG_TAG,"Starting displayDate set, so starting new crossword...");
-            startNewCrossword();
+//*//*
         }
-
+//*/
     }
 
     public static void emailDeveloperFeedback(Context context) {
