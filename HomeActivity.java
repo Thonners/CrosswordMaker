@@ -39,13 +39,7 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
 
     private CrosswordLibraryManager libraryManager ;
     private ArrayList<CrosswordLibraryManager.SavedCrossword> recentCrosswords ;
-/*
-    // For displayDate picker
-    Calendar c = Calendar.getInstance();
-    int startYear = c.get(Calendar.YEAR);
-    int startMonth = c.get(Calendar.MONTH);
-    int startDay = c.get(Calendar.DAY_OF_MONTH);
-*/
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +49,12 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
     @Override
     protected void onResume() {
         super.onResume();
-        updateRecentCrosswords();
+        if (sdcardIsAvailable()) {
+            updateRecentCrosswords();
+        } else {
+            showToast(getResources().getString(R.string.sdcard_error_1));
+            openToolkitActivity();
+        }
     }
 
 
@@ -93,10 +92,10 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
 
     private void updateRecentCrosswords() {
         // Update recent crosswords list
-        Log.d(LOG_TAG,"Searching for recent crossword file... ");
+        Log.d(LOG_TAG, "Searching for recent crossword file... ");
         libraryManager = new CrosswordLibraryManager(this);
         recentCrosswords = libraryManager.getRecentCrosswords();
-        switch (recentCrosswords.size())  {
+        switch (recentCrosswords.size()) {
             case 3:
                 TextView recentTV3Title = (TextView) findViewById(R.id.home_card_recent_3_title);
                 TextView recentTV3Date = (TextView) findViewById(R.id.home_card_recent_3_date);
@@ -138,9 +137,8 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
                 break;
         }
 
-
         RelativeLayout recentLayout = (RelativeLayout) findViewById(R.id.home_card_recent_layout);
-        switch (recentCrosswords.size())  {
+        switch (recentCrosswords.size()) {
             case 0:
                 // Set no recent text
                 TextView recentTV1Title = (TextView) findViewById(R.id.home_card_recent_1_title);
@@ -160,23 +158,37 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
     }
 
     public void toolkitClicked(View view) {
+        openToolkitActivity();
+    }
+    private void openToolkitActivity() {
         // Open just a toolkit activity
         Intent intent = new Intent(this, ToolkitSliderActivity.class);
         startActivity(intent);
     }
 
     public void savedClicked(View view) {
-        // Toast to say do new one
-        Intent intent = new Intent(this, SavedCrosswordSelector.class);
-        startActivity(intent);
-
+        if (sdcardIsAvailable()) {
+            if (new CrosswordLibraryManager(this).getSavedCrosswords().size() > 0 ) {
+                // Open SavedCrosswordSelector
+                Intent intent = new Intent(this, SavedCrosswordSelector.class);
+                startActivity(intent);
+            } else {
+                showToast(getResources().getString(R.string.home_recent_none1) + "\n" + getResources().getString(R.string.home_recent_none2));
+            }
+        } else {
+            showToast(getResources().getString(R.string.sdcard_error_1));
+        }
     }
 
     public void newClicked(View view) {
-        // Open something to let the person enter the details
-        publications = getResources().getTextArray(R.array.publications);
-        popupPublicationDialogOptions();
-
+        // Check SD card is available to save to, otherwise show toast and ignore press
+        if (sdcardIsAvailable()) {
+            // Open something to let the person enter the details
+            publications = getResources().getTextArray(R.array.publications);
+            popupPublicationDialogOptions();
+        } else {
+            showToast(getResources().getString(R.string.sdcard_error_1));
+        }
     }
 
     public void recentClicked(View view) {
@@ -344,6 +356,9 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
         DialogFragment dialogFragment = new StartDatePicker();
         dialogFragment.show(getFragmentManager(), "start_date_picker");
     }
+    private void showToast(String string) {
+        Toast.makeText(this,string,Toast.LENGTH_LONG).show();
+    }
 
     @Override
     public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
@@ -380,35 +395,8 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             // TODO Auto-generated method stub
             // Use the current displayDate as the default displayDate in the picker
-            DatePickerDialog dialog = new DatePickerDialog(getActivity(), (HomeActivity) getActivity(), startYear, startMonth, startDay);
-            return dialog ;
+            return new DatePickerDialog(getActivity(), (HomeActivity) getActivity(), startYear, startMonth, startDay);
         }
-   /*     public void onDateSet(DatePicker view, int year, int monthOfYear,
-                              int dayOfMonth) {
-
-
-
-            /* Old code:
-            String yr = year + "" ;
-            String month = (monthOfYear + 1) + "" ;   // Add 1 to the month so that it displays normally. Calendar returns months 0-11.
-            String day = dayOfMonth + "";
-        String date ;
-
-            // Do something with the displayDate chosen by the user
-            if (month.length() == 1) {
-                month = "0" + month;
-            }
-            if (day.length() == 1) {
-                day = "0" + day ;
-            }
-
-            // Date in save format (yyyyMMdd)
-            date = yr + month + day ;
-
-            Log.d(LOG_TAG,"Starting displayDate set, so starting new crossword...");
-//*//*
-        }
-//*/
     }
 
     public static void emailDeveloperFeedback(Context context) {
@@ -460,6 +448,22 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
         } else {
             // no camera on this device
             return false;
+        }
+    }
+    public static boolean sdcardIsAvailable() {
+        // Check to see if SD Card is available - This is required to save crosswords
+        Boolean isSDPresent = android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED);
+        if(isSDPresent)
+        {
+            // yes SD-card is present
+            Log.d("SD-Card", "SD Card is Present");
+            return true ;
+        }
+        else
+        {
+            // Sorry
+            Log.d("SD-Card", "SD Card not Present - cannot save crosswords");
+            return false ;
         }
     }
 }

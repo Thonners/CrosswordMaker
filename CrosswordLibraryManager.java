@@ -2,6 +2,7 @@ package com.thonners.crosswordmaker;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
@@ -42,6 +43,14 @@ public class CrosswordLibraryManager {
 
     public CrosswordLibraryManager(Context context) {
         this.context = context;
+
+        if (Build.VERSION.SDK_INT >= 30) {
+            rootDir = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
+        } else {
+            rootDir = new File(Environment.getExternalStorageDirectory() + "/.CrosswordToolkit");
+        }
+        Log.d(LOG_TAG, "Root directory being used = " + rootDir.getPath());
+
     }
 
     public ArrayList<SavedCrossword> getSavedCrosswords() {
@@ -59,7 +68,6 @@ public class CrosswordLibraryManager {
         // Get list of saved files and add to foundCrosswordFiles
         try {
             Log.d(LOG_TAG, "Getting list of crossword files.");
-            rootDir = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
             foundCrosswordFiles = rootDir.listFiles();
             Arrays.sort(foundCrosswordFiles);
         } catch (Exception e) {
@@ -68,15 +76,19 @@ public class CrosswordLibraryManager {
 
         // Output what files were found
         Log.d(LOG_TAG, "Directory searched: " + rootDir);
-        for (int i =0 ; i < foundCrosswordFiles.length ; i++) {
-            foundCrosswordFilePaths.add(foundCrosswordFiles[i].getName());
-            Log.d(LOG_TAG,"File at index " + i + " is " + foundCrosswordFiles[i].getName());
+        if (foundCrosswordFiles != null) {
+            for (int i = 0; i < foundCrosswordFiles.length; i++) {
+                foundCrosswordFilePaths.add(foundCrosswordFiles[i].getName());
+                Log.d(LOG_TAG, "File at index " + i + " is " + foundCrosswordFiles[i].getName());
+            }
         }
     }
     private void processSavedFiles() {
-        for (int i = 0 ; i < foundCrosswordFiles.length ; i++ ) {
-            if (foundCrosswordFiles[i].isDirectory() && foundCrosswordFiles[i].getName().contains("-")) {
-                addCrosswordToLibrary(new SavedCrossword(context, foundCrosswordFiles[i]));
+        if (foundCrosswordFiles != null) {
+            for (int i = 0 ; i < foundCrosswordFiles.length ; i++ ) {
+                if (foundCrosswordFiles[i].isDirectory() && foundCrosswordFiles[i].getName().contains("-")) {
+                    addCrosswordToLibrary(new SavedCrossword(context, foundCrosswordFiles[i]));
+                }
             }
         }
 
@@ -103,7 +115,7 @@ public class CrosswordLibraryManager {
 
     private void getRecentFile() {
         // Extract recent file
-        recentCrosswordsFile = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),RECENT_CROSSWORD_LOG_FILE_NAME);
+        recentCrosswordsFile = new File(rootDir,RECENT_CROSSWORD_LOG_FILE_NAME);
     }
     private void processRecentFile() {
         // Divide recent file into last three crosswords and make each into a SavedCrossword object.
@@ -115,7 +127,7 @@ public class CrosswordLibraryManager {
                 BufferedReader br = new BufferedReader(new FileReader(recentCrosswordsFile));
                 String line ;
                 while ((line = br.readLine()) != null) {
-                    File newRecentCrosswordFile = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),line);
+                    File newRecentCrosswordFile = new File(rootDir, line);
                     SavedCrossword newRecentSavedCrossword = new SavedCrossword(context, newRecentCrosswordFile);
                     recentCrosswords.add(newRecentSavedCrossword);
                     Log.d(LOG_TAG, "Added a new entry to the recent crossword list: " + newRecentSavedCrossword.getTitle() + " " + newRecentSavedCrossword.getDisplayDate());

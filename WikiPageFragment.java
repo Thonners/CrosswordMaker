@@ -7,7 +7,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 
 public class WikiPageFragment extends Fragment {
@@ -32,6 +34,14 @@ public class WikiPageFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_wiki, container, false);
         webView = (WebView) view.findViewById(R.id.wiki_webview);
         webView.loadUrl(getResources().getString(R.string.wiki_url));
+
+        // Set WebView client to prevent wiki page loading in browser
+        webView.setWebViewClient(new WebViewClient());
+
+        // Enable Javascript to allow better navigation
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+
         return view;
     }
 
@@ -56,5 +66,7 @@ public class WikiPageFragment extends Fragment {
         // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
     }
+
+
 
 }

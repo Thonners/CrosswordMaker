@@ -43,8 +43,8 @@ public class SavedCrosswordSelector extends ActionBarActivity  {
 
         int i = 0;
         for (CrosswordLibraryManager.SavedCrossword savedCrossword : libraryManager.getSavedCrosswords()) {
-            addCrosswordToLayout(i,savedCrossword);
-            i++ ;
+            addCrosswordToLayout(i, savedCrossword);
+            i++;
         }
 
     }

@@ -1,6 +1,7 @@
 package com.thonners.crosswordmaker;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 import android.util.TypedValue;
@@ -588,15 +589,23 @@ public class Crossword {
         fileName = date + "-" + title.replaceAll(" ","_").replaceAll("-","__"); //.toLowerCase() ; // Delete this if it works
         // Create the save files/directories
         // Directory
-        saveDir = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),fileName);
-        Log.d(LOG_TAG,"rootDir = " + saveDir.getPath());
+        if (Build.VERSION.SDK_INT >= 30) {
+            saveDir = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName);
+        } else {
+            File docsDirectory = new File(Environment.getExternalStorageDirectory() + "/.CrosswordToolkit");
+            if (!docsDirectory.mkdir()) {
+                Log.e(LOG_TAG, "Error creating documents directory! In big trouble here...");
+            }
+            saveDir = new File(docsDirectory, fileName) ;
+        }
+        Log.d(LOG_TAG,"saveDir = " + saveDir.getPath());
         if(!saveDir.exists()) {
-            Log.d(LOG_TAG,"rootDir doesn't exist, so creating it...");
+            Log.d(LOG_TAG,"saveDir doesn't exist, so creating it...");
             if (!saveDir.mkdirs()) {
                 Log.e(LOG_TAG, "Main directory not created");
             }
         } else {
-            Log.d(LOG_TAG, "rootDir already exsits.");
+            Log.d(LOG_TAG, "saveDir already exists.");
         }
 
         // Main Crossword file
