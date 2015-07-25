@@ -11,14 +11,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
- * Created by mat on 04/02/15.
+ * XMLParser Class
+ * Parses the XML returned by the Merriam Webster online dictionary and splits it into words, word types and definitions.
+ *
+ * Created by Thonners on 04/02/15.
  */
 public class XmlParser {
 
     private static final String LOG_TAG = "xmlParser";
+
+    private static final String CHARSET = "UTF-8" ; // Change this string if necessary. Used to be CHARSET = StandardCharsets.UTF_8 ;
 
     private static final String XML_TAG_ENTRY_LIST = "entry_list" ; //Hopefully it will ignore the 'version="1.0"' also in the entry tag. Contains the entire feed
     private static final String XML_TAG_ENTRY = "entry" ;           //Hopefully it will ignore the ' id=X' also in the entry tag
@@ -40,7 +44,7 @@ public class XmlParser {
 
     public ArrayList<Entry> parse(String input) throws XmlPullParserException, IOException  {
         input = cleanTags(input);
-        InputStream stream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
+        InputStream stream = new ByteArrayInputStream(input.getBytes(CHARSET));
         return parse(stream);
     }
 
@@ -69,7 +73,7 @@ public class XmlParser {
     }
 
     private ArrayList<Entry> readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
-        ArrayList<Entry> entries = new ArrayList();
+        ArrayList<Entry> entries = new ArrayList<>();
 
         Log.d(LOG_TAG,"Reading Feed...");
 
@@ -102,6 +106,7 @@ public class XmlParser {
                 continue;
             }
             String name = parser.getName();
+
             if (name.equals(XML_TAG_WORD)) {
                 word = readWord(parser);
             } else if (name.equals(XML_TAG_WORD_TYPE)) {
@@ -169,7 +174,7 @@ public class XmlParser {
     private String readDefinitionNo(XmlPullParser parser)throws IOException, XmlPullParserException {
     // Extract the value from within the tag
       String definitionNo = "" ;
-    while (parser.getEventType() != XmlPullParser.END_TAG && parser.getName() != XML_TAG_DEFINITION_NUMBER) {
+    while (parser.getEventType() != XmlPullParser.END_TAG && !parser.getName().equals(XML_TAG_DEFINITION_NUMBER)) {
 /*
         Log.d(LOG_TAG,"DefinitionNo search ongoing " );
         if (parser.getEventType() == XmlPullParser.TEXT) {
@@ -207,9 +212,8 @@ public class XmlParser {
 
     private String readDefinition(XmlPullParser parser)throws IOException, XmlPullParserException {
     // Extract the value from within the tag
-        String definition = "";
         parser.require(XmlPullParser.START_TAG, ns, XML_TAG_DEFINITION);
-        definition = readText(parser);
+        String definition = readText(parser);
          // Skip first character which is always ':'. Put it in manually above to have a space between ':' and definition. If no definition found, return definition to blank so it won't be added to the definitions ArrayList in readDefinitions()
         if (definition.startsWith(":")) {
             definition = definition.substring(1) ; // Skip first character which is always ':'. Put it in manually above to have a space between ':' and definition
