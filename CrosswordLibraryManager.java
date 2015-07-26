@@ -43,12 +43,8 @@ public class CrosswordLibraryManager {
 
     public CrosswordLibraryManager(Context context) {
         this.context = context;
+        rootDir = new File(Environment.getExternalStorageDirectory() + "/.CrosswordToolkit");
 
-        if (Build.VERSION.SDK_INT >= 30) {
-            rootDir = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
-        } else {
-            rootDir = new File(Environment.getExternalStorageDirectory() + "/.CrosswordToolkit");
-        }
         Log.d(LOG_TAG, "Root directory being used = " + rootDir.getPath());
 
     }

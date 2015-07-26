@@ -39,7 +39,7 @@ public class AnagramPageFragment extends Fragment {
     private ArrayList<String[]> dictionaryByLetter= new ArrayList<String[]>() ;
     private ArrayList<ArrayList<String>> dictionaryByLength = new ArrayList<ArrayList<String>>() ;
 
-
+    private boolean dictionaryLoaded = false ;
     private boolean buttonIsClear  = false ;    // Variable to store whether the button next to the search bar should be 'search' or 'clear'
 
     private OnAnagramFragmentListener mListener;
@@ -75,12 +75,6 @@ public class AnagramPageFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_anagram, container, false);
         searchButton = (Button) view.findViewById(R.id.anagram_search);
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                searchClicked();
-            }
-        });
         inputBox = (EditText) view.findViewById(R.id.anagram_search_input);
         inputBox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -318,7 +312,7 @@ public class AnagramPageFragment extends Fragment {
         dictionaryByLetter.add(getResources().getStringArray(R.array.wordsY));
         dictionaryByLetter.add(getResources().getStringArray(R.array.wordsZ));
         Log.d(LOG_TAG,"DictionaryByLetter Loaded...");
-        // Add all thr words to the dictionary
+        // Add all the words to the dictionary
         for (int i = 0 ; i < 26 ; i++) {
         Log.d(LOG_TAG,"i=" + i);
             for (int j =0 ; j < dictionaryByLetter.get(i).length ; j ++) {
@@ -341,9 +335,20 @@ public class AnagramPageFragment extends Fragment {
             }
         }
 
-        Log.d(LOG_TAG,"Dictionary & HashMap loaded...");
+        Log.d(LOG_TAG, "Dictionary & HashMap loaded...");
     }
-
+    private void setSearchButtonClickable() {
+        // Allow the search button to be pressed once dictionary is loaded
+        Log.d(LOG_TAG,"Search button now clickable");
+        searchButton.setClickable(true);
+        searchButton.setText(getResources().getString(R.string.search));
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchClicked();
+            }
+        });
+    }
     private String sortWord(String input) {
         // Sort the letters into alphabetical order
         char[] wordChars = input.toLowerCase().toCharArray();
@@ -379,15 +384,19 @@ public class AnagramPageFragment extends Fragment {
 
     private class LoadDictionaryTask extends AsyncTask<Void,Void,String> {
         // Load the dictionary in the background to prevent hanging the main thread
-    @Override
-    protected String doInBackground(Void... params) {
-        Log.d(LOG_TAG," Reading the dictionary in background...");
+        @Override
+        protected String doInBackground(Void... params) {
+            Log.d(LOG_TAG," Reading the dictionary in background...");
 
-        loadDictionary();
-        Log.d(LOG_TAG, " Dictionary loaded in background!");
+            loadDictionary();
+            Log.d(LOG_TAG, " Dictionary loaded in background!");
 
-        return null ;
-    }
+            return null ;
+        }
+
+        protected void onPostExecute(String result) {
+            setSearchButtonClickable();
+        }
 
     }
 

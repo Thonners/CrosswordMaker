@@ -589,15 +589,12 @@ public class Crossword {
         fileName = date + "-" + title.replaceAll(" ","_").replaceAll("-","__"); //.toLowerCase() ; // Delete this if it works
         // Create the save files/directories
         // Directory
-        if (Build.VERSION.SDK_INT >= 30) {
-            saveDir = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName);
-        } else {
-            File docsDirectory = new File(Environment.getExternalStorageDirectory() + "/.CrosswordToolkit");
-            if (!docsDirectory.mkdir()) {
-                Log.e(LOG_TAG, "Error creating documents directory! In big trouble here...");
-            }
-            saveDir = new File(docsDirectory, fileName) ;
+        File docsDirectory = new File(Environment.getExternalStorageDirectory() + "/.CrosswordToolkit");
+        if (!docsDirectory.mkdir()) {
+            Log.e(LOG_TAG, "Error creating documents directory! In big trouble here...");
         }
+        saveDir = new File(docsDirectory, fileName) ;
+
         Log.d(LOG_TAG,"saveDir = " + saveDir.getPath());
         if(!saveDir.exists()) {
             Log.d(LOG_TAG,"saveDir doesn't exist, so creating it...");
