@@ -70,8 +70,6 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
         switch (item.getItemId()) {
             case R.id.action_feedback:
                 // Send an email
@@ -191,9 +189,6 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
         }
     }
 
-    public void recentClicked(View view) {
-        // Deal with user clicking on a recent crossword
-    }
     public void settingsClicked(View view) {
         // Show some settings options?
         openSettings(this);
@@ -393,7 +388,6 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // TODO Auto-generated method stub
             // Use the current displayDate as the default displayDate in the picker
             return new DatePickerDialog(getActivity(), (HomeActivity) getActivity(), startYear, startMonth, startDay);
         }
@@ -442,13 +436,7 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
         Toast.makeText(context, "Will create a settings option soon", Toast.LENGTH_SHORT).show();
     }
     public static boolean deviceHasCameraCapability(Context context) {
-        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
-            // this device has a camera
-            return true;
-        } else {
-            // no camera on this device
-            return false;
-        }
+        return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA) ;
     }
     public static boolean sdcardIsAvailable() {
         // Check to see if SD Card is available - This is required to save crosswords

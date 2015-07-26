@@ -189,7 +189,6 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
     }
 
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
     }
     public void onFragmentInteraction(Uri uri) {

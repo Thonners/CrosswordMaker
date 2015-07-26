@@ -9,9 +9,11 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -80,6 +82,17 @@ public class AnagramPageFragment extends Fragment {
             }
         });
         inputBox = (EditText) view.findViewById(R.id.anagram_search_input);
+        inputBox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    Log.d(LOG_TAG,"IME_ACTION_SEARCH has matched.");
+                    searchClicked();
+                    return true;
+                }
+                return false;
+            }
+        });
         resultsLinearLayout = (LinearLayout) view.findViewById(R.id.anagram_results_layout);
         return view ;
     }
@@ -103,7 +116,6 @@ public class AnagramPageFragment extends Fragment {
     }
 
     public interface OnAnagramFragmentListener {
-        // TODO: Update argument type and name
         public void searchDictionary(String searchTerm);
     }
 
@@ -152,8 +164,8 @@ public class AnagramPageFragment extends Fragment {
         // First check input and ignore any non letters or '.'s
         String searchStringOriginal = inputBox.getText().toString().replaceAll(" ",""); // Remove all spaces
         String searchString = "";
-        boolean containsIllegalCharachters = false ;
-        int j=0;
+        boolean containsIllegalCharacters = false ;
+
         for (int i = 0 ; i < searchStringOriginal.length() ; i++ ) {
             if (Character.isLetter(searchStringOriginal.toLowerCase().charAt(i)) || searchStringOriginal.charAt(i) == '.') {
                 Log.d(LOG_TAG, "Adding '" + searchStringOriginal.substring(i,i+1) + "' to search string (currently = " + searchString + " as this is a valid character for input.");
@@ -161,14 +173,14 @@ public class AnagramPageFragment extends Fragment {
                 searchString = searchString + searchStringOriginal.substring(i,i+1);
             } else {
                 Log.d(LOG_TAG, "Illegal character found in input: " + searchStringOriginal.substring(i,i+1));
-                containsIllegalCharachters = true ; // Doesn't matter if this is overwritten multiple times
+                containsIllegalCharacters = true ; // Doesn't matter if this is overwritten multiple times
             }
         }
 
 
         Log.d(LOG_TAG, "Original input string: " + searchStringOriginal + " || Tidied string  = " + searchString);
 
-        if(!containsIllegalCharachters) {
+        if(!containsIllegalCharacters) {
             if (searchString.contains(".")) {
                 // Search word fit if input contains '.'
                 Log.d(LOG_TAG, "Searching wordFit...");

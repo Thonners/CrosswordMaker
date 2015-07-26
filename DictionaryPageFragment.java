@@ -13,9 +13,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.widget.CardView;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,7 +31,7 @@ import android.widget.Toast;
  * Activities that contain this fragment must implement the
  * {@link DictionaryPageFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link DictionaryPageFragment#newInstance} factory method to
+ * Use the {@link DictionaryPageFragment#/*newInstance} factory method to
  * create an instance of this fragment.
  */
 public class DictionaryPageFragment extends Fragment {
@@ -41,7 +43,6 @@ public class DictionaryPageFragment extends Fragment {
     String searchTerm;
     String searchPrefix = "define:";
     boolean searchMWUnderway = false ;
-    boolean searchGoogleOnNextClick = false ;
     String lastSearch = null;
 
     private OnFragmentInteractionListener mListener;
@@ -69,6 +70,16 @@ public class DictionaryPageFragment extends Fragment {
             }
         });
         inputBox = (EditText) view.findViewById(R.id.dictionary_search_input);
+        inputBox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    searchClicked();
+                    return true;
+                }
+                return false;
+            }
+        });
         resultsLinearLayout = (LinearLayout) view.findViewById(R.id.dictionary_results_layout);
         return view ;
     }

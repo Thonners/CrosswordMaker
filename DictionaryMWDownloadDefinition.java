@@ -24,7 +24,10 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
- * Created by mat on 02/02/15.
+ * DictionaryMWDownloadDefinition
+ * Async task to download definition from Merriam-Webster.
+ *
+ * Created by Thonners on 02/02/15.
  */
 public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> {
 
@@ -87,10 +90,8 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
             in.close();
             xmlRaw = str.toString();
         } catch (IllegalStateException e) {
-            // TODO Auto-generated catch block
             Log.e(LOG_TAG, e.getMessage());
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             Log.e(LOG_TAG, e.getMessage());
         }
         return xmlRaw;
@@ -98,7 +99,6 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
 
     @Override
     protected void onPostExecute(String rawXML) {
-        // TODO Auto-generated method stub
         super.onPostExecute(rawXML);
         if (!isCancelled()) {
             ViewGroup finalView = decodeXML(rawXML);
