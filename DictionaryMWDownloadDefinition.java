@@ -8,7 +8,6 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -151,12 +150,12 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
         viewGroup.setOrientation(LinearLayout.VERTICAL);
             Log.d(LOG_TAG, "Adding results to the results view");
 
-        XmlParser2 parser = new XmlParser2();
+        XmlParser parser = new XmlParser();
         try {
-            ArrayList<XmlParser2.Entry> entries = parser.parse(xmlRaw);
+            ArrayList<XmlParser.Entry> entries = parser.parse(xmlRaw);
             Log.d(LOG_TAG, "Cycling through definitions");
 
-            for (XmlParser2.Entry entry : entries) {
+            for (XmlParser.Entry entry : entries) {
                 CardView card = new CardView(context);
                 LinearLayout linearLayout = new LinearLayout(context);
                 linearLayout.setOrientation(LinearLayout.VERTICAL);

@@ -9,15 +9,16 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 /**
- * XMLParser Class
- * Parses the XML returned by the Merriam Webster online dictionary and splits it into words, word types and definitions.
+ * XMLParser
+ * Parse the XML returned by the Merriam Webster dictionary
+ * Format it into word, word-type and definition
  *
- * Created by Thonners on 04/02/15.
+ * Created by Thonners on 26/07/15.
  */
+
 public class XmlParser {
 
     private static final String LOG_TAG = "xmlParser";
@@ -29,11 +30,8 @@ public class XmlParser {
     private static final String XML_TAG_WORD = "ew" ;               // Word to be defined
     private static final String XML_TAG_DEFINITION_ZONE = "def" ;   // Tag containing the definition
     private static final String XML_TAG_DEFINITION_NUMBER = "sn" ;  // Tag which precedes the definition in the XML.
-    private static final String XML_TAG_DEFINITION_NUMBER2 = "snp" ;  // Tag which precedes the definition in the XML.
     private static final String XML_TAG_DEFINITION = "dt" ;         // Tag containing the definition
     private static final String XML_TAG_WORD_TYPE = "fl" ;          // Tag denoting verb, noun, etc.
-    private static final String XML_TAG_LINK_1 ="sx";               // Tag with a link to another word. Ignore this in the definition
-    private static final String XML_TAG_LINK_2 ="fw";               // Tag with a link to another word. Ignore this in the definition
 
     // We don't use namespaces
     private static final String ns = null;
@@ -42,8 +40,8 @@ public class XmlParser {
         // Empty Constructor
     }
 
-    public ArrayList<Entry> parse(String input) throws XmlPullParserException, IOException  {
-        input = cleanTags(input);
+    public ArrayList<Entry> parse(String input) throws XmlPullParserException, IOException {
+    //    input = cleanTags(input);
         InputStream stream = new ByteArrayInputStream(input.getBytes(CHARSET));
         return parse(stream);
     }
@@ -60,22 +58,10 @@ public class XmlParser {
         }
     }
 
-    // DOESN'T WORK ATM
-    private String cleanTags(String stringToClean) {
-        // Remove any tags that will cause trouble
-        ArrayList<String> badTags = new ArrayList<>();
-        badTags.add("vi");
-        String cleanString = "";
-        for (String badTag : badTags) {
-            cleanString = stringToClean.replaceAll("<" + badTag  + ">[^</ "+ badTag + ">]*</ "+ badTag + ">","") ;
-        }
-        return cleanString ;
-    }
-
     private ArrayList<Entry> readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
         ArrayList<Entry> entries = new ArrayList<>();
 
-        Log.d(LOG_TAG,"Reading Feed...");
+        Log.d(LOG_TAG, "Reading Feed...");
 
         parser.require(XmlPullParser.START_TAG, ns, XML_TAG_ENTRY_LIST);
         while (parser.next() != XmlPullParser.END_TAG) {
@@ -92,6 +78,7 @@ public class XmlParser {
         }
         return entries;
     }
+
 
     private Entry readEntry(XmlPullParser parser)  throws XmlPullParserException, IOException {
         Log.d(LOG_TAG,"Entry found, reading entry...");
@@ -125,10 +112,9 @@ public class XmlParser {
         parser.require(XmlPullParser.START_TAG, ns, XML_TAG_WORD);
         String word = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, XML_TAG_WORD);
-        Log.d(LOG_TAG,"Word for entry found: " + word);
+        Log.d(LOG_TAG, "Word for entry found: " + word);
         return word;
     }
-
     private String readWordType(XmlPullParser parser) throws IOException, XmlPullParserException {
         // Read the word type from the tag
         parser.require(XmlPullParser.START_TAG, ns, XML_TAG_WORD_TYPE);
@@ -137,123 +123,95 @@ public class XmlParser {
         Log.d(LOG_TAG,"WordType for entry found: " + wordType);
         return wordType ;
     }
-
-    private ArrayList<String> readDefinitions(XmlPullParser parser) throws IOException, XmlPullParserException {
+    private ArrayList<String> readDefinitions(XmlPullParser parser)  throws IOException, XmlPullParserException {
         // Extract all the definitions from the various numbered definitions
         ArrayList<String> definitions = new ArrayList<String>();
         String definitionNumber = "";
 
-
         parser.require(XmlPullParser.START_TAG, ns, XML_TAG_DEFINITION_ZONE);
 
-        while (parser.next() != XmlPullParser.END_TAG) {
-            if (parser.getEventType() != XmlPullParser.START_TAG) {
-                continue;
-            }
-            String name = parser.getName() ;
-            if (name.equals(XML_TAG_DEFINITION_NUMBER)) {
-                definitionNumber = readDefinitionNo(parser);
-            } else if (name.equals(XML_TAG_DEFINITION)) {
-                String def = readDefinition(parser);
-                if (!def.matches("")) {
-                    if (definitionNumber.matches("")) {
-                        Log.d(LOG_TAG,"No definition number found, so assuming there's only one option");
-                        definitions.add(def);
-                    } else {
-                        definitions.add(definitionNumber + ": " + def);
+        // Track how 'deep' into the definition zone's nested tags we are.
+        int depth = 1 ;
+        while (depth != 0) {
+            switch (parser.next()) {
+                case XmlPullParser.END_TAG:
+                    depth--;
+                    Log.d(LOG_TAG,"End tag found for: " + parser.getName() + ". Depth now = " + depth);
+                    break;
+                case XmlPullParser.START_TAG:
+                    depth++;
+                    Log.d(LOG_TAG,"Start tag found for: " + parser.getName() + ". Depth now = " + depth);
+                    if (parser.getName().matches(XML_TAG_DEFINITION_NUMBER)) {
+                        definitionNumber = "" ;
+                        int defNoDepth = 1;
+                        while (defNoDepth != 0) {
+                            switch (parser.next()) {
+                                case XmlPullParser.END_TAG:
+                                    defNoDepth--;
+                                    Log.d(LOG_TAG, "End tag found for: " + parser.getName() + ". defNoDepth now = " + depth);
+                                    if (parser.getName().matches(XML_TAG_DEFINITION_NUMBER)) {
+                                        depth--;
+                                    }
+                                    break;
+                                case XmlPullParser.START_TAG:
+                                    defNoDepth++;
+                                    Log.d(LOG_TAG, "Start tag found for: " + parser.getName() + ". defNoDepth now = " + depth);
+                                    break;
+                                case XmlPullParser.TEXT:
+                                    definitionNumber = definitionNumber + parser.getText();
+                                    Log.d(LOG_TAG, "Some defNo text found: " + parser.getText());
+                                    break;
+                            }
+                        }
+                            Log.d(LOG_TAG,"Definition number tag found: " + definitionNumber);
+                    } else if (parser.getName().matches(XML_TAG_DEFINITION)) {
+                        parser.next();
+                        String definition = parser.getText() ;
+                        int defDepth = 1 ;
+                        while (defDepth != 0) {
+                            switch (parser.next()) {
+                                case XmlPullParser.END_TAG:
+                                    defDepth--;
+                                    Log.d(LOG_TAG, "Within definition tags, end tag found for: " + parser.getName() + ". defDepth now = " + defDepth);
+                                    if (parser.getName().matches(XML_TAG_DEFINITION)) {
+                                        // Reduce depth by 1 here as the closing <dt> tag will not be picked up by the main loop as when this inner while loop ends, parser.next() will be called.
+                                        depth-- ;
+                                    }
+                                    break;
+                                case XmlPullParser.START_TAG:
+                                    defDepth++;
+                                    Log.d(LOG_TAG, "Within definition tags, start tag found for: " + parser.getName() + ". defDepth now = " + defDepth);
+                                    break ;
+                                case XmlPullParser.TEXT:
+                                    Log.d(LOG_TAG,"Some definition text: " + parser.getText());
+                                    definition = definition + parser.getText();
+                                    break;
+                            }
+                        }
+                        if (definition.startsWith(":")) {
+                            definition = definition.substring(1);   // Remove the ':' from the front of the definition string if it exists, so a space can be put in
+                        }
+                        if (!definitionNumber.matches("")) {
+                            definition = definitionNumber + ": " + definition ;
+                        }
+                        Log.d(LOG_TAG,"Definition found: " + definition);
+                        definitions.add(definition);
                     }
-                }
-            } else  {
-                skip(parser);
+                    break;
             }
         }
 
         return definitions ;
     }
-
-    private String readDefinitionNo(XmlPullParser parser)throws IOException, XmlPullParserException {
-    // Extract the value from within the tag
-      String definitionNo = "" ;
-    while (parser.getEventType() != XmlPullParser.END_TAG && !parser.getName().equals(XML_TAG_DEFINITION_NUMBER)) {
-/*
-        Log.d(LOG_TAG,"DefinitionNo search ongoing " );
-        if (parser.getEventType() == XmlPullParser.TEXT) {
-            definitionNo = definitionNo + parser.getText();
-        Log.d(LOG_TAG,"DefinitionNo for entry found: " + definitionNo);
-        }
-
-        try {
-            parser.require(XmlPullParser.END_TAG, ns, XML_TAG_DEFINITION_NUMBER);
-            break ;
-        } catch (Exception e) {
-
-        }
-        parser.next();
-
-    }
-  */
-        if (parser.getEventType() != XmlPullParser.START_TAG) {
-            continue;
-        }
-        String name = parser.getName();
-        if (name.equals(XML_TAG_DEFINITION_NUMBER)) {
-           definitionNo = readText(parser);
-        } else if (name.equals(XML_TAG_DEFINITION_NUMBER2)) {
-           definitionNo = definitionNo + readText(parser);
-        }
-    }
-        /*
-        parser.require(XmlPullParser.START_TAG, ns, XML_TAG_DEFINITION_NUMBER);
-        definitionNo = readText(parser);
-        parser.require(XmlPullParser.END_TAG, ns, XML_TAG_DEFINITION_NUMBER);       //*/
-        Log.d(LOG_TAG,"DefinitionNo for entry found: " + definitionNo);
-        return definitionNo ;
-    }
-
-    private String readDefinition(XmlPullParser parser)throws IOException, XmlPullParserException {
-    // Extract the value from within the tag
-        parser.require(XmlPullParser.START_TAG, ns, XML_TAG_DEFINITION);
-        String definition = readText(parser);
-         // Skip first character which is always ':'. Put it in manually above to have a space between ':' and definition. If no definition found, return definition to blank so it won't be added to the definitions ArrayList in readDefinitions()
-        if (definition.startsWith(":")) {
-            definition = definition.substring(1) ; // Skip first character which is always ':'. Put it in manually above to have a space between ':' and definition
-        } else {
-            definition = "";
-        }
-
-        String tagName = parser.getName();
-        while (!tagName.equals(XML_TAG_DEFINITION)) {
-
-            if(tagName.equals(XML_TAG_LINK_1) || tagName.equals(XML_TAG_LINK_2)) {
-                Log.d(LOG_TAG, "Ignoring link tags, but adding to definition");
-                definition = definition + readText(parser);
-            } else {
-                Log.d(LOG_TAG, "skipping bunf");
-                parser.next();
-            }
-            if (parser.getEventType() == XmlPullParser.END_TAG) {
-                tagName = parser.getName();
-            }
-        }
-        Log.d(LOG_TAG,"Definition found: " + definition);
-
-        parser.require(XmlPullParser.END_TAG, ns, XML_TAG_DEFINITION);
-        return definition ;
-    }
-
     private String readText(XmlPullParser parser) throws IOException, XmlPullParserException {
-    // Extract the value from within the tag
         String result = "";
         if (parser.next() == XmlPullParser.TEXT) {
             result = parser.getText();
             parser.nextTag();
-            Log.d(LOG_TAG, "Reading text: " + result);
         }
         return result;
     }
-
     private void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
-        Log.d(LOG_TAG,"Skipping entry...");
         if (parser.getEventType() != XmlPullParser.START_TAG) {
             throw new IllegalStateException();
         }
@@ -269,11 +227,10 @@ public class XmlParser {
             }
         }
     }
-
     public static class Entry {
         public String word ;
         public String wordType ;   // Noun, verb, etc.
-        public ArrayList<String> definitions = new ArrayList<String>(); // Might need to make this a list
+        public ArrayList<String> definitions = new ArrayList<String>();
 
         public Entry(String word, String wordType, ArrayList<String> definitions){
             this.word = word ;
