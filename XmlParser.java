@@ -254,20 +254,20 @@ public class XmlParser {
 
     private void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
         Log.d(LOG_TAG,"Skipping entry...");
-    if (parser.getEventType() != XmlPullParser.START_TAG) {
-        throw new IllegalStateException();
-    }
-    int depth = 1;
-    while (depth != 0) {
-        switch (parser.next()) {
-        case XmlPullParser.END_TAG:
-            depth--;
-            break;
-        case XmlPullParser.START_TAG:
-            depth++;
-            break;
+        if (parser.getEventType() != XmlPullParser.START_TAG) {
+            throw new IllegalStateException();
         }
-    }
+        int depth = 1;
+        while (depth != 0) {
+            switch (parser.next()) {
+                case XmlPullParser.END_TAG:
+                    depth--;
+                    break;
+                case XmlPullParser.START_TAG:
+                    depth++;
+                    break;
+            }
+        }
     }
 
     public static class Entry {

@@ -151,12 +151,12 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
         viewGroup.setOrientation(LinearLayout.VERTICAL);
             Log.d(LOG_TAG, "Adding results to the results view");
 
-        XmlParser parser = new XmlParser();
+        XmlParser2 parser = new XmlParser2();
         try {
-            ArrayList<XmlParser.Entry> entries = parser.parse(xmlRaw);
+            ArrayList<XmlParser2.Entry> entries = parser.parse(xmlRaw);
             Log.d(LOG_TAG, "Cycling through definitions");
 
-            for (XmlParser.Entry entry : entries) {
+            for (XmlParser2.Entry entry : entries) {
                 CardView card = new CardView(context);
                 LinearLayout linearLayout = new LinearLayout(context);
                 linearLayout.setOrientation(LinearLayout.VERTICAL);

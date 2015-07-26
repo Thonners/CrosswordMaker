@@ -19,7 +19,7 @@ import java.util.ArrayList;
  * Created by Thonners on 26/07/15.
  */
 
-public class XMLParser2 {
+public class XmlParser2 {
 
     private static final String LOG_TAG = "xmlParser";
 
@@ -39,7 +39,7 @@ public class XMLParser2 {
     // We don't use namespaces
     private static final String ns = null;
 
-    public XMLParser2() {
+    public XmlParser2() {
         // Empty Constructor
     }
 
@@ -115,7 +115,7 @@ public class XMLParser2 {
         parser.require(XmlPullParser.START_TAG, ns, XML_TAG_WORD);
         String word = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, XML_TAG_WORD);
-        Log.d(LOG_TAG,"Word for entry found: " + word);
+        Log.d(LOG_TAG, "Word for entry found: " + word);
         return word;
     }
     private String readWordType(XmlPullParser parser) throws IOException, XmlPullParserException {
@@ -133,7 +133,80 @@ public class XMLParser2 {
 
         parser.require(XmlPullParser.START_TAG, ns, XML_TAG_DEFINITION_ZONE);
 
-        //TODO: Complete logic to extract definition
+        // Track how 'deep' into the definition zone's nested tags we are.
+        int depth = 1 ;
+        while (depth != 0) {
+            switch (parser.next()) {
+                case XmlPullParser.END_TAG:
+                    depth--;
+                    Log.d(LOG_TAG,"End tag found for: " + parser.getName() + ". Depth now = " + depth);
+                    break;
+                case XmlPullParser.START_TAG:
+                    depth++;
+                    Log.d(LOG_TAG,"Start tag found for: " + parser.getName() + ". Depth now = " + depth);
+                    if (parser.getName().matches(XML_TAG_DEFINITION_NUMBER)) {
+                        definitionNumber = "" ;
+                        int defNoDepth = 1;
+                        while (defNoDepth != 0) {
+                            switch (parser.next()) {
+                                case XmlPullParser.END_TAG:
+                                    defNoDepth--;
+                                    Log.d(LOG_TAG, "End tag found for: " + parser.getName() + ". defNoDepth now = " + depth);
+                                    if (parser.getName().matches(XML_TAG_DEFINITION_NUMBER)) {
+                                        depth--;
+                                    }
+                                    break;
+                                case XmlPullParser.START_TAG:
+                                    defNoDepth++;
+                                    Log.d(LOG_TAG, "Start tag found for: " + parser.getName() + ". defNoDepth now = " + depth);
+                                    break;
+                                case XmlPullParser.TEXT:
+                                    definitionNumber = definitionNumber + parser.getText();
+                                    Log.d(LOG_TAG, "Some defNo text found: " + parser.getText());
+                                    break;
+                            }
+                        }
+                            Log.d(LOG_TAG,"Definition number tag found: " + definitionNumber);
+                        /*} else if (parser.getName().matches(XML_TAG_DEFINITION_NUMBER2)) {
+                        parser.next();
+                        definitionNumber = definitionNumber + parser.getText() ;
+                        Log.d(LOG_TAG,"Definition number2 tag found: " + definitionNumber);//*/
+                    } else if (parser.getName().matches(XML_TAG_DEFINITION)) {
+                        parser.next();
+                        String definition = parser.getText() ;
+                        int defDepth = 1 ;
+                        while (defDepth != 0) {
+                            switch (parser.next()) {
+                                case XmlPullParser.END_TAG:
+                                    defDepth--;
+                                    Log.d(LOG_TAG, "Within definition tags, end tag found for: " + parser.getName() + ". defDepth now = " + defDepth);
+                                    if (parser.getName().matches(XML_TAG_DEFINITION)) {
+                                        // Reduce depth by 1 here as the closing <dt> tag will not be picked up by the main loop as when this inner while loop ends, parser.next() will be called.
+                                        depth-- ;
+                                    }
+                                    break;
+                                case XmlPullParser.START_TAG:
+                                    defDepth++;
+                                    Log.d(LOG_TAG, "Within definition tags, start tag found for: " + parser.getName() + ". defDepth now = " + defDepth);
+                                    break ;
+                                case XmlPullParser.TEXT:
+                                    Log.d(LOG_TAG,"Some definition text: " + parser.getText());
+                                    definition = definition + parser.getText();
+                                    break;
+                            }
+                        }
+                        if (definition.startsWith(":")) {
+                            definition = definition.substring(1);   // Remove the ':' from the front of the definition string if it exists, so a space can be put in
+                        }
+                        if (!definitionNumber.matches("")) {
+                            definition = definitionNumber + ": " + definition ;
+                        }
+                        Log.d(LOG_TAG,"Definition found: " + definition);
+                        definitions.add(definition);
+                    }
+                    break;
+            }
+        }
 
         return definitions ;
     }
