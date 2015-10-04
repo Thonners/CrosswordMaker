@@ -32,7 +32,7 @@ public class AnagramPageFragment extends Fragment {
 
     private static final String LOG_TAG = "AnagramPageFragment" ;
 
-    private int hashMapSize = 315000 ;   // Size for the hashMap to allow loadFactor < 0.75 whilst fiting all the words in the dictionary
+    private int hashMapSize = 315000 ;   // Size for the hashMap to allow loadFactor < 0.75 whilst fitting all the words in the dictionary
     private HashMap<String, ArrayList<String>> dictionaryHM = new HashMap<String, ArrayList<String>>(hashMapSize);    // Hashmap to store the options in
 
     private ArrayList<String> dictionary = new ArrayList<String>() ;
@@ -47,6 +47,7 @@ public class AnagramPageFragment extends Fragment {
     Button searchButton ;
     EditText inputBox ;
     LinearLayout resultsLinearLayout ;
+    LinearLayout progressSpinnerLinLayout ;
 
     public AnagramPageFragment() {
         // Required empty public constructor
@@ -88,6 +89,7 @@ public class AnagramPageFragment extends Fragment {
             }
         });
         resultsLinearLayout = (LinearLayout) view.findViewById(R.id.anagram_results_layout);
+        progressSpinnerLinLayout = (LinearLayout) view.findViewById(R.id.linlaHeaderProgress) ;
         return view ;
     }
 
@@ -119,28 +121,6 @@ public class AnagramPageFragment extends Fragment {
         hideKeyboard();
         clearResults();
         search();
-    }
-
-    private void toggleSearchButton() {
-        //Toggle the function of the search button
-        if (buttonIsClear) {
-            // If button was 'clear' when clicked, clear search/view, and return text to 'search'
-            Log.d(LOG_TAG, "Clearing results and search. ");
-            clearSearch() ;
-            searchButton.setText(getString(R.string.search));
-        } else {
-            // If button was 'search' when clicked, do search, and change button to 'clear'.
-            Log.d(LOG_TAG, "Searching... ");
-            search();
-            searchButton.setText(getString(R.string.clear));
-        }
-        buttonIsClear = ! buttonIsClear ;
-    }
-
-    private void clearSearch() {
-        // If clear clicked, clear the text from the search. Button not yet implemented
-        // Clear text from input box
-        inputBox.setText("");
     }
 
     private void clearResults() {
@@ -189,35 +169,42 @@ public class AnagramPageFragment extends Fragment {
     }
 
     private void searchWordFit(String input) {
-        // Cycle through dictionary to find it
-        showSearchingToast();
+        // Load Async task to search the word-fit to stop it haning the UI Thread
+        GetWordSolverAnswers getWordSolverAnswers = new GetWordSolverAnswers() ;
+        getWordSolverAnswers.execute(input);
+    }
+
+    private ArrayList<String> getWordFitAnswers(String input) {
+        // Cycle through dictionary to find possible matches
+        ArrayList<String> answers = new ArrayList<>() ;
         boolean resultFound = false ;
 
-                Log.d(LOG_TAG, "input = " + input);
+        Log.d(LOG_TAG, "input = " + input);
         List<String> dictionaryToSearch ; //= new ArrayList<>();
         if (input.charAt(0) == '.') {
             // Search whole dictionary
-                Log.d(LOG_TAG, "searching entire dictionary. Will be slow...");
+            Log.d(LOG_TAG, "searching entire dictionary. Will be slow...");
             dictionaryToSearch = dictionary ;
         } else {
-                Log.d(LOG_TAG, "searching words beginning with " + input.charAt(0) + " ...");
-                String[] dic = dictionaryByLetter.get(getLetterIndex(input.charAt(0)));
+            Log.d(LOG_TAG, "searching words beginning with " + input.charAt(0) + " ...");
+            String[] dic = dictionaryByLetter.get(getLetterIndex(input.charAt(0)));
 
-                dictionaryToSearch = Arrays.asList(dic);
+            dictionaryToSearch = Arrays.asList(dic);
         }
         for (String word : dictionaryToSearch) {
             if (word != null && word.toLowerCase().matches(input)) {
                 Log.d(LOG_TAG, "matched " + word + " to the input: " + input);
                 resultFound = true ;
-                addToResults(word);
+                answers.add(word);
             }
         }
 
         if (!resultFound) {
             Log.d(LOG_TAG, "No match found for: " +  input);
-            addToResults(getString(R.string.no_match_found), false);
+            return null ;
         }
 
+        return answers ;
     }
 
     private void searchAnagram(String input) {
@@ -271,10 +258,6 @@ public class AnagramPageFragment extends Fragment {
         resultsLinearLayout.addView(cardView);
     }
 
-    private void showSearchingToast() {
-        Toast searchingToast = Toast.makeText(getActivity(),getString(R.string.searching),Toast.LENGTH_LONG);
-        searchingToast.show();
-    }
     private void showIllegalCharactersToast() {
         Toast illegalCharactersToast = Toast.makeText(getActivity(), getString(R.string.illegalCharacterToast), Toast.LENGTH_SHORT);
         illegalCharactersToast.show();
@@ -349,6 +332,13 @@ public class AnagramPageFragment extends Fragment {
             }
         });
     }
+    private void setSearchButtonNotClickable() {
+        // Prevent the search button being pressed while looking up word-solver answers
+        Log.d(LOG_TAG,"Search button not clickable");
+        searchButton.setClickable(false);
+        searchButton.setText(R.string.searching);
+        searchButton.setPressed(true);
+    }
     private String sortWord(String input) {
         // Sort the letters into alphabetical order
         char[] wordChars = input.toLowerCase().toCharArray();
@@ -400,5 +390,46 @@ public class AnagramPageFragment extends Fragment {
 
     }
 
+    private class GetWordSolverAnswers extends AsyncTask<String,Void,String> {
+        /**
+         *  Async task to compute the word-solver answers. Allows it to be moved off the main UI Thread.
+         *
+         * Created by mat on 04/10/15.
+         */
+
+        ArrayList<String> answers = new ArrayList<>();
+
+        @Override
+        protected void onPreExecute() {
+            // Show the progress spinner
+            progressSpinnerLinLayout.setVisibility(View.VISIBLE);
+            // Stop the search button from being pressed
+            setSearchButtonNotClickable();
+        }
+        @Override
+        protected String doInBackground(String... input) {
+            Log.d(LOG_TAG,"Getting Word-solver answers...");
+            answers = getWordFitAnswers(input[0]);
+            Log.d(LOG_TAG,"Done!");
+            return null ;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            // Hide the progress spinner
+            progressSpinnerLinLayout.setVisibility(View.GONE);
+            // Set search clickable again
+            setSearchButtonClickable();
+
+            // Add answers to view
+            if (answers != null) {
+                for (String word : answers) {
+                    addToResults(word);
+                }
+            } else {
+                addToResults(getString(R.string.no_match_found), false);
+            }
+        }
+    }
 
 }

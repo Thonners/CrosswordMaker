@@ -8,6 +8,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -56,18 +57,33 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
     private int searchSuccess ;
     public String definition ;
 
+    LinearLayout progressLinearLayout ;
+    Button searchButton ;
+
     private String urlPrefix = "http://www.dictionaryapi.com/api/v1/references/collegiate/xml/";
     private String urlSuffix = "?key=";
     private String url ;
 //    private View finalView ;    // Final view to be passed back to the DictionaryPageFragment to be put in the answers
 
-    public DictionaryMWDownloadDefinition (Context appContext, String aSearchTerm, DictionaryMWDownloadDefinitionListener aListener) {
+    public DictionaryMWDownloadDefinition (Context appContext, String aSearchTerm, LinearLayout progressLinLayout, Button aSearchButton, DictionaryMWDownloadDefinitionListener aListener) {
         context = appContext ;
         listener = aListener;
+        progressLinearLayout = progressLinLayout ;
+        searchButton = aSearchButton ;
         searchTerm = aSearchTerm.replaceAll(" ","%20");     // Replace all is to properly handle spaces for the website url
         searchSuccess = SEARCH_NOT_COMPLETED;
 
         url = urlPrefix + searchTerm + urlSuffix + context.getString(R.string.dictionary_mw_api_key);
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        // Show progress bar
+        progressLinearLayout.setVisibility(View.VISIBLE);
+        // Set search button not clickable
+        searchButton.setClickable(false);
+        searchButton.setText(R.string.searching);
     }
 
     @Override
@@ -99,12 +115,19 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
     @Override
     protected void onPostExecute(String rawXML) {
         super.onPostExecute(rawXML);
+        // Hide progress bar
+        progressLinearLayout.setVisibility(View.GONE);
+        // Return search button to normal
+        searchButton.setClickable(true);
+        searchButton.setText(R.string.search);
+
         if (!isCancelled()) {
             ViewGroup finalView = decodeXML(rawXML);
 
 
             listener.completionCallBack(finalView, searchSuccess);
         }
+
     }
 
     private ViewGroup decodeXML(String rawXML) {

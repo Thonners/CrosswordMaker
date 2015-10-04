@@ -40,6 +40,7 @@ public class DictionaryPageFragment extends Fragment {
     Button searchButton ;
     EditText inputBox ;
     LinearLayout resultsLinearLayout ;
+    LinearLayout progressLinearLayout ;
     String searchTerm;
     String searchPrefix = "define:";
     boolean searchMWUnderway = false ;
@@ -81,6 +82,7 @@ public class DictionaryPageFragment extends Fragment {
             }
         });
         resultsLinearLayout = (LinearLayout) view.findViewById(R.id.dictionary_results_layout);
+        progressLinearLayout = (LinearLayout) view.findViewById(R.id.dictionary_header_progress);
         return view ;
     }
 
@@ -132,7 +134,7 @@ public class DictionaryPageFragment extends Fragment {
             searchTerm = inputBox.getText().toString().trim();
             if (searchTerm.length() > 0) {
                 Log.d(LOG_TAG, "Search button clicked. Trying MW dictionary");
-                showSearchingToast();
+               // showSearchingToast();
                 searchMWDictionary(searchTerm);
 
             } else {
@@ -237,7 +239,7 @@ public class DictionaryPageFragment extends Fragment {
                     searchMWUnderway = false ;  // Reset to allow future searches
                 }
             };
-            DictionaryMWDownloadDefinition definition = new DictionaryMWDownloadDefinition(getActivity(), query, listener);
+            DictionaryMWDownloadDefinition definition = new DictionaryMWDownloadDefinition(getActivity(), query, progressLinearLayout, searchButton, listener);
             definition.execute();
     }
 
@@ -275,9 +277,9 @@ public class DictionaryPageFragment extends Fragment {
     public void showAlreadySearchingToast() {
         showToast(getString(R.string.already_searching));
     }
-    public void showSearchingToast() {
+  /*  public void showSearchingToast() {
         showToast(getString(R.string.searching));
-    }
+    }*/
     private void showToast(String toastString) {
         Toast searchingToast = Toast.makeText(getActivity(), toastString, Toast.LENGTH_SHORT);
         searchingToast.show();
