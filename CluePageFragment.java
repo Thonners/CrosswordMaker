@@ -43,6 +43,7 @@ public class CluePageFragment extends Fragment {
     String imageFilePath;
     GridLayout grid ;
     ImageView clueImageView ;
+    TouchImageView clueImageViewTouch ;
     File clueImageFile;
     Bitmap clueImageBitmap ;
     View takeCluePhotoButton ;
@@ -86,6 +87,17 @@ public class CluePageFragment extends Fragment {
     private void initialise(View view) {
 
         takeCluePhotoButton = (View) view.findViewById(R.id.take_picture_clues_button) ;
+        clueImageViewTouch = (TouchImageView) view.findViewById(R.id.image_view_clues) ;
+        clueImageViewTouch.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                // Offer option to retake clues picture if user long-clicks
+                Log.d(LOG_TAG,"Long-click on clue image detected");
+                retakePicture();
+                return true;
+            }
+        });
+        /* //-------------- Old standard ImageView - remove if pinch-to-zoom works
         clueImageView = (ImageView) view.findViewById(R.id.image_view_clues);
         clueImageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -96,7 +108,7 @@ public class CluePageFragment extends Fragment {
                 return true;
             }
         });
-
+        */
 
         if (clueImageFileExists()) {
             setClueImageInView();
@@ -157,7 +169,8 @@ public class CluePageFragment extends Fragment {
         clueImageBitmap = getImage(clueImageFile);
 
         Log.d(LOG_TAG, "Setting image");
-        clueImageView.setImageBitmap(clueImageBitmap);
+        //clueImageView.setImageBitmap(clueImageBitmap);
+        clueImageViewTouch.setImageBitmap(clueImageBitmap);
     }
     private void removePhotoButton() {
         //Remove button from view
@@ -233,9 +246,11 @@ public class CluePageFragment extends Fragment {
         String imageType = options.outMimeType;
         Log.d(LOG_TAG,"Bounds: imageHeight = " + imageHeight + ", imageWidth = " + imageWidth + ", imageType = " + imageType);
 
-        Log.d(LOG_TAG,"clueImageView.getWidth() = " + clueImageView.getWidth());
-        options.inSampleSize = calculateInSampleSize(options,clueImageView.getWidth());
-
+        Log.d(LOG_TAG,"clueImageView.getWidth() = " + clueImageViewTouch.getWidth());
+        options.inSampleSize = calculateInSampleSize(options,clueImageViewTouch.getWidth());
+        // Old - delete if touch works
+        //Log.d(LOG_TAG,"clueImageView.getWidth() = " + clueImageView.getWidth());
+        //options.inSampleSize = calculateInSampleSize(options,clueImageView.getWidth());
         // Turn off justDecodeBounds so that the file is properly decoded
         options.inJustDecodeBounds = false ;
 

@@ -26,7 +26,7 @@ public class NewCrossword extends ActionBarActivity {
     NumberPicker numberPicker ;
 
     private int min = 3 ;
-    private int max = 20 ;
+    private int max = 30 ;
     private int defaultValue = 13 ;
 
     @Override
