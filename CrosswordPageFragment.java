@@ -124,6 +124,16 @@ public class CrosswordPageFragment extends Fragment {
         crossword = new Crossword(getActivity().getApplicationContext(), crosswordGrid,crosswordStringArray);
     }
 
+    public void zoomCrossword(){
+        if(crossword.getIsZoomed()){
+            Log.d(LOG_TAG, "Zoom out FAB pressed");
+            // TODO: Set zoom out icon instead of zoom in icon in this set
+        } else {
+            Log.d(LOG_TAG, "Zoom in FAB pressed");
+        }
+        crossword.toggleZoom();
+    }
+
     public Crossword getCrossword() {
         return crossword;
     }

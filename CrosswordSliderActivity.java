@@ -267,6 +267,9 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
         pager.setCurrentItem(DICTIONARY_TAB, true);
     }
 
+    public void zoomCrosswordClicked(View view){
+        crosswordPageFragment.zoomCrossword();
+    }
 
     // ------------------------- Menu button presses --------------------------------------
 

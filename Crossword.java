@@ -60,6 +60,7 @@ public class Crossword {
     private float fontSize ;
 
     private boolean editMode = false ;
+    private boolean isZoomedIn = false ;
 
     private ArrayList<Clue> hClues = new ArrayList<Clue>() ;     // Storage for all the horizontal clues
     private ArrayList<Clue> vClues = new ArrayList<Clue>() ;     // Storage for all the vertical clues
@@ -560,6 +561,32 @@ public class Crossword {
         Log.d(LOG_TAG, "Length of saveArray = " + saveArray.length);
 
         return saveArray ;
+    }
+
+    public void toggleZoom() {
+
+        // Toggle zooming of the grid
+        int cellSize ;
+        if(isZoomedIn) {
+
+            cellSize = cellWidth ;
+        } else {
+            cellSize = context.getResources().getDimensionPixelOffset(R.dimen.cell_size_zoomed_in) ;
+        }
+
+        // Change polarity of isZoomedIn
+        isZoomedIn = !isZoomedIn ;
+
+        // Force all cells to that size
+        for (int i = 0; i < rowCount; i++) {
+            for (int j = 0; j < rowCount; j++) {
+                cells[i][j].setWidth(cellSize);
+                cells[i][j].setHeight(cellSize);
+            }
+        }
+    }
+    public boolean getIsZoomed(){
+        return isZoomedIn;
     }
 
     // ------------------------------------------- Save / Delete / Initialise methods --------------------------------------------
