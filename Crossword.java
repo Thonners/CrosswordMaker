@@ -1,10 +1,14 @@
 package com.thonners.crosswordmaker;
 
 import android.content.Context;
+import android.graphics.Point;
+import android.hardware.display.DisplayManager;
 import android.os.Build;
 import android.os.Environment;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.WindowManager;
 import android.widget.GridLayout;
 
 import java.io.BufferedReader;
@@ -94,7 +98,23 @@ public class Crossword {
 
     //---------------------------------------------- Constructors --------------------------------------------------
 
-    public Crossword(Context context, int rows, GridLayout gridLayout, int screenWidth, int screenHeight, String title, String date) {
+    public Crossword(Context context, int rows, GridLayout gridLayout, String title, String date) {
+        this.context = context;
+        rowCount = rows;
+        grid = gridLayout;
+        this.title = title;
+        this.date = date ;
+
+        getScreenDetails();
+        calculateCellWidth() ;
+        calculateFontSize();
+        createGrid();
+        createCells();
+
+        initialiseSaveFiles();
+
+    }
+/*// DELETE THIS IF ABOVE CONSTRUCTOR WORKS CONSISTENTLY    public Crossword(Context context, int rows, GridLayout gridLayout, int screenWidth, int screenHeight, String title, String date) {
         this.context = context;
         rowCount = rows;
         grid = gridLayout;
@@ -109,7 +129,7 @@ public class Crossword {
         createCells();
 
         initialiseSaveFiles();
-    }
+    } //*/
     public Crossword(Context context, GridLayout gridLayout, String[] savedCrossword, boolean editMode) {
         // Constructor for a saved crossword
         this.context = context ;
@@ -318,9 +338,11 @@ public class Crossword {
 
         Log.d("Sizes","cellWidth = " + cellWidth);
     }
+    private float calculateFontSize(int aCellWidth) {
+        return ((float) aCellWidth / 2) ;
+    }
     private void calculateFontSize() {
-        fontSize = (float) cellWidth / 2 ;
-        Log.d("Sizes","fontSize = " + fontSize);
+        this.fontSize = calculateFontSize(this.cellWidth);
     }
     // ---------------------------------------------------- Public get/set methods ------------------------------------------
     public void setTitle(String newTitle) {
@@ -563,16 +585,32 @@ public class Crossword {
         return saveArray ;
     }
 
+    private void getScreenDetails() {
+
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE) ;
+        DisplayMetrics metrics = new DisplayMetrics();
+        windowManager.getDefaultDisplay().getMetrics(metrics);
+
+        screenWidth = metrics.widthPixels;
+        screenHeight = metrics.heightPixels;
+
+        Log.d(LOG_TAG, "Screen Width = " + screenWidth);
+        Log.d(LOG_TAG,"Screen Height = " + screenHeight);
+    }
     public void toggleZoom() {
+        // Method to toggle zooming of the grid
 
-        // Toggle zooming of the grid
-        int cellSize ;
-        if(isZoomedIn) {
+        // Force initialisation of screen details & font size
+        getScreenDetails();
 
-            cellSize = cellWidth ;
-        } else {
-            cellSize = context.getResources().getDimensionPixelOffset(R.dimen.cell_size_zoomed_in) ;
+        // Set cell size based on current state of zoom
+        int newCellSize = cellWidth;
+        if(!isZoomedIn) {
+            // If not already zoomed in, change value to zoomed in values
+            newCellSize = context.getResources().getDimensionPixelOffset(R.dimen.cell_size_zoomed_in) ;
         }
+        // Calculate new font size
+        float newFontSize = calculateFontSize(newCellSize);
 
         // Change polarity of isZoomedIn
         isZoomedIn = !isZoomedIn ;
@@ -580,8 +618,9 @@ public class Crossword {
         // Force all cells to that size
         for (int i = 0; i < rowCount; i++) {
             for (int j = 0; j < rowCount; j++) {
-                cells[i][j].setWidth(cellSize);
-                cells[i][j].setHeight(cellSize);
+                cells[i][j].setWidth(newCellSize);
+                cells[i][j].setHeight(newCellSize);
+                cells[i][j].setTextSize(TypedValue.COMPLEX_UNIT_PX, newFontSize);
             }
         }
     }

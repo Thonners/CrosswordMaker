@@ -108,7 +108,8 @@ public class GridMaker extends ActionBarActivity {
         // Get photo to generate the grid automatically
         dispatchTakePictureIntent();
         } else {
-            crossword = new Crossword(getApplicationContext(), crosswordRowCount, grid, screenWidth, screenHeight, crosswordTitle, crosswordDate);
+            //crossword = new Crossword(getApplicationContext(), crosswordRowCount, grid, screenWidth, screenHeight, crosswordTitle, crosswordDate);
+            crossword = new Crossword(getApplicationContext(), crosswordRowCount, grid, crosswordTitle, crosswordDate);
             tutorialToast();
         }
 
@@ -485,7 +486,7 @@ public class GridMaker extends ActionBarActivity {
 
         iv.setImageBitmap(scaledBitmap);
 
-        crossword = new Crossword(this, crosswordRowCount, grid, screenWidth, screenHeight, crosswordTitle, crosswordDate);
+        crossword = new Crossword(this, crosswordRowCount, grid, crosswordTitle, crosswordDate);
 
         String[] saveArrayTemp = new String[Crossword.SAVE_ARRAY_START_INDEX + (crosswordRowCount * crosswordRowCount)];
         int index = Crossword.SAVE_ARRAY_START_INDEX;   // Index at which to start counting for generating a saveArray
