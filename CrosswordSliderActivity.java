@@ -1,6 +1,7 @@
 package com.thonners.crosswordmaker;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.FragmentManager;
@@ -192,7 +193,10 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
         if (pager.getCurrentItem() == 0) {
             // If the user is currently looking at the first step, i.e. the crossword activity, allow the system to handle the
             // Back button. This calls finish() on this activity and pops the back stack.
-            super.onBackPressed();
+            //super.onBackPressed();
+            Intent homeIntent = new Intent(this,HomeActivity.class) ;
+            homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(homeIntent);
         } else {
             // Otherwise, return to the crossword Activity
             pager.setCurrentItem(0);
