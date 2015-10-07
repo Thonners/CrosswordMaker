@@ -2,6 +2,7 @@ package com.thonners.crosswordmaker;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
@@ -9,6 +10,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.internal.view.menu.ActionMenuItemView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -90,11 +92,14 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
                     switch (pager.getCurrentItem()) {
                         case CROSSWORD_TAB:
                             hideKeyboard();
+                            showActionZoom();
                             break;
                         case CLUE_TAB:
+                            hideActionZoom();
                             hideKeyboard();
                             break;
                         case DICTIONARY_TAB:
+                            hideActionZoom();
                             dictionaryPageFragment.inputBoxRequestFocus();
                             if (dontShowKeyboard) {
                                 dontShowKeyboard = false;  // Reset for next time
@@ -103,10 +108,12 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
                             }
                             break;
                         case ANAGRAM_TAB:
+                            hideActionZoom();
                             anagramPageFragment.inputBoxRequestFocus();
                             showKeyboard(anagramPageFragment.getInputBox());
                             break;
                         case WIKI_TAB:
+                            hideActionZoom();
                             hideKeyboard();
                             break;
                     }
@@ -146,6 +153,10 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
         // as you specify a parent activity in AndroidManifest.xml.
 
         switch (item.getItemId()) {
+            case R.id.action_zoom:
+                // Toggle the zoom
+                toggleZoom();
+                break;
             case R.id.action_save:
                 // Save the grid
                 saveGrid();
@@ -245,7 +256,16 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
         InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
-
+    private void hideActionZoom() {
+        // Remove/hide the zoom icon from the menu
+        ActionMenuItemView menuZoom = (ActionMenuItemView) findViewById(R.id.action_zoom);
+        menuZoom.setVisibility(View.GONE);
+    }
+    private void showActionZoom(){
+        // Replace the zoom icon in the menu
+        ActionMenuItemView menuZoom = (ActionMenuItemView) findViewById(R.id.action_zoom);
+        menuZoom.setVisibility(View.VISIBLE);
+    }
     private void showKeyboard(View view) {
         Log.d(LOG_TAG,"Show keyboard called");
         // Method to hide the keyboard
@@ -267,12 +287,24 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
         pager.setCurrentItem(DICTIONARY_TAB, true);
     }
 
-    public void zoomCrosswordClicked(View view){
-        crosswordPageFragment.zoomCrossword();
-    }
-
     // ------------------------- Menu button presses --------------------------------------
 
+    private void toggleZoom() {
+        // Toggle the zoom
+        crosswordPageFragment.zoomCrossword();
+
+        // Toggle the icon
+        ActionMenuItemView menuZoom = (ActionMenuItemView) findViewById(R.id.action_zoom);
+
+        // Check Android version sufficient
+        if(Build.VERSION.SDK_INT >= 21) {
+            if (crosswordPageFragment.getCrossword().getIsZoomed()) {
+                menuZoom.setIcon(getDrawable(R.drawable.ic_zoom_out_white));
+            } else {
+                menuZoom.setIcon(getDrawable(R.drawable.ic_zoom_in_white));
+            }
+        }
+    }
     public void saveGrid() {
         // Save the grid
         crosswordPageFragment.getCrossword().saveCrossword();

@@ -16,6 +16,7 @@ public class CellView extends RelativeLayout implements Serializable {
 
     private Cell cell ;
     private int clueNumber ;
+    private TextView clueNumberDisplay = null;
     private RelativeLayout.LayoutParams cellLP = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT) ;
     private RelativeLayout.LayoutParams cellNoLP = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT) ;
 
@@ -25,7 +26,7 @@ public class CellView extends RelativeLayout implements Serializable {
         
         initialiseLayoutParams();
         
-        this.addView(cell , 0, cellLP);
+        this.addView(cell, 0, cellLP);
     }
     
     private void initialiseLayoutParams() {
@@ -42,7 +43,7 @@ public class CellView extends RelativeLayout implements Serializable {
     }
 
     private void createClueNumber() {
-        TextView clueNumberDisplay = new TextView(getContext()) ;
+        clueNumberDisplay = new TextView(getContext()) ;
         clueNumberDisplay.setText("" + clueNumber);
         clueNumberDisplay.setPadding(5,0,0,0);
         clueNumberDisplay.setTextColor(getContext().getResources().getColor(R.color.dark_grey));
@@ -51,6 +52,22 @@ public class CellView extends RelativeLayout implements Serializable {
 
         this.addView(clueNumberDisplay, 1, cellNoLP);
         clueNumberDisplay.bringToFront();
+    }
+
+    public void setSize(int cellSize) {
+        // Set the size of the cell view, and the text sizes of the textview and clue number
+        // Calculate font sizes
+        float mainTextSize = (float) cellSize / 2 ;
+        float clueTextSize = mainTextSize / 2 ;
+
+        // Set parameters
+        cell.setWidth(cellSize);
+        cell.setHeight(cellSize);
+        cell.setTextSize(TypedValue.COMPLEX_UNIT_PX, mainTextSize);
+        if (clueNumberDisplay != null) {
+            // Check not null, as will be the case the first time the CellView is created.
+            clueNumberDisplay.setTextSize(TypedValue.COMPLEX_UNIT_PX, clueTextSize);
+        }
     }
 
     public Cell getCell() {

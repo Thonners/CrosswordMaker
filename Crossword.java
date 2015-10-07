@@ -107,29 +107,12 @@ public class Crossword {
 
         getScreenDetails();
         calculateCellWidth() ;
-        calculateFontSize();
         createGrid();
         createCells();
 
         initialiseSaveFiles();
 
     }
-/*// DELETE THIS IF ABOVE CONSTRUCTOR WORKS CONSISTENTLY    public Crossword(Context context, int rows, GridLayout gridLayout, int screenWidth, int screenHeight, String title, String date) {
-        this.context = context;
-        rowCount = rows;
-        grid = gridLayout;
-        this.screenWidth = screenWidth ;
-        this.screenHeight = screenHeight ;
-        this.title = title;
-        this.date = date ;
-
-        calculateCellWidth() ;
-        calculateFontSize();
-        createGrid();
-        createCells();
-
-        initialiseSaveFiles();
-    } //*/
     public Crossword(Context context, GridLayout gridLayout, String[] savedCrossword, boolean editMode) {
         // Constructor for a saved crossword
         this.context = context ;
@@ -143,7 +126,6 @@ public class Crossword {
         this.clueImagePath = crosswordStringArray[SAVED_ARRAY_INDEX_CLUE_IMAGE];
 
         createGrid();
-        calculateFontSize();
         createCells();
         if (editMode) {
             toggleBlackCells() ;
@@ -185,11 +167,13 @@ public class Crossword {
                 cellViews[i][j] = new CellView(context, this, i, j);
                 cells[i][j] = cellViews[i][j].getCell();
                 cells[i][j].setId(cells[i][j].getCellId(rowCount));
-                cells[i][j].setWidth(cellWidth);
-                cells[i][j].setHeight(cellWidth);
+   //             cells[i][j].setWidth(cellWidth);
+   //             cells[i][j].setHeight(cellWidth);
                 cells[i][j].setAllCaps(true);
                 cells[i][j].setTextColor(context.getResources().getColor(R.color.black));
-                cells[i][j].setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize);
+//                cells[i][j].setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize);
+
+                cellViews[i][j].setSize(cellWidth);
 
                 GridLayout.Spec row = GridLayout.spec(i);
                 GridLayout.Spec col = GridLayout.spec(j);
@@ -338,12 +322,8 @@ public class Crossword {
 
         Log.d("Sizes","cellWidth = " + cellWidth);
     }
-    private float calculateFontSize(int aCellWidth) {
-        return ((float) aCellWidth / 2) ;
-    }
-    private void calculateFontSize() {
-        this.fontSize = calculateFontSize(this.cellWidth);
-    }
+
+
     // ---------------------------------------------------- Public get/set methods ------------------------------------------
     public void setTitle(String newTitle) {
         if(newTitle.length() > 0 ) {
@@ -610,7 +590,7 @@ public class Crossword {
             newCellSize = context.getResources().getDimensionPixelOffset(R.dimen.cell_size_zoomed_in) ;
         }
         // Calculate new font size
-        float newFontSize = calculateFontSize(newCellSize);
+//        float newFontSize = calculateFontSize(newCellSize);
 
         // Change polarity of isZoomedIn
         isZoomedIn = !isZoomedIn ;
@@ -618,9 +598,11 @@ public class Crossword {
         // Force all cells to that size
         for (int i = 0; i < rowCount; i++) {
             for (int j = 0; j < rowCount; j++) {
-                cells[i][j].setWidth(newCellSize);
+/*                cells[i][j].setWidth(newCellSize);
                 cells[i][j].setHeight(newCellSize);
-                cells[i][j].setTextSize(TypedValue.COMPLEX_UNIT_PX, newFontSize);
+                cells[i][j].setTextSize(TypedValue.COMPLEX_UNIT_PX, newFontSize);   //*/
+
+                cellViews[i][j].setSize(newCellSize);
             }
         }
     }
@@ -714,21 +696,6 @@ public class Crossword {
 
         // Save the grid
         saveCrossword();
-    }
-    // Delete this if it works from CLM
-    public void deleteCrossword() {
-        Log.d(LOG_TAG, "Call to delete crossword received. Looping through & deleting files.") ;
-        // Delete crossword save directory and all files contained within
-        File[] files = saveDir.listFiles();
-        for (File f : files) {
-            if (f != null) {
-                Log.d(LOG_TAG,"Deleting file at: " + f.getPath());
-                f.delete();
-            }
-        }
-        Log.d(LOG_TAG,"Deleting parent directory: " + saveDir.getPath());
-        saveDir.delete() ;
-
     }
 
 }
