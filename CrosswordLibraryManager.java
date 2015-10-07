@@ -29,7 +29,7 @@ public class CrosswordLibraryManager {
 
     Context context ;
     File[] foundCrosswordFiles;    // Note that this is the directory in which the crossword and images (if they exist) will be saved
-    ArrayList<String> foundCrosswordFilePaths = new ArrayList<String>() ;
+    ArrayList<String> foundCrosswordFilePathsList = new ArrayList<String>() ;
     File rootDir;
 
     File recentCrosswordsFile ;
@@ -65,16 +65,28 @@ public class CrosswordLibraryManager {
         try {
             Log.d(LOG_TAG, "Getting list of crossword files.");
             foundCrosswordFiles = rootDir.listFiles();
-            Arrays.sort(foundCrosswordFiles);
+            //Arrays.sort(foundCrosswordFiles);
         } catch (Exception e) {
             Log.e(LOG_TAG, "Error getting file list: " + e.getMessage());
         }
+
+        // Get File paths to allow sorting - file path should lead with date in YYYYMMDD, so alphabetical sorting will result in them ordered by date
+        String[] foundCrosswordFilePaths = new String[foundCrosswordFiles.length] ;
+        for(int i =0 ; i < foundCrosswordFilePaths.length ; i++) {
+            foundCrosswordFilePaths[i] = foundCrosswordFiles[i].getAbsolutePath();
+        }
+        Arrays.sort(foundCrosswordFilePaths);
+        // Re-assign files in alphabetical/date order
+        for(int j=0 ; j < foundCrosswordFilePaths.length ; j++) {
+            foundCrosswordFiles[j] = new File(foundCrosswordFilePaths[j]);
+        }
+
 
         // Output what files were found
         Log.d(LOG_TAG, "Directory searched: " + rootDir);
         if (foundCrosswordFiles != null) {
             for (int i = 0; i < foundCrosswordFiles.length; i++) {
-                foundCrosswordFilePaths.add(foundCrosswordFiles[i].getName());
+                foundCrosswordFilePathsList.add(foundCrosswordFiles[i].getName());
                 Log.d(LOG_TAG, "File at index " + i + " is " + foundCrosswordFiles[i].getName());
             }
         }
@@ -99,7 +111,7 @@ public class CrosswordLibraryManager {
         getSavedFiles();
         Log.d(LOG_TAG, "Checking crossword file doesn't already exist for: " + directoryName);
 
-        if (foundCrosswordFilePaths.contains(directoryName)) {
+        if (foundCrosswordFilePathsList.contains(directoryName)) {
         Log.d(LOG_TAG, "Crossword file found for: " + directoryName);
             return true ;
         } else {
