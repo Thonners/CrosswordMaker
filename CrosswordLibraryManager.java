@@ -2,7 +2,6 @@ package com.thonners.crosswordmaker;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
@@ -33,7 +32,6 @@ public class CrosswordLibraryManager {
     File rootDir;
 
     File recentCrosswordsFile ;
-    String recentCrosswordFileName ;
 
     int noRecentCrosswords = 3 ;    // Number of recent crosswords to track
 
@@ -339,9 +337,6 @@ public class CrosswordLibraryManager {
         }
         public String getDisplayDate() {
             return displayDate;
-        }
-        public String getPercentageComplete() {
-            return percentageComplete;
         }
         public String getDisplayPercentageComplete() {
             return context.getString(R.string.completion) + " " + percentageComplete + "%" ;
