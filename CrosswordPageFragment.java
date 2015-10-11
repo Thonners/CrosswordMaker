@@ -31,6 +31,7 @@ public class CrosswordPageFragment extends Fragment {
     private static final String LOG_TAG = "CrosswordPageFragment";
 
     private GridLayout crosswordGrid ;
+    private CrosswordGrid cGrid ;
     Crossword crossword ;
     String[] crosswordStringArray;
 
@@ -72,6 +73,7 @@ public class CrosswordPageFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_crossword_page, container, false);
         crosswordGrid = (GridLayout) view.findViewById(R.id.crossword_grid);
+        cGrid = (CrosswordGrid) view.findViewById(R.id.crossword_grid2);
 
         createCrossword();
 
@@ -121,7 +123,8 @@ public class CrosswordPageFragment extends Fragment {
 
     private void createCrossword() {
         // Create the crossword
-        crossword = new Crossword(getActivity().getApplicationContext(), crosswordGrid,crosswordStringArray);
+        //crossword = new Crossword(getActivity().getApplicationContext(), crosswordGrid,crosswordStringArray);
+        crossword = new Crossword(getActivity().getApplicationContext(), cGrid,crosswordStringArray,false);
     }
 
     public void zoomCrossword(){

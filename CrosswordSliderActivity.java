@@ -194,9 +194,15 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
             // If the user is currently looking at the first step, i.e. the crossword activity, allow the system to handle the
             // Back button. This calls finish() on this activity and pops the back stack.
             //super.onBackPressed();
-            Intent homeIntent = new Intent(this,HomeActivity.class) ;
-            homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(homeIntent);
+            if (crosswordPageFragment.getCrossword().getIsZoomed()) {
+                // Zoom out if zoomed in and back pressed
+                crosswordPageFragment.getCrossword().toggleZoom();
+            } else {
+                // If not zoomed in and on crossword fragment, go home.
+                Intent homeIntent = new Intent(this, HomeActivity.class);
+                homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(homeIntent);
+            }
         } else {
             // Otherwise, return to the crossword Activity
             pager.setCurrentItem(0);

@@ -10,6 +10,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.WindowManager;
 import android.widget.GridLayout;
+import android.widget.RelativeLayout;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -94,6 +95,7 @@ public class Crossword {
     String savePath ;
 
     GridLayout grid;
+    CrosswordGrid   crosswordGrid ;
 
 
     //---------------------------------------------- Constructors --------------------------------------------------
@@ -142,11 +144,37 @@ public class Crossword {
         // Default constructor for saved crossword - don't use edit mode.
         this(context, gridLayout, savedCrossword, false);
     }
+    public Crossword(Context context, CrosswordGrid crosswordGrid, String[] savedCrossword, boolean editMode) {
+        // Constructor for a saved crossword
+        this.context = context ;
+        this.crosswordGrid = crosswordGrid;
+        this.crosswordStringArray = savedCrossword ;
+        this.title = crosswordStringArray[SAVED_ARRAY_INDEX_TITLE];
+        this.date = crosswordStringArray[SAVED_ARRAY_INDEX_DATE];
+        this.rowCount = Integer.parseInt(crosswordStringArray[SAVED_ARRAY_INDEX_ROW_COUNT]);
+        this.cellWidth = Integer.parseInt(crosswordStringArray[SAVED_ARRAY_INDEX_CELL_WIDTH]);
+        this.crosswordImagePath = crosswordStringArray[SAVED_ARRAY_INDEX_CROSSWORD_IMAGE];
+        this.clueImagePath = crosswordStringArray[SAVED_ARRAY_INDEX_CLUE_IMAGE];
 
+        //createGrid();
+        crosswordGrid.setGridSize(rowCount);
+        crosswordGrid.setCrossword(this);
+        createCellsRL();
+        if (editMode) {
+            toggleBlackCells() ;
+        } else {
+            fillCells();
+            freezeGrid();
+            findClues();
+        }
+
+        initialiseSaveFiles();
+
+    }
     // --------------------------------------- Crossword Creation - private methods --------------------------------
     private void createGrid() {
-        grid.setFocusable(true);
-        grid.setFocusableInTouchMode(true);
+      //  grid.setFocusable(true);
+      //  grid.setFocusableInTouchMode(true);
         grid.setRowCount(rowCount);
         grid.setColumnCount(rowCount);
         grid.setBackground(context.getResources().getDrawable(R.drawable.cell_white));
@@ -167,8 +195,8 @@ public class Crossword {
                 cellViews[i][j] = new CellView(context, this, i, j);
                 cells[i][j] = cellViews[i][j].getCell();
                 cells[i][j].setId(cells[i][j].getCellId(rowCount));
-   //             cells[i][j].setWidth(cellWidth);
-   //             cells[i][j].setHeight(cellWidth);
+                //             cells[i][j].setWidth(cellWidth);
+                //             cells[i][j].setHeight(cellWidth);
                 cells[i][j].setAllCaps(true);
                 cells[i][j].setTextColor(context.getResources().getColor(R.color.black));
 //                cells[i][j].setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize);
@@ -179,6 +207,35 @@ public class Crossword {
                 GridLayout.Spec col = GridLayout.spec(j);
                 GridLayout.LayoutParams params = new GridLayout.LayoutParams(row, col);
                 grid.addView(cellViews[i][j], params);
+
+            }
+        }
+    }
+    private void createCellsRL() {
+        //Generate all the cells in the crossword grid
+
+        // Initialise the cells variable to the right size
+        cells = new Cell[rowCount][rowCount];
+        cellViews = new CellView[rowCount][rowCount];
+
+        // TODO: Make each row in a separate parallel thread
+
+        for (int i = 0; i < rowCount; i++) {
+            for (int j = 0; j < rowCount; j++) {
+
+                // Create the cell
+                cellViews[i][j] = new CellView(context, this, i, j);
+                cells[i][j] = cellViews[i][j].getCell();
+                cells[i][j].setId(cells[i][j].getCellId(rowCount));
+                //             cells[i][j].setWidth(cellWidth);
+                //             cells[i][j].setHeight(cellWidth);
+                cells[i][j].setAllCaps(true);
+                cells[i][j].setTextColor(context.getResources().getColor(R.color.black));
+//                cells[i][j].setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize);
+
+                cellViews[i][j].setSize(cellWidth);
+
+                crosswordGrid.addCellView(i, j, cellViews[i][j]);
 
             }
         }
@@ -368,6 +425,9 @@ public class Crossword {
     }
     public Cell getCell(int row, int column) {
         return cells[row][column];
+    }
+    public CellView getCellView(int row, int column) {
+        return cellViews[row][column];
     }
 
     public void clearCellHighlights() {
