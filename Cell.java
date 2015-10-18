@@ -1,7 +1,6 @@
 package com.thonners.crosswordmaker;
 
 import android.content.Context;
-import android.database.CrossProcessCursorWrapper;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -9,19 +8,15 @@ import android.text.Spanned;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
-
-import java.io.Serializable;
-import java.security.Key;
 
 /**
  * Created by mat on 30/11/14.
  */
 public class Cell extends EditText implements View.OnClickListener, View.OnFocusChangeListener , TextWatcher {
 
-    private String logTag = "Clue" ;
+    private static final String LOG_TAG = "Cell" ;
 
     private Crossword crossword ;
 
@@ -131,7 +126,7 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
         }
 
         // If in crossword filling mode, and cell clicked, change clue orientation
-        Log.d(logTag, " Cell click repeated, swapping clue highlight orientation");
+        Log.d(LOG_TAG, " Cell click repeated, swapping clue highlight orientation");
         swapClueHighlightOrientation();
 
     }
@@ -141,7 +136,7 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
     public void onFocusChange(View view, boolean hasFocus){
         // To change cell highlight if cell has focus
         if (hasFocus) {
-            Log.d(logTag, "Cell " + cellName + " has focus");
+            Log.d(LOG_TAG, "Cell " + cellName + " has focus");
 
             crossword.clearCellHighlights();
 
@@ -154,11 +149,14 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
                 } else if (vClue != null) {
                     vClue.highlightClue(this);
                 } else {
-                    Log.d(logTag, "Cell seems not to belong to a clue. Is the grid valid?");
+                    Log.d(LOG_TAG, "Cell seems not to belong to a clue. Is the grid valid?");
                 }
             }
+
+            crossword.scrollToCell(this);
+
         } else {
-            Log.d(logTag, "Cell " + cellName + " has lost focus");
+            Log.d(LOG_TAG, "Cell " + cellName + " has lost focus");
         }
     }
 

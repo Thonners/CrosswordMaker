@@ -1,7 +1,6 @@
 package com.thonners.crosswordmaker;
 
 import android.app.Activity;
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,8 +9,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.GridLayout;
+import android.widget.ScrollView;
 
 import java.io.File;
 
@@ -30,8 +29,10 @@ public class CrosswordPageFragment extends Fragment {
     private static final String ARG_STRING_ARRAY = "crosswordStringArray" ;
     private static final String LOG_TAG = "CrosswordPageFragment";
 
-    private GridLayout crosswordGrid ;
-    private CrosswordGrid cGrid ;
+    private CrosswordGrid crosswordGrid;
+    private HorizontalScrollViewNoFocus horizontalScrollViewNoFocus ;
+    private ScrollView verticalScrollView ;
+
     Crossword crossword ;
     String[] crosswordStringArray;
 
@@ -72,8 +73,14 @@ public class CrosswordPageFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_crossword_page, container, false);
-        crosswordGrid = (GridLayout) view.findViewById(R.id.crossword_grid);
-        cGrid = (CrosswordGrid) view.findViewById(R.id.crossword_grid2);
+        // Get instances of the views
+        crosswordGrid = (CrosswordGrid) view.findViewById(R.id.crossword_grid);
+        horizontalScrollViewNoFocus = (HorizontalScrollViewNoFocus) view.findViewById(R.id.horizontal_scroll_view_crossword);
+        verticalScrollView = (ScrollView) view.findViewById(R.id.vertical_scroll_view_crossword);
+
+        // Pass scroll view instances to the crosswordGrid
+        crosswordGrid.setHorizontalScrollView(horizontalScrollViewNoFocus);
+        crosswordGrid.setVerticalScrollView(verticalScrollView);
 
         createCrossword();
 
@@ -117,14 +124,11 @@ public class CrosswordPageFragment extends Fragment {
         public void onFragmentInteraction(Uri uri);
     }
 
-    public GridLayout getCrosswordGrid() {
-        return crosswordGrid;
-    }
 
     private void createCrossword() {
         // Create the crossword
         //crossword = new Crossword(getActivity().getApplicationContext(), crosswordGrid,crosswordStringArray);
-        crossword = new Crossword(getActivity().getApplicationContext(), cGrid,crosswordStringArray,false);
+        crossword = new Crossword(getActivity().getApplicationContext(), crosswordGrid,crosswordStringArray,false);
     }
 
     public void zoomCrossword(){

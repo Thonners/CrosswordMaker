@@ -263,8 +263,12 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
 
     private void hideKeyboard() {
         // Method to hide the keyboard
-        InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        try {
+            InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        } catch (NullPointerException npe) {
+            Log.d(LOG_TAG,"Caught null pointer exception trying to close keyboard.");
+        }
     }
     private void hideActionZoom() {
         // Remove/hide the zoom icon from the menu
@@ -278,7 +282,7 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
     }
     private void showKeyboard(View view) {
         Log.d(LOG_TAG,"Show keyboard called");
-        // Method to hide the keyboard
+        // Method to show the keyboard
         InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.showSoftInput(view, inputManager.SHOW_IMPLICIT);
     }

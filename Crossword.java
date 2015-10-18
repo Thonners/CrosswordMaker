@@ -670,6 +670,11 @@ public class Crossword {
         return isZoomedIn;
     }
 
+    public void scrollToCell(Cell cell){
+        // Method to call scrollToCell from CrosswordGrid. This will tell the scroll view to scroll to the highlighted cell
+        crosswordGrid.scrollToView(cell);
+    }
+
     // ------------------------------------------- Save / Delete / Initialise methods --------------------------------------------
     public void saveCrossword() {
         // Save file to memory. Use files created by initialiseSaveFiles
