@@ -191,7 +191,7 @@ public class XmlParser {
                         if (definition.startsWith(":")) {
                             definition = definition.substring(1);   // Remove the ':' from the front of the definition string if it exists, so a space can be put in
                         }
-                        if (!definitionNumber.matches("")) {
+                        if (!definitionNumber.matches("") && !definitionNumber.matches("null")) {
                             definition = definitionNumber + ": " + definition ;
                         }
                         Log.d(LOG_TAG,"Definition found: " + definition);
