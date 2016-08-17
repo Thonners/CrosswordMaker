@@ -1,0 +1,46 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/saved_crossword_main_layout"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.thonners.crosswordmaker.SavedCrosswordSelector" >
+
+    <android.support.v7.widget.CardView
+            android:id="@+id/saved_file_selection_prompt"
+        android:layout_height="@dimen/home_card_default_height"
+        android:layout_width="fill_parent"
+        android:layout_marginTop="@dimen/saved_prompt_margin_horizontal"
+        android:layout_marginLeft="@dimen/saved_prompt_margin_horizontal"
+        android:layout_marginRight="@dimen/saved_prompt_margin_horizontal"
+        android:padding="@dimen/home_card_padding">
+        <TextView
+            android:id="@+id/saved_file_selection_prompt_TV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/saved_file_selection_prompt"
+            android:textSize="@dimen/home_card_text_size_main"
+            android:textStyle="bold"
+            android:layout_gravity="center"/>
+    </android.support.v7.widget.CardView>
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/saved_file_selection_prompt"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin">
+
+        <RelativeLayout
+            android:id="@+id/saved_crosswords_r_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+
+        </RelativeLayout>
+    </ScrollView>
+
+
+</RelativeLayout>

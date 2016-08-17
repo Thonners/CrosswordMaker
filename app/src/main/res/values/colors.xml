@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Material design colours -->
+    <!-- Greys -->
+    <color name="primary">#222222</color>
+    <color name="primary_dark">#111111</color>
+    <color name="accent">#77EEEE</color>
+    <!-- Bright colours
+    <color name="primary">#32CD32</color>
+    <color name="primary_dark">#238F23</color>
+    <color name="accent">#00ECFF</color> -->
+
+    <!-- Floating Action Button Colours-->
+    <color name="fab_color_1">#FF3333</color>
+    <color name="fab_color_1_muted">#FFADAD</color>
+    <color name="fab_color_2">#9c27b0</color>
+    <color name="fab_color_2_muted">#a56ab0</color>
+
+    <color name="black"> #000000 </color>
+    <color name="white"> #FFFFFF </color>
+    <color name="light_grey">#D3D3D3</color>
+    <color name="dark_grey">#222222</color>
+
+    <color name="text_default">#666666</color>
+
+    <color name="cell_highlighted">#FFFF00</color>
+    <color name="clue_highlighted">#FFFFB2</color>
+
+
+
+</resources>

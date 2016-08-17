@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.thonners.crosswordmaker" >
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher_toolkit"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".HomeActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".NewCrossword"
+            android:label="@string/title_activity_new_crossword"
+            android:parentActivityName=".HomeActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.thonners.crosswordmaker.HomeActivity" />
+        </activity>
+        <activity
+            android:name=".GridMaker"
+            android:label="@string/title_activity_grid_maker"
+            android:parentActivityName=".HomeActivity"
+            android:screenOrientation="portrait" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.thonners.crosswordmaker.NewCrossword" />
+        </activity>
+        <activity
+            android:name=".SavedCrosswordSelector"
+            android:label="@string/title_activity_saved_crossword_selector"
+            android:parentActivityName=".HomeActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.thonners.crosswordmaker.HomeActivity" />
+        </activity>
+        <activity
+            android:name=".CrosswordSliderActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_crosword_slider"
+            android:parentActivityName=".HomeActivity"
+            android:screenOrientation="portrait" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.thonners.crosswordmaker.HomeActivity" />
+        </activity>
+        <activity
+            android:name=".ToolkitSliderActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:label="@string/title_activity_toolkit"
+            android:parentActivityName=".HomeActivity"
+            android:screenOrientation="portrait" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.thonners.crosswordmaker.HomeActivity" />
+        </activity>
+        <activity
+            android:name=".CrosswordGridEditor"
+            android:label="@string/title_activity_crossword_grid_editor"
+            android:parentActivityName=".SavedCrosswordSelector" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.thonners.crosswordmaker.SavedCrosswordSelector" />
+        </activity>
+    </application>
+
+</manifest>

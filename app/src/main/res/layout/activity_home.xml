@@ -1,0 +1,52 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".HomeActivity"
+    android:orientation="vertical"
+    android:layout_centerHorizontal="true">
+
+    <Space
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="3"/>
+
+    <Button
+        android:id="@+id/home_old_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/home_old"
+        android:textSize="@dimen/home_button_text_size"
+        android:layout_gravity="center"
+        android:padding="@dimen/home_button_padding"
+        android:layout_marginTop="@dimen/home_button_space"
+        android:layout_marginBottom="@dimen/home_button_space"
+        android:onClick="savedClicked"/>
+
+    <Space
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="3"/>
+
+    <Button
+        android:id="@+id/home_new_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/home_new"
+        android:textSize="@dimen/home_button_text_size"
+        android:layout_gravity="center"
+        android:padding="@dimen/home_button_padding"
+        android:layout_marginTop="@dimen/home_button_space"
+        android:layout_marginBottom="@dimen/home_button_space"
+        android:onClick="newClicked"/>
+
+    <Space
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="3"/>
+
+</LinearLayout>
+

@@ -1,0 +1,44 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.thonners.crosswordmaker.CrosswordSliderActivity">
+
+    <item android:id="@+id/action_zoom"
+        android:icon="@drawable/ic_zoom_in_white"
+        android:title="@string/action_zoom_in"
+        android:orderInCategory="1"
+        app:showAsAction="always"/>
+
+    <item android:id="@+id/action_save"
+        android:icon="@drawable/ic_menu_save_white"
+        android:title="@string/save"
+        android:orderInCategory="2"
+        app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/action_edit"
+        android:title="@string/action_edit"
+        android:orderInCategory="20"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/action_retake_clues"
+        android:title="@string/action_retake"
+        android:orderInCategory="30"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/action_feedback"
+        android:title="@string/action_feedback"
+        android:orderInCategory="150"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/action_about"
+        android:title="@string/action_about"
+        android:orderInCategory="200"
+        app:showAsAction="never" />
+
+
+</menu>

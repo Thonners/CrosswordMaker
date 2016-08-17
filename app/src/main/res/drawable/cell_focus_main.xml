@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle" >
+    <solid android:color="#FFFF00" />
+
+    <!-- Uncomment line below to keep black border of cell -->
+    <!-- <stroke android:width="@dimen/grid_padding" android:color="#000000"/> -->
+</shape>

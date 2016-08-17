@@ -1,0 +1,47 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android.support.design="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.thonners.crosswordmaker.NewCrossword">
+
+    <TextView
+        android:id="@+id/new_crossword_prompt_top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/new_crossword_prompt_top"
+        android:layout_gravity="center_horizontal"
+        android:textSize="@dimen/home_button_text_size"
+        android:layout_weight="1"/>
+
+
+
+    <NumberPicker
+        android:id="@+id/no_columns"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/number_picker_padding"
+        android:layout_below="@+id/new_crossword_prompt_top"
+        android:layout_centerHorizontal="true"></NumberPicker>
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_add"
+        android:layout_marginBottom="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android.support.design:fabSize="normal"
+        android:onClick="manualEnterClicked"
+        android:elevation="@dimen/fab_elevation"
+        android.support.design:borderWidth="0dp" />
+
+</RelativeLayout>
