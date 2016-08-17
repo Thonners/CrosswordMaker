@@ -1,6 +1,7 @@
 # CrosswordMaker
 
 Android app to save crosswords digitally. Plus dictionary, anagram & word-solver tools.
+Get it here: https://play.google.com/store/apps/details?id=com.thonners.crosswordmaker
 
 ## Getting started
 
