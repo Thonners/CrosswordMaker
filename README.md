@@ -5,7 +5,6 @@ Android app to save crosswords digitally. Plus dictionary, anagram & word-solver
 ## Getting started
 
 Clone this repository and open in AndroidStudio to start building the app for yourself.
-You'll need to make your own drawables - I won't fill github's server space with .pngs.
 
 ## License
 
