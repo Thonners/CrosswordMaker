@@ -67,11 +67,13 @@
     <string name="already_searching">Already Searching.\nPlease wait for this search to complete before searching again.</string>
     <string name="searching">Searching...</string>
     <string name="loading">Loading...</string>
+    <string name="shuffle">Shuffle</string>
     <string name="completion">Completion:</string>
     <string name="no_match_found">Sorry. No match found.</string>
     <string name="illegalCharacterToast">Ignoring illegal input.\nOnly letters and \'.\' allowed in input\!</string>
     <string name="clear">Clear</string>
     <string name="anagram_prompt">Enter letters for anagram:\nTo use \'word-fit\', use \'.\' for unknown letters:</string>
+    <string name="manual_anagram_prompt">Enter letters for anagram:\nHit 'Shuffle' below to randomise letters:</string>
     <string name="dictionary_prompt">Enter word to search:</string>
 
     <string name="title_activity_saved_crossword_selector">Select crossword to load</string>

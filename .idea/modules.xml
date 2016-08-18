@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/CrosswordMaker.iml" filepath="$PROJECT_DIR$/CrosswordMaker.iml" />
+      <module fileurl="file:///mnt/hdd/home/mathonwy/AndroidStudioProjects/CrosswordMaker/app/app.iml" filepath="/mnt/hdd/home/mathonwy/AndroidStudioProjects/CrosswordMaker/app/app.iml" />
     </modules>
   </component>
 </project>

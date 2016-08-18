@@ -5,6 +5,18 @@
       <GradleProjectSettings>
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="/mnt/hdd/home/mathonwy/AndroidStudioProjects/CrosswordMaker" />
+            <option value="/mnt/hdd/home/mathonwy/AndroidStudioProjects/CrosswordMaker/app" />
+          </set>
+        </option>
+        <option name="myModules">
+          <set>
+            <option value="/mnt/hdd/home/mathonwy/AndroidStudioProjects/CrosswordMaker" />
+            <option value="/mnt/hdd/home/mathonwy/AndroidStudioProjects/CrosswordMaker/app" />
+          </set>
+        </option>
       </GradleProjectSettings>
     </option>
   </component>
