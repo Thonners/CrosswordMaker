@@ -24,12 +24,13 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
 
     private static final String LOG_TAG = "CrosswordSliderActivity";
 
-    private static final int NUM_PAGES      = 5 ;    // Number of slidable view/pages. Crossword, Clues, Anagram, Dictionary, Doodle.
+    private static final int NUM_PAGES      = 6 ;    // Number of slidable view/pages. Crossword, Clues, Manual anagram, Anagram, Dictionary, Doodle.
     private static final int CROSSWORD_TAB  = 0 ;
     private static final int CLUE_TAB       = 1 ;
-    private static final int DICTIONARY_TAB = 2 ;
-    private static final int ANAGRAM_TAB    = 3 ;
-    private static final int WIKI_TAB = 4 ;
+    private static final int MANUAL_ANAGRAM_TAB = 2 ;
+    private static final int DICTIONARY_TAB = 3 ;
+    private static final int ANAGRAM_TAB    = 4 ;
+    private static final int WIKI_TAB = 5 ;
 
     private ViewPager pager ;               // This handles the animation/transition between pages
     private PagerAdapter pagerAdapter ;     // This provides the pages for the PagerAdapter.
@@ -42,6 +43,7 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
     // Fragments
     CrosswordPageFragment crosswordPageFragment ;
     CluePageFragment cluePageFragment ;
+    ManualAnagramPageFragment manualAnagramPageFragment ;
     DictionaryPageFragment dictionaryPageFragment;
     AnagramPageFragment anagramPageFragment;
     WikiPageFragment wikiPageFragment;
@@ -99,6 +101,11 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
                             hideActionZoom();
                             hideKeyboard();
                             break;
+                        case MANUAL_ANAGRAM_TAB:
+                            hideActionZoom();
+                            manualAnagramPageFragment.inputBoxRequestFocus();
+                            showKeyboard(manualAnagramPageFragment.getInputBox());
+                            break ;
                         case DICTIONARY_TAB:
                             hideActionZoom();
                             dictionaryPageFragment.inputBoxRequestFocus();
@@ -235,6 +242,9 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
                 case CLUE_TAB:
                     cluePageFragment = CluePageFragment.newInstance(crosswordStringArray[Crossword.SAVED_ARRAY_INDEX_CLUE_IMAGE]);
                     return cluePageFragment ;
+                case MANUAL_ANAGRAM_TAB:
+                    manualAnagramPageFragment = new ManualAnagramPageFragment() ;
+                    return manualAnagramPageFragment ;
                 case DICTIONARY_TAB:
                     dictionaryPageFragment = new DictionaryPageFragment() ;
                     return dictionaryPageFragment;

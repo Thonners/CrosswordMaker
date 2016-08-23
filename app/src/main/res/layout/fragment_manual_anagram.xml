@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/saved_crossword_layout_side_padding"
     tools:context="com.thonners.crosswordmaker.CrosswordPageFragment">
 
     <TextView
@@ -14,15 +13,21 @@
         android:text="@string/manual_anagram_prompt"
         android:textSize="@dimen/home_card_text_size_main"
         android:textStyle="bold"
-        android:layout_gravity="center_horizontal"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
         android:gravity="center"
-        android:padding="@dimen/clue_image_padding"/>
+        android:padding="@dimen/clue_image_padding"
+        android:layout_margin="@dimen/clue_image_padding"/>
 
     <LinearLayout
+        android:id="@+id/manual_anagram_input_layout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="@dimen/clue_image_padding">
+        android:padding="@dimen/clue_image_padding"
+        android:layout_marginLeft="@dimen/clue_image_padding"
+        android:layout_marginRight="@dimen/clue_image_padding"
+        android:layout_below="@+id/anagram_prompt">
 
         <EditText
             android:layout_width="0dp"
@@ -37,16 +42,33 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clickable="false"
             android:text="@string/shuffle"
-            android:id="@+id/anagram_search"
+            android:id="@+id/manual_anagram_search"
             android:layout_gravity="end"/>
     </LinearLayout>
     <RelativeLayout
         android:id="@+id/manual_anagram_results"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
+        android:layout_height="match_parent"
+        android:layout_below="@+id/manual_anagram_input_layout">
     </RelativeLayout>
-</LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/manual_anagram_known_letters_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+    </LinearLayout>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/manual_anagram_fab"
+        android:layout_width="@dimen/fab_radius"
+        android:layout_height="@dimen/fab_radius"
+        android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_marginBottom="@dimen/fab_margin"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@id/manual_anagram_known_letters_layout"
+        android:src="@drawable/ic_refresh_white_24dp"
+        android:scaleType="center" />
+</RelativeLayout>

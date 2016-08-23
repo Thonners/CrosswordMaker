@@ -73,7 +73,7 @@
     <string name="illegalCharacterToast">Ignoring illegal input.\nOnly letters and \'.\' allowed in input\!</string>
     <string name="clear">Clear</string>
     <string name="anagram_prompt">Enter letters for anagram:\nTo use \'word-fit\', use \'.\' for unknown letters:</string>
-    <string name="manual_anagram_prompt">Enter letters for anagram:\nHit 'Shuffle' below to randomise letters:</string>
+    <string name="manual_anagram_prompt">Enter letters for anagram:\nHit \'Shuffle\' below to randomise letters:</string>
     <string name="dictionary_prompt">Enter word to search:</string>
 
     <string name="title_activity_saved_crossword_selector">Select crossword to load</string>
@@ -115,12 +115,14 @@
     <array name="tab_titles">
         <item name="tab_title_crossword">Crossword</item>
         <item name="tab_title_clues">Clues</item>
+        <item name="tab_title_manual_anagram">Anagram</item>
         <item name="tab_title_dictionary">Dictionary</item>
-        <item name="tab_title_anagram">Anagram</item>
+        <item name="tab_title_anagram">Solver</item>
         <item name="tab_title_wiki">Wiki</item>
     </array>
 
     <array name="tab_titles_toolkit">
+        <item name="tab_title_manual_anagram">Anagram</item>
         <item name="tab_title_dictionary">Dictionary</item>
         <item name="tab_title_anagram">Anagram</item>
         <item name="tab_title_wiki">Wiki</item>
