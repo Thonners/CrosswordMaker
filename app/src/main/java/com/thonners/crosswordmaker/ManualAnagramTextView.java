@@ -68,14 +68,14 @@ public class ManualAnagramTextView extends TextView {
         setPosition();
 
         // Set the onClickListener in case the letter is known
-        this.setOnClickListener(new OnClickListener() {
+/*        this.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.d(LOG_TAG, "Letter clicked: " + letter) ;
                 toggleLetterKnown();
             }
         });
-
+*/
     }
 
     public void setLetterNo(int letterNo) {
