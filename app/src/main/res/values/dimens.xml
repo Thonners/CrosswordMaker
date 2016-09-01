@@ -58,7 +58,10 @@
     <dimen name="manual_anagram_text_size">18sp</dimen>
     <dimen name="manual_anagram_known_letter_size">18sp</dimen>
     <dimen name="manual_anagram_known_letter_padding">8dp</dimen>
-    <dimen name="manual_anagram_known_letter_margin">8dp</dimen>
+    <dimen name="manual_anagram_known_letter_margin">14dp</dimen>
+    <dimen name="manual_anagram_card_elevation_resting">6dp</dimen>
+    <dimen name="manual_anagram_card_elevation_active">46dp</dimen>
+
 
     <dimen name="dictionary_word">16sp</dimen>
     <dimen name="dictionary_word_type">14sp</dimen>

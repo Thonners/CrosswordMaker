@@ -73,7 +73,7 @@
     <string name="illegalCharacterToast">Ignoring illegal input.\nOnly letters and \'.\' allowed in input\!</string>
     <string name="clear">Clear</string>
     <string name="anagram_prompt">Enter letters for anagram:\nTo use \'word-fit\', use \'.\' for unknown letters:</string>
-    <string name="manual_anagram_prompt">Enter letters for anagram:\nHit \'Shuffle\' below to randomise letters:</string>
+    <string name="manual_anagram_prompt">Enter letters for anagram:\nHit \'Shuffle\' below to randomise letters:\nMore instructions available via the menu.</string>
     <string name="dictionary_prompt">Enter word to search:</string>
 
     <string name="title_activity_saved_crossword_selector">Select crossword to load</string>
@@ -111,6 +111,10 @@
     <string name="tutorial_toast_auto_grid_check"> Check that the generated grid is correct, then hit Enter.</string>
     <string name="tutorial_toast_dictionary">Enter a word to look up in the search box</string>
     <string name="title_activity_crosword_slider">CroswordSliderActivity</string>
+
+    <!-- Manual Anagram -->
+    <string name="tutorial_snackbar_message">Full instructions available via the menu.</string>
+    <string name="show">SHOW</string>
 
     <array name="tab_titles">
         <item name="tab_title_crossword">Crossword</item>

@@ -1,8 +1,12 @@
 package com.thonners.crosswordmaker;
 
 import android.content.Context;
+import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.Space;
 import android.support.v7.widget.CardView;
@@ -38,11 +42,13 @@ public class ManualAnagramPageFragment extends Fragment {
     private Button shuffleButton ;
     private FloatingActionButton shuffleFAB ;
     private EditText inputBox ;
+    private RelativeLayout fragmentParentLayout ;
     private RelativeLayout outputParentLayout ;
     private LinearLayout knownLettersLayout ;
     private int knownLetterCount = 0 ;
 
     private ManualAnagramKnownLetterCardView activeKnownLetterCard = null ;
+    private ManualAnagramTextView activeLetterTV = null ;
 
     /**
      * Required empty constructor
@@ -103,9 +109,23 @@ public class ManualAnagramPageFragment extends Fragment {
             }
         });
         knownLettersLayout = (LinearLayout) view.findViewById(R.id.manual_anagram_known_letters_layout) ;
+
+        fragmentParentLayout = (RelativeLayout) view.findViewById(R.id.fragment_parent_layout);
+
         return view ;
     }
 
+    private void showInstructionsSnackbar() {
+        // Show a snackbar about the instructions
+        Snackbar snackbar = Snackbar.make(fragmentParentLayout,getResources().getString(R.string.tutorial_snackbar_message),Snackbar.LENGTH_LONG) ;
+        snackbar.setAction(getResources().getText(R.string.show), new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showInstructions() ;
+            }
+        }) ;
+        snackbar.show();
+    }
     /**
      * Method to be called once the shuffle button is clicked. Restructuring required.
      */
@@ -150,14 +170,7 @@ public class ManualAnagramPageFragment extends Fragment {
             letterTV.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (activeKnownLetterCard != null) {
-                        String letter = ((ManualAnagramTextView) view).getLetter() ;
-                        Log.d(LOG_TAG, letter + " letter clicked, after knownLetterCard was highlighted.");
-                        activeKnownLetterCard.setLetter(letter);
-                        clearActiveKnownLetterCard();
-                    } else {
-                        Log.d(LOG_TAG, "Letter clicked, but no KnownLetterCard was highlighted");
-                    }
+                    setKnownLetter((ManualAnagramTextView) view);
                 }
             });
         }
@@ -223,7 +236,7 @@ public class ManualAnagramPageFragment extends Fragment {
     /**
      * Method to return the ID of the anchor view - a blank space which will position itself in the
      * centre of the main results view.
-     * @return
+     * @return The int ID of the anchor view
      */
     private int getAnchorID() {
         Space anchor = new Space(getActivity()) ;
@@ -255,7 +268,7 @@ public class ManualAnagramPageFragment extends Fragment {
             knownLetterCards[i].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    setActiveKnownLetterCard(view) ;
+                    setActiveKnownLetterCard((ManualAnagramKnownLetterCardView) view) ;
                 }
             });
 
@@ -267,31 +280,76 @@ public class ManualAnagramPageFragment extends Fragment {
     /**
      * Method to make a note of which ManualAnagramKnownLetterCardView has been touched, so it can be
      * set to the correct letter when selected by the user.
-     * @param view The ManualAnagramKnownLetterCardView touched by the user.
+     * @param newKnownLetterCard The ManualAnagramKnownLetterCardView touched by the user.
      */
-    private void setActiveKnownLetterCard(View view) {
-        ManualAnagramKnownLetterCardView newKnownLetterCard = (ManualAnagramKnownLetterCardView) view ;
+    private void setActiveKnownLetterCard(ManualAnagramKnownLetterCardView newKnownLetterCard) {
         Log.d(LOG_TAG,"ActiveKnownLetterCard clicked") ;
         if (activeKnownLetterCard != null && activeKnownLetterCard.getIndex() == newKnownLetterCard.getIndex()) {
             clearActiveKnownLetterCard();
         } else {
+            // Clear any previously set card before setting this one, to avoid two cards looking active to the user
+            clearActiveKnownLetterCard();
             activeKnownLetterCard = newKnownLetterCard;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                activeKnownLetterCard.setElevation(getResources().getDimension(R.dimen.manual_anagram_card_elevation_active));
+            }
         }
     }
 
     /**
-     * Clears the active known letter, so that touching a results letter will not result in any action.
+     * Clears the active known letter card, so that touching a results letter will not result in any action.
      */
     private void clearActiveKnownLetterCard() {
+        // Clear any set features, such as card elevation from a previously active card
+        if (activeKnownLetterCard != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                activeKnownLetterCard.setElevation(getResources().getDimension(R.dimen.manual_anagram_card_elevation_resting));
+            }
+        }
+        // Set the active card to null
         activeKnownLetterCard = null ;
     }
 
     /**
-     * Method to set the letter of a known letter card view.
-     * @param view The ManualAnagramKnownLetterCardView to be set
-     * @param letter The letter to be set to
+     * Method to set the letter of a known letter card manualAnagramTextView.
+     * @param manualAnagramTextView The letter's TextView in the main results layout.
      */
-    private void setKnownLetter(ManualAnagramKnownLetterCardView view, String letter) {
-        view.setLetter(letter);
+    private void setKnownLetter(ManualAnagramTextView manualAnagramTextView) {
+        // Get the letter
+        String letter = manualAnagramTextView.getLetter() ;
+        // Check whether a knownLetterCard is active
+        if (activeKnownLetterCard != null) {
+            // If so, set it to the touched letter
+            activeKnownLetterCard.setLetter(letter);
+            manualAnagramTextView.setTextColor(getResources().getColor(R.color.light_grey));
+            // Clear the active card / letter TV so as not to contaminate future touches
+            clearActiveKnownLetterCard();
+            clearActiveLetterTV() ;
+        } else {
+            // Set or clear the activeLetterTV depending on whether it's already set to the same letter
+            if (activeLetterTV != null && activeLetterTV.getLetterNo() == manualAnagramTextView.getLetterNo()) {
+                // Clear any previously active TVs
+                clearActiveLetterTV();
+                // Set the active known letter, so the user can touch a card
+                activeLetterTV = manualAnagramTextView;
+                activeLetterTV.setTypeface(null, Typeface.BOLD);
+            } else {
+                clearActiveLetterTV();
+            }
+        }
+
+    }
+
+    private void clearActiveLetterTV() {
+        // Clear any highlighting if required
+        if (activeLetterTV != null) {
+            activeLetterTV.setTypeface(null, Typeface.NORMAL);
+        }
+        // Clear the active TV
+        activeLetterTV = null ;
+    }
+
+    private void showInstructions() {
+        Log.d(LOG_TAG, "Would show manual anagram instructions now") ;
     }
 }

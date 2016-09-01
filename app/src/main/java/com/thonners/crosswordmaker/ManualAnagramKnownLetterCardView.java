@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.util.StringBuilderPrinter;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,8 +54,10 @@ public class ManualAnagramKnownLetterCardView extends CardView {
         params.bottomMargin = 3;
         this.setLayoutParams(params);
         tv = (TextView) ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.manual_anagram_known_letters_card_view, null);
-        tv.setWidth(context.getResources().getDimensionPixelOffset(R.dimen.fab_radius));
-        this.addView(tv) ;
+        LinearLayout.LayoutParams tvParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT) ;
+        tv.setGravity(Gravity.CENTER_HORIZONTAL);
+        this.addView(tv,tvParams) ;
+        clearLetter();
     }
     public void setParentView(LinearLayout parentView) {
         this.parentView = parentView ;
@@ -63,7 +65,12 @@ public class ManualAnagramKnownLetterCardView extends CardView {
 
     public void setLetter(String letter) {
         this.letter = letter ;
+        tv.setTextAlignment(TEXT_ALIGNMENT_TEXT_END);
         tv.setText(letter);
+    }
+    public void clearLetter() {
+        this.letter = " " ;
+        tv.setText(" ");
     }
 
     public int getIndex() {

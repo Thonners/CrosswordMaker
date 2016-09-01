@@ -133,4 +133,8 @@ public class ManualAnagramTextView extends TextView {
     public String getLetter() {
         return letter ;
     }
+
+    public int getLetterNo() {
+        return letterNo;
+    }
 }
