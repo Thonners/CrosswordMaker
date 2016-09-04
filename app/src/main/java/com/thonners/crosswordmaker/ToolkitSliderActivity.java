@@ -22,10 +22,11 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
 
     private static final String LOG_TAG = "ToolkitSliderActivity";
 
-    private static final int NUM_PAGES      = 3;     // Number of pages in the slider
-    private static final int DICTIONARY_TAB = 0 ;
-    private static final int ANAGRAM_TAB    = 1 ;
-    private static final int WIKI_TAB = 2 ;
+    private static final int NUM_PAGES      = 4;     // Number of pages in the slider
+    private static final int MANUAL_ANAGRAM_TAB = 0 ;
+    private static final int DICTIONARY_TAB = 1 ;
+    private static final int ANAGRAM_TAB    = 2 ;
+    private static final int WIKI_TAB = 3 ;
 
     private ViewPager pager ;               // Handles the transition between fragments
     private PagerAdapter pagerAdapter ;     // Provides the pages for the pager
@@ -35,9 +36,10 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
     private CharSequence[] tabTitles ;
 
     // Fragments
-    DictionaryPageFragment dictionaryPageFragment ;
-    AnagramPageFragment anagramPageFragment ;
-    WikiPageFragment wikiPageFragment;
+    private ManualAnagramPageFragment manualAnagramPageFragment ;
+    private DictionaryPageFragment dictionaryPageFragment ;
+    private AnagramPageFragment anagramPageFragment ;
+    private WikiPageFragment wikiPageFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -101,6 +103,10 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
                 if (state == ViewPager.SCROLL_STATE_IDLE)
                 {
                     switch (pager.getCurrentItem()) {
+                        case MANUAL_ANAGRAM_TAB:
+                            manualAnagramPageFragment.inputBoxRequestFocus();
+                            showKeyboard(manualAnagramPageFragment.getInputBox());
+                            break ;
                         case DICTIONARY_TAB:
                             dictionaryPageFragment.inputBoxRequestFocus();
                             if (dontShowKeyboard) {
@@ -158,6 +164,9 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
         public Fragment getItem(int position) {
 
             switch (position) {
+                case MANUAL_ANAGRAM_TAB:
+                    manualAnagramPageFragment = new ManualAnagramPageFragment() ;
+                    return manualAnagramPageFragment ;
                 case DICTIONARY_TAB:
                     dictionaryPageFragment = new DictionaryPageFragment() ;
                     return dictionaryPageFragment;

@@ -2,14 +2,11 @@ package com.thonners.crosswordmaker;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.Space;
-import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -170,7 +167,7 @@ public class ManualAnagramPageFragment extends Fragment {
             letterTV.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    setKnownLetter((ManualAnagramTextView) view);
+                    letterTVClicked((ManualAnagramTextView) view);
                 }
             });
         }
@@ -268,7 +265,14 @@ public class ManualAnagramPageFragment extends Fragment {
             knownLetterCards[i].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    setActiveKnownLetterCard((ManualAnagramKnownLetterCardView) view) ;
+                    knownLetterCardClicked((ManualAnagramKnownLetterCardView) view) ;
+                }
+            });
+            knownLetterCards[i].setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    knownLetterCardLongClicked((ManualAnagramKnownLetterCardView) view) ;
+                    return true ;
                 }
             });
 
@@ -282,29 +286,48 @@ public class ManualAnagramPageFragment extends Fragment {
      * set to the correct letter when selected by the user.
      * @param newKnownLetterCard The ManualAnagramKnownLetterCardView touched by the user.
      */
-    private void setActiveKnownLetterCard(ManualAnagramKnownLetterCardView newKnownLetterCard) {
+    private void knownLetterCardClicked(ManualAnagramKnownLetterCardView newKnownLetterCard) {
         Log.d(LOG_TAG,"ActiveKnownLetterCard clicked") ;
         if (activeKnownLetterCard != null && activeKnownLetterCard.getIndex() == newKnownLetterCard.getIndex()) {
+            // If the card clicked is already high-lighted, clear the highlight
             clearActiveKnownLetterCard();
         } else {
-            // Clear any previously set card before setting this one, to avoid two cards looking active to the user
-            clearActiveKnownLetterCard();
-            activeKnownLetterCard = newKnownLetterCard;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                activeKnownLetterCard.setElevation(getResources().getDimension(R.dimen.manual_anagram_card_elevation_active));
+            // Check that the card is empty. If not, prompt user to clear the card before re-filling it
+            if (newKnownLetterCard.isEmpty()) {
+                // Clear any previously set card before setting this one, to avoid two cards looking active to the user
+                clearActiveKnownLetterCard();
+                activeKnownLetterCard = newKnownLetterCard;
+                activeKnownLetterCard.setIsActive();
+            } else {
+                // Not sure what to do, if anything, if user clicks a card that's already filled.
             }
         }
     }
 
+    /**
+     * Method to handle a user long-clicking a known letter card.
+     *
+     * If the card is empty, offer option to add hyphen/slash to the right - for compound words.
+     * If the card already has a letter, clear it and reset the view to its original state.
+     * @param knownLetterCardView The knownLetterCard that has been long clicked.
+     */
+    private void knownLetterCardLongClicked(ManualAnagramKnownLetterCardView knownLetterCardView) {
+        // Clear any active card to avoid confusion
+        clearActiveKnownLetterCard();
+        // Handle the long-click:
+        if (knownLetterCardView.isEmpty()) {
+            // Show snackbar / popup to add divider to right of knownLetterCardView
+        } else {
+            knownLetterCardView.clearLetter();
+        }
+    }
     /**
      * Clears the active known letter card, so that touching a results letter will not result in any action.
      */
     private void clearActiveKnownLetterCard() {
         // Clear any set features, such as card elevation from a previously active card
         if (activeKnownLetterCard != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                activeKnownLetterCard.setElevation(getResources().getDimension(R.dimen.manual_anagram_card_elevation_resting));
-            }
+            activeKnownLetterCard.setIsActive(false);
         }
         // Set the active card to null
         activeKnownLetterCard = null ;
@@ -314,27 +337,28 @@ public class ManualAnagramPageFragment extends Fragment {
      * Method to set the letter of a known letter card manualAnagramTextView.
      * @param manualAnagramTextView The letter's TextView in the main results layout.
      */
-    private void setKnownLetter(ManualAnagramTextView manualAnagramTextView) {
-        // Get the letter
-        String letter = manualAnagramTextView.getLetter() ;
+    private void letterTVClicked(ManualAnagramTextView manualAnagramTextView) {
         // Check whether a knownLetterCard is active
         if (activeKnownLetterCard != null) {
-            // If so, set it to the touched letter
-            activeKnownLetterCard.setLetter(letter);
-            manualAnagramTextView.setTextColor(getResources().getColor(R.color.light_grey));
-            // Clear the active card / letter TV so as not to contaminate future touches
-            clearActiveKnownLetterCard();
-            clearActiveLetterTV() ;
+            // Check that this letter isn't already assigned to another known letter card
+            if (!manualAnagramTextView.isKnown()) {
+                // If so, set it to the touched letter. This will also set the textView to known, i.e. greyed out.
+                activeKnownLetterCard.setLetter(manualAnagramTextView);
+                //activeKnownLetterCard.setLetter(letter);
+                // Clear the active card / letter TV so as not to contaminate future touches
+                clearActiveKnownLetterCard();
+                clearActiveLetterTV();
+            }
         } else {
             // Set or clear the activeLetterTV depending on whether it's already set to the same letter
             if (activeLetterTV != null && activeLetterTV.getLetterNo() == manualAnagramTextView.getLetterNo()) {
+                clearActiveLetterTV();
+            } else {
                 // Clear any previously active TVs
                 clearActiveLetterTV();
                 // Set the active known letter, so the user can touch a card
                 activeLetterTV = manualAnagramTextView;
-                activeLetterTV.setTypeface(null, Typeface.BOLD);
-            } else {
-                clearActiveLetterTV();
+                activeLetterTV.setIsActive() ;
             }
         }
 

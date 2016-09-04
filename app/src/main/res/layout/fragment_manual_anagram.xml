@@ -50,7 +50,8 @@
         <LinearLayout
             android:id="@+id/manual_anagram_known_letters_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/manual_anagram_known_letter_layout_height"
+            android:layout_margin="@dimen/manual_anagram_known_letter_layout_margin"
             android:layout_alignParentBottom="true"
             android:orientation="horizontal">
         </LinearLayout>

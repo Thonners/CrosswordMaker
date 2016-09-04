@@ -1,6 +1,7 @@
 package com.thonners.crosswordmaker;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -26,9 +27,17 @@ public class ManualAnagramKnownLetterCardView extends CardView {
     private LinearLayout parentView ;
     private View mainView ;
     private TextView tv ;
-    private String letter ;
+    private String letter  = " ";
     private int index ;
+    private boolean isActive  = false ;
 
+    private ManualAnagramTextView associatedTV = null;
+
+    /**
+     * Constructor.
+     * @param context   Application context
+     * @param index     Index number of this view in the string of the answer.
+     */
     public ManualAnagramKnownLetterCardView(Context context, int index) {
         super(context);
         Log.d(LOG_TAG,"KnownCard created.");
@@ -47,8 +56,13 @@ public class ManualAnagramKnownLetterCardView extends CardView {
         super(context, attrs, defStyle);
     }
 
+    /**
+     * Method to initialise the view.
+     * TODO: Move the textView params to the xml.
+     * @param context   Application context
+     */
     public void initialise(Context context) {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1f) ;
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1f) ;
         params.leftMargin = 2 ;
         params.rightMargin = 2 ;
         params.bottomMargin = 3;
@@ -65,16 +79,64 @@ public class ManualAnagramKnownLetterCardView extends CardView {
 
     public void setLetter(String letter) {
         this.letter = letter ;
-        tv.setTextAlignment(TEXT_ALIGNMENT_TEXT_END);
         tv.setText(letter);
     }
+    public void setLetter(ManualAnagramTextView textView) {
+        associatedTV = textView ;
+        associatedTV.setLetterKnown();
+        letter = associatedTV.getLetter();
+        tv.setText(letter);
+    }
+
+    /**
+     * Short-cut method to set this view as active.
+     */
+    public void setIsActive() {
+        setIsActive(true);
+    }
+
+    /**
+     * Method to provide visual feedback to the user that this view is active - i.e. clicking a
+     * letter's textView will result in that letter being assigned to this view.
+     *
+     * Show active by raising elevation of the card, or changing background colour, depending on
+     * android version.
+     *
+     * If no longer active, clear feedback and reset to normal.
+     */
+    public void setIsActive(boolean isActive) {
+        if (isActive) {
+            // View is active, so provide visual feedback to user
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                this.setElevation(getResources().getDimension(R.dimen.manual_anagram_card_elevation_active));
+            } else {
+                this.setBackgroundColor(getResources().getColor(R.color.cell_highlighted));
+            }
+        } else {
+            // Not active, so clear highlighting
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                this.setElevation(getResources().getDimension(R.dimen.manual_anagram_card_elevation_resting));
+            } else {
+                this.setBackgroundColor(getResources().getColor(R.color.card_background));
+            }
+        }
+    }
+
     public void clearLetter() {
+        if (associatedTV != null) {
+            associatedTV.setLetterKnown(false);
+        }
+        associatedTV = null ;
         this.letter = " " ;
         tv.setText(" ");
     }
 
     public int getIndex() {
         return index ;
+    }
+
+    public boolean isEmpty() {
+        return this.letter.trim().matches("");
     }
 
 }
