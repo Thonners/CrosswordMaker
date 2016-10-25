@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
@@ -41,15 +42,17 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
     private CharSequence[] tabTitles ;
 
     // Fragments
-    CrosswordPageFragment crosswordPageFragment ;
-    CluePageFragment cluePageFragment ;
-    ManualAnagramPageFragment manualAnagramPageFragment ;
-    DictionaryPageFragment dictionaryPageFragment;
-    AnagramPageFragment anagramPageFragment;
-    WikiPageFragment wikiPageFragment;
+    private CrosswordPageFragment crosswordPageFragment ;
+    private CluePageFragment cluePageFragment ;
+    private ManualAnagramPageFragment manualAnagramPageFragment ;
+    private DictionaryPageFragment dictionaryPageFragment;
+    private AnagramPageFragment anagramPageFragment;
+    private WikiPageFragment wikiPageFragment;
 
-    String[] crosswordStringArray;
-    Crossword crossword ;
+    private boolean firstVisitManualAnagram = true ;
+
+    private String[] crosswordStringArray;
+    private Crossword crossword ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,8 +106,13 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
                             break;
                         case MANUAL_ANAGRAM_TAB:
                             hideActionZoom();
-                            manualAnagramPageFragment.inputBoxRequestFocus();
-                            showKeyboard(manualAnagramPageFragment.getInputBox());
+                            // Show the snackbar if it's the first time the fragment has been seen
+                            if (firstVisitManualAnagram) {
+                                showInstructionsSnackbar();
+                            } else {
+                                manualAnagramPageFragment.inputBoxRequestFocus();
+                                showKeyboard(manualAnagramPageFragment.getInputBox());
+                            }
                             break ;
                         case DICTIONARY_TAB:
                             hideActionZoom();
@@ -180,6 +188,10 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
             case R.id.action_feedback:
                 // Send an email
                 emailDeveloperFeedback();
+                break;
+            case R.id.action_instructions:
+                // Show instructions dialog/activity
+                showInstructions() ;
                 break;
             case R.id.action_about:
                 // Show 'About' Dialog
@@ -311,6 +323,18 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
         pager.setCurrentItem(DICTIONARY_TAB, true);
     }
 
+    private void showInstructionsSnackbar() {
+        // Set to false to prevent snackbar being shown again
+        firstVisitManualAnagram = false ;
+        // Create & show the snackbar
+        Snackbar.make(pager,R.string.snackbar_instructions,Snackbar.LENGTH_LONG).setAction(R.string.show, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showInstructions();
+            }
+        }).show();
+    }
+
     // ------------------------- Menu button presses --------------------------------------
 
     private void toggleZoom() {
@@ -351,6 +375,10 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
 
         pager.setCurrentItem(CLUE_TAB,true);
         cluePageFragment.dispatchTakePictureIntent();
+    }
+    private void showInstructions() {
+        InstructionsDialog dialog = new InstructionsDialog() ;
+        dialog.show(getSupportFragmentManager(), getResources().getString(R.string.instructions));
     }
     private void openSettings() {
         // TODO: come up with some settings / an activity for settings

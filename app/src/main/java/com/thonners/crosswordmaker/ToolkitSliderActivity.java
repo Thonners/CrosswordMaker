@@ -3,6 +3,7 @@ package com.thonners.crosswordmaker;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -41,6 +42,8 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
     private AnagramPageFragment anagramPageFragment ;
     private WikiPageFragment wikiPageFragment;
 
+    private boolean firstVisitManualAnagram = true ;
+
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -48,6 +51,7 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         initialise() ;
+
     }
 
 
@@ -68,6 +72,10 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
             case R.id.action_feedback:
                 // Send an email
                 HomeActivity.emailDeveloperFeedback(this);
+                break;
+            case R.id.action_instructions:
+                // Show instructions dialog/activity
+                showInstructions() ;
                 break;
             case R.id.action_about:
                 // Show 'About' Dialog
@@ -104,8 +112,13 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
                 {
                     switch (pager.getCurrentItem()) {
                         case MANUAL_ANAGRAM_TAB:
-                            manualAnagramPageFragment.inputBoxRequestFocus();
-                            showKeyboard(manualAnagramPageFragment.getInputBox());
+                            // Show the snackbar if it's the first time the fragment has been seen
+                            if (firstVisitManualAnagram) {
+                                showInstructionsSnackbar();
+                            } else {
+                                manualAnagramPageFragment.inputBoxRequestFocus();
+                                showKeyboard(manualAnagramPageFragment.getInputBox());
+                            }
                             break ;
                         case DICTIONARY_TAB:
                             dictionaryPageFragment.inputBoxRequestFocus();
@@ -207,4 +220,19 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
         pager.setCurrentItem(DICTIONARY_TAB, true);
     }
 
+    private void showInstructions() {
+        InstructionsDialog dialog = new InstructionsDialog() ;
+        dialog.show(getSupportFragmentManager(), getResources().getString(R.string.instructions));
+    }
+    private void showInstructionsSnackbar() {
+        // Set to false to prevent snackbar being shown again
+        firstVisitManualAnagram = false ;
+        // Create & show the snackbar
+        Snackbar.make(pager,R.string.snackbar_instructions,Snackbar.LENGTH_LONG).setAction(R.string.show, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showInstructions();
+            }
+        }).show();
+    }
 }

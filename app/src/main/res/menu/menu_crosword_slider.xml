@@ -25,6 +25,12 @@
         android:orderInCategory="30"
         app:showAsAction="never" />
 
+    <item android:id="@+id/action_instructions"
+        android:title="@string/action_instructions"
+        android:icon="@drawable/ic_info_outline_white_24dp"
+        android:orderInCategory="40"
+        app:showAsAction="never" />
+
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:orderInCategory="100"
