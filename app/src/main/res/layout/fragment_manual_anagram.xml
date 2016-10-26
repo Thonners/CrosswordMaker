@@ -71,5 +71,6 @@
         android:layout_alignParentEnd="true"
         android:layout_above="@+id/manual_anagram_known_letters_layout"
         android:src="@drawable/ic_refresh_white_24dp"
-        android:scaleType="center" />
+        android:scaleType="center"
+        android:visibility="gone"/>
 </RelativeLayout>

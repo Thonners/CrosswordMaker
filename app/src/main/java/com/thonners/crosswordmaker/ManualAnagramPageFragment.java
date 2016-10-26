@@ -7,6 +7,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.Space;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -37,12 +39,13 @@ public class ManualAnagramPageFragment extends Fragment {
     private OnManualAnagramFragmentListener mListener;
 
     private Button shuffleButton ;
-    private FloatingActionButton shuffleFAB ;
+    private FloatingActionButton reshuffleFAB;
     private EditText inputBox ;
     private RelativeLayout fragmentParentLayout ;
     private RelativeLayout outputParentLayout ;
     private LinearLayout knownLettersLayout ;
     private int knownLetterCount = 0 ;
+    private boolean shuffleActive = true ; // if true, shuffle button shuffles, if false, button clears editText
 
     private ManualAnagramKnownLetterCardView activeKnownLetterCard = null ;
     private ManualAnagramTextView activeLetterTV = null ;
@@ -96,13 +99,32 @@ public class ManualAnagramPageFragment extends Fragment {
                 return false;
             }
         });
+        inputBox.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // Required method
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // Text has been changed, so force shuffle/clear functionality back to 'shuffle'
+                shuffleButton.setText(R.string.shuffle);
+                shuffleActive = true ;
+                Log.d(LOG_TAG, "onTextChanged() has been called, so changing shufleActive back to true");
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                // Required method
+            }
+        });
         outputParentLayout = (RelativeLayout) view.findViewById(R.id.manual_anagram_results);
-        shuffleFAB = (FloatingActionButton) view.findViewById(R.id.manual_anagram_fab) ;
-        shuffleFAB.setOnClickListener(new View.OnClickListener() {
+        reshuffleFAB = (FloatingActionButton) view.findViewById(R.id.manual_anagram_fab) ;
+        reshuffleFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.d(LOG_TAG,"Shuffle FAB clicked.");
-                shuffleClicked();
+                reshuffleClicked();
             }
         });
         knownLettersLayout = (LinearLayout) view.findViewById(R.id.manual_anagram_known_letters_layout) ;
@@ -133,7 +155,25 @@ public class ManualAnagramPageFragment extends Fragment {
         // Reshuffle subfunction:
             // Shuffle order of views
             // Populate the views
-        populateKnownLettersLayout(inputBox.getText().toString().toUpperCase().replaceAll("\\s", "").length());
+        if (shuffleActive) {
+            populateKnownLettersLayout(inputBox.getText().toString().toUpperCase().replaceAll("\\s", "").length());
+            shuffleLetters();
+            // Show the re-shuffle FAB
+            reshuffleFAB.setVisibility(View.VISIBLE);
+            // Change the button to 'clear'
+            shuffleButton.setText(R.string.clear);
+        } else {
+            // Clear the text
+            inputBox.getText().clear();
+            // Hide the FAB
+            reshuffleFAB.setVisibility(View.GONE);
+            // Change button back to shuffle
+            shuffleButton.setText(R.string.shuffle);
+        }
+        // Toggle boolean switch
+        shuffleActive = !shuffleActive;
+    }
+    private void reshuffleClicked() {
         shuffleLetters();
     }
 
