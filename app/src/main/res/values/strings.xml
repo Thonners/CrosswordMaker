@@ -61,6 +61,7 @@
     <string name="home_library2">Access all your saved crosswords</string>
     <string name="home_settings">Settings</string>
     <string name="home_settings2">Change your preferences</string>
+    <string name="low_ram_snackbar">There's an option in the \'Settings\' menu for low RAM devices. Try this if you are experiencing crashes.</string>
 
     <!-- Toolkit Activity & Fragments-->
     <array name="tab_titles">

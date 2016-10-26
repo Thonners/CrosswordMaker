@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
@@ -20,10 +21,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -32,10 +36,13 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
 
     private static final String LOG_TAG = "HomeActivity";
 
+    private final String firstRunFileName = "firstRun" ;
+
     private String publication;
     private String date ;
     private CharSequence[] publications ;
     private boolean safeToOverwrite = false ;
+    private LinearLayout mainLayout ;
 
     private CrosswordLibraryManager libraryManager ;
     private ArrayList<CrosswordLibraryManager.SavedCrossword> recentCrosswords ;
@@ -44,6 +51,8 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_material);
+        mainLayout = (LinearLayout) findViewById(R.id.home_main_layout) ;
+        checkFirstRun();
     }
 
     @Override
@@ -354,6 +363,23 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
     private void showToast(String string) {
         Toast.makeText(this,string,Toast.LENGTH_LONG).show();
     }
+    private void checkFirstRun() {
+        File firstRunFile = new File(getFilesDir(),firstRunFileName) ;
+        // If first run file doesn't exist, show the snackbar
+        if (firstRunFile.exists()) {
+            // This is likely to be true, so will be a faster test than the negative
+            Log.d(LOG_TAG, "firstRunFile found, so not showing snackbar.");
+        } else {
+            Log.d(LOG_TAG,"First run file not found, so showing snackbar") ;
+            Snackbar.make(mainLayout,R.string.low_ram_snackbar,Snackbar.LENGTH_LONG).show();
+            // Now create the file for next time
+            try {
+                firstRunFile.createNewFile() ;
+            } catch (IOException exception) {
+                Log.d(LOG_TAG,"Error creating first run file: " + exception.getLocalizedMessage()) ;
+            }
+        }
+    }
 
     @Override
     public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
@@ -392,7 +418,7 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
             return new DatePickerDialog(getActivity(), (HomeActivity) getActivity(), startYear, startMonth, startDay);
         }
     }
-
+    // Public static methods
     public static void emailDeveloperFeedback(Context context) {
         // Create an email to me with specific subject heading. Outsource actual email sending.
         Log.d(LOG_TAG,"Trying to launch email to developer");
