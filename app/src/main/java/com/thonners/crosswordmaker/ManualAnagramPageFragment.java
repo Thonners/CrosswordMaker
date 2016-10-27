@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v4.widget.Space;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -180,7 +179,7 @@ public class ManualAnagramPageFragment extends Fragment {
             // Change button back to shuffle
             shuffleButton.setText(R.string.shuffle);
             // Clear the results
-            clearDisplayedLetters();
+            hideShuffledView();
             clearKnownLetterLayout();
         }
         // Toggle boolean switch
@@ -199,7 +198,9 @@ public class ManualAnagramPageFragment extends Fragment {
         // Make sure the keyboard is hidden
         hideKeyboard();
         // Clear the view
-        clearDisplayedLetters();
+        clearShuffledViewChildren();
+        // Set alpha to zero just in case
+        outputParentLayout.setAlpha(0.0f);
 
         // Get the text (force it to upper case for when it gets displayed, and remove all spaces)
         String input = inputBox.getText().toString().toUpperCase().replaceAll("\\s", "") ;
@@ -224,6 +225,12 @@ public class ManualAnagramPageFragment extends Fragment {
                 }
             });
         }
+
+        // Animate the parent view's reentry
+        outputParentLayout.animate()
+                .setDuration(350)
+                .alpha(1.0f)
+                .setListener(null);
     }
 
     /**
@@ -250,7 +257,38 @@ public class ManualAnagramPageFragment extends Fragment {
     /**
      * Clears the letters from the results view.
      */
-    private void clearDisplayedLetters() {
+    private void hideShuffledView() {
+        outputParentLayout.animate()
+                .setDuration(350)
+                .alpha(0.0f)
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        clearShuffledViewChildren() ;
+
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+
+                    }
+                });
+    }
+
+    /**
+     * Method to clear all TextViews from the main display.
+     */
+    private void clearShuffledViewChildren() {
         // Clear the results view
         if (outputParentLayout.getChildCount() > 0) {
             outputParentLayout.removeAllViews();
@@ -305,7 +343,7 @@ public class ManualAnagramPageFragment extends Fragment {
      */
     private void populateKnownLettersLayout(int letterCount) {
         Log.d(LOG_TAG,"Adding known letter empty cards. Lettercount = " + letterCount);
-        // Clear known letters from old instances
+        // Clear known letters from old instances. This should also move it off the screen
         clearKnownLetterLayout();
         // Create an array in which to hold the Cards
         ManualAnagramKnownLetterCardView[] knownLetterCards = new ManualAnagramKnownLetterCardView[letterCount] ;
@@ -330,8 +368,11 @@ public class ManualAnagramPageFragment extends Fragment {
             });
 
             knownLettersLayout.addView(knownLetterCards[i],i);
-
         }
+        knownLettersLayout.animate()
+                .setDuration(350)
+                .translationY(0)
+                .setListener(null);
     }
 
     /**
@@ -450,8 +491,32 @@ public class ManualAnagramPageFragment extends Fragment {
      * For use when the results are to be cleared
      */
     private void clearKnownLetterLayout() {
-        // Remove all the cards from teh known letters layout
-        knownLettersLayout.removeAllViews();
+        // Transition the view off the screen
+        knownLettersLayout.animate()
+                .setDuration(350)
+                .translationY(knownLettersLayout.getHeight())
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        // Remove all the cards from the known letters layout
+                        knownLettersLayout.removeAllViews();
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+
+                    }
+                });
     }
     /**
      * Method to remove the reshuffle FAB from view.
