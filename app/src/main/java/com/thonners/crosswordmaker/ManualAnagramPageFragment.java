@@ -1,11 +1,13 @@
 package com.thonners.crosswordmaker;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v4.widget.Space;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -99,6 +101,13 @@ public class ManualAnagramPageFragment extends Fragment {
                 return false;
             }
         });
+        inputBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(LOG_TAG,"inputBox clicked, clearing FAB...");
+                hideReshuffleFAB();
+            }
+        });
         inputBox.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -127,6 +136,7 @@ public class ManualAnagramPageFragment extends Fragment {
                 reshuffleClicked();
             }
         });
+        reshuffleFAB.setTranslationX(100);
         knownLettersLayout = (LinearLayout) view.findViewById(R.id.manual_anagram_known_letters_layout) ;
 
         fragmentParentLayout = (RelativeLayout) view.findViewById(R.id.fragment_parent_layout);
@@ -159,16 +169,19 @@ public class ManualAnagramPageFragment extends Fragment {
             populateKnownLettersLayout(inputBox.getText().toString().toUpperCase().replaceAll("\\s", "").length());
             shuffleLetters();
             // Show the re-shuffle FAB
-            reshuffleFAB.setVisibility(View.VISIBLE);
+            showReshuffleFAB() ;
             // Change the button to 'clear'
             shuffleButton.setText(R.string.clear);
         } else {
             // Clear the text
             inputBox.getText().clear();
             // Hide the FAB
-            reshuffleFAB.setVisibility(View.GONE);
+            hideReshuffleFAB();
             // Change button back to shuffle
             shuffleButton.setText(R.string.shuffle);
+            // Clear the results
+            clearDisplayedLetters();
+            clearKnownLetterLayout();
         }
         // Toggle boolean switch
         shuffleActive = !shuffleActive;
@@ -293,7 +306,7 @@ public class ManualAnagramPageFragment extends Fragment {
     private void populateKnownLettersLayout(int letterCount) {
         Log.d(LOG_TAG,"Adding known letter empty cards. Lettercount = " + letterCount);
         // Clear known letters from old instances
-        knownLettersLayout.removeAllViews();
+        clearKnownLetterLayout();
         // Create an array in which to hold the Cards
         ManualAnagramKnownLetterCardView[] knownLetterCards = new ManualAnagramKnownLetterCardView[letterCount] ;
         // Cycle through the number of letters and create a card for each one. Add this to the layout, giving it an index appropriately.
@@ -419,6 +432,10 @@ public class ManualAnagramPageFragment extends Fragment {
 
     }
 
+    /**
+     * Clear the activeLetterTV variable, so that no TV is currently active.
+     * This means a user can click a known letter to activate it, rather than set the current 'activeLetterTV'
+     */
     private void clearActiveLetterTV() {
         // Clear any highlighting if required
         if (activeLetterTV != null) {
@@ -427,6 +444,65 @@ public class ManualAnagramPageFragment extends Fragment {
         // Clear the active TV
         activeLetterTV = null ;
     }
+
+    /**
+     * Method to remove all views from the knownLettersLayout - i.e. to clear the view.
+     * For use when the results are to be cleared
+     */
+    private void clearKnownLetterLayout() {
+        // Remove all the cards from teh known letters layout
+        knownLettersLayout.removeAllViews();
+    }
+    /**
+     * Method to remove the reshuffle FAB from view.
+     * Should be used whenever the FAB should not be visible, i.e. when the keyboard is up, or there are no letters to display
+     */
+    private void hideReshuffleFAB() {
+        // Animate it off the screen
+        reshuffleFAB.animate()
+                .translationX(100)
+                .setDuration(350)
+                .alpha(0.0f)
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
+                        Log.d(LOG_TAG,"hideReshuffleFAB animation starting...");
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        Log.d(LOG_TAG,"hideReshuffleFAB animation done.");
+                        // Set visibility to gone
+                        reshuffleFAB.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+
+                    }
+                });
+    }
+
+    /**
+     * Method to show the reshuffle FAB.
+     */
+    private void showReshuffleFAB() {
+        // Show the re-shuffle FAB, but set alpha to 0.0f so it can be animated in
+        reshuffleFAB.setVisibility(View.VISIBLE);
+        reshuffleFAB.setAlpha(0.0f);
+        // Animate its entry
+        reshuffleFAB.animate()
+                .translationX(0)
+                .alpha(1.0f)
+                .setDuration(350)
+                .setListener(null);
+    }
+
 
     private void showInstructions() {
         Log.d(LOG_TAG, "Would show manual anagram instructions now") ;
