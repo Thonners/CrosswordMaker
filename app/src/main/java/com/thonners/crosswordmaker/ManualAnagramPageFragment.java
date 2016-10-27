@@ -332,14 +332,26 @@ public class ManualAnagramPageFragment extends Fragment {
             // If the card clicked is already high-lighted, clear the highlight
             clearActiveKnownLetterCard();
         } else {
-            // Check that the card is empty. If not, prompt user to clear the card before re-filling it
-            if (newKnownLetterCard.isEmpty()) {
-                // Clear any previously set card before setting this one, to avoid two cards looking active to the user
-                clearActiveKnownLetterCard();
+            // If a letter is active, set this card to that letter, otherwise, activate the card
+            if (activeLetterTV != null) {
+                // Set the active known letter card to this card. Do this so that the Z heights are correct after it's cleared later (setting active then not active raises it higher than its original height).
                 activeKnownLetterCard = newKnownLetterCard;
                 activeKnownLetterCard.setIsActive();
+                // Set this card to that letter!
+                activeKnownLetterCard.setLetter(activeLetterTV);
+                // Clear that active stuff
+                clearActiveKnownLetterCard();
+                clearActiveLetterTV();
             } else {
-                // Not sure what to do, if anything, if user clicks a card that's already filled.
+                // Check that the card is empty. If not, prompt user to clear the card before re-filling it
+                if (newKnownLetterCard.isEmpty()) {
+                    // Clear any previously set card before setting this one, to avoid two cards looking active to the user
+                    clearActiveKnownLetterCard();
+                    activeKnownLetterCard = newKnownLetterCard;
+                    activeKnownLetterCard.setIsActive();
+                } else {
+                    // Not sure what to do, if anything, if user clicks a card that's already filled.
+                }
             }
         }
     }
@@ -396,9 +408,12 @@ public class ManualAnagramPageFragment extends Fragment {
             } else {
                 // Clear any previously active TVs
                 clearActiveLetterTV();
-                // Set the active known letter, so the user can touch a card
-                activeLetterTV = manualAnagramTextView;
-                activeLetterTV.setIsActive() ;
+                // Provided the letter isn't already known, set it as active
+                if (!manualAnagramTextView.isKnown()) {
+                    // Set the active known letter, so the user can touch a card
+                    activeLetterTV = manualAnagramTextView;
+                    activeLetterTV.setIsActive();
+                }
             }
         }
 

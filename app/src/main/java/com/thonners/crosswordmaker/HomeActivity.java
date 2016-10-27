@@ -52,6 +52,7 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_material);
         mainLayout = (LinearLayout) findViewById(R.id.home_main_layout) ;
+        if (mainLayout != null) Log.d(LOG_TAG,"mainLayout is not null!") ;
         checkFirstRun();
     }
 
