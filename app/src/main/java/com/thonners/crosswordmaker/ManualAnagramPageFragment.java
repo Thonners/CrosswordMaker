@@ -165,12 +165,19 @@ public class ManualAnagramPageFragment extends Fragment {
             // Shuffle order of views
             // Populate the views
         if (shuffleActive) {
-            populateKnownLettersLayout(inputBox.getText().toString().toUpperCase().replaceAll("\\s", "").length());
-            shuffleLetters();
-            // Show the re-shuffle FAB
-            showReshuffleFAB() ;
-            // Change the button to 'clear'
-            shuffleButton.setText(R.string.clear);
+            // Ensure the knownLetterLayout is cleared
+            removeKnownLetterViews();
+            // Get the string to be anagrammed
+            String anagram = inputBox.getText().toString().toUpperCase().replaceAll("\\s", "") ;
+            int anagramLength = anagram.length() ;
+            if (anagramLength > 0) {
+                populateKnownLettersLayout(anagramLength);
+                shuffleLetters();
+                // Show the re-shuffle FAB
+                showReshuffleFAB();
+                // Change the button to 'clear'
+                shuffleButton.setText(R.string.clear);
+            }
         } else {
             // Clear the text
             inputBox.getText().clear();
@@ -504,7 +511,7 @@ public class ManualAnagramPageFragment extends Fragment {
                     @Override
                     public void onAnimationEnd(Animator animator) {
                         // Remove all the cards from the known letters layout
-                        knownLettersLayout.removeAllViews();
+                        removeKnownLetterViews();
                     }
 
                     @Override
@@ -517,6 +524,14 @@ public class ManualAnagramPageFragment extends Fragment {
 
                     }
                 });
+    }
+
+    /**
+     * Method to remove all knownLetterCards from the main known letter layout
+     */
+    private void removeKnownLetterViews() {
+        // Remove all the cards from the known letters layout
+        knownLettersLayout.removeAllViews();
     }
     /**
      * Method to remove the reshuffle FAB from view.
