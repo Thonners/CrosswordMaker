@@ -45,8 +45,8 @@ public class ManualAnagramPageFragment extends Fragment {
     private RelativeLayout fragmentParentLayout ;
     private RelativeLayout outputParentLayout ;
     private LinearLayout knownLettersLayout ;
-    private int knownLetterCount = 0 ;
     private boolean shuffleActive = true ; // if true, shuffle button shuffles, if false, button clears editText
+    private ManualAnagramTextView textViews[] ;
 
     private ManualAnagramKnownLetterCardView activeKnownLetterCard = null ;
     private ManualAnagramTextView activeLetterTV = null ;
@@ -172,7 +172,7 @@ public class ManualAnagramPageFragment extends Fragment {
             int anagramLength = anagram.length() ;
             if (anagramLength > 0) {
                 populateKnownLettersLayout(anagramLength);
-                shuffleLetters();
+                createTextViews();
                 // Show the re-shuffle FAB
                 showReshuffleFAB();
                 // Change the button to 'clear'
@@ -192,16 +192,22 @@ public class ManualAnagramPageFragment extends Fragment {
         // Toggle boolean switch
         shuffleActive = !shuffleActive;
     }
+
+    /**
+     * Method to handle clicks on the reshuffle FAB.
+     * Clears the results view, then redraws the textViews once their order has been shuffled.
+     */
     private void reshuffleClicked() {
-        shuffleLetters();
+        clearShuffledViewChildren();
+        shuffle();
     }
 
     /**
-     * Method to shuffle the order of the letters and display them in the main results view.
+     * Method to create the textviews which are to be shown in the main results view.
      *
      * Hides the keyboard, clears the results so it's ready for the newly created letters.
      */
-    private void shuffleLetters() {
+    private void createTextViews() {
         // Make sure the keyboard is hidden
         hideKeyboard();
         // Clear the view
@@ -210,27 +216,40 @@ public class ManualAnagramPageFragment extends Fragment {
         outputParentLayout.setAlpha(0.0f);
 
         // Get the text (force it to upper case for when it gets displayed, and remove all spaces)
-        String input = inputBox.getText().toString().toUpperCase().replaceAll("\\s", "") ;
-        int lettersLength = input.length() ;
-        Log.d(LOG_TAG,"Letters to be shuffled: " + input + ", there are " + lettersLength + " letters.");
+        String input = inputBox.getText().toString().toUpperCase().replaceAll("\\s", "");
+        int lettersLength = input.length();
+        Log.d(LOG_TAG, "Letters to be shuffled: " + input + ", there are " + lettersLength + " letters.");
 
         // Split string into letters
-        char[] letters = input.toCharArray() ;
-        shuffleArray(letters);
-        // Shuffle
-        Log.d(LOG_TAG,"Shuffled letters: " + new String(letters));
+        char[] letters = input.toCharArray();
 
-        // Create the text views & add to the main view
-        // Initialise the first letter - this will be the anchor
-        int anchorID = getAnchorID() ;
-        for (int i = 0 ; i < lettersLength ; i++) {
-            ManualAnagramTextView letterTV = new ManualAnagramTextView(getActivity(), letters[i], i, lettersLength, outputParentLayout, anchorID) ;
-            letterTV.setOnClickListener(new View.OnClickListener() {
+        // Create the TextViews & add to outputParentLayout
+        textViews = new ManualAnagramTextView[lettersLength];
+        for (int i = 0; i < lettersLength; i++) {
+            textViews[i] = new ManualAnagramTextView(getActivity(), letters[i], lettersLength, outputParentLayout, getAnchorID());
+            textViews[i].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     letterTVClicked((ManualAnagramTextView) view);
                 }
             });
+        }
+
+        shuffle();
+
+    }
+
+    /**
+     * Method to display the shuffled array, including the entry animation.
+     */
+    private void shuffle() {
+        // Shuffle
+        shuffleArray(textViews);
+
+        // Reposition the view
+        for (int i = 0 ; i < textViews.length ; i++) {
+            textViews[i].setLetterNo(i);
+            textViews[i].draw(getAnchorID());
         }
 
         // Animate the parent view's reentry
@@ -241,23 +260,19 @@ public class ManualAnagramPageFragment extends Fragment {
     }
 
     /**
-     * Method to randomly shuffle the character array.
-     * @param array The array to be shuffled.
+     * Method to shuffle the order of the given array
+     * @param array The array to be shuffled
      */
-    private void shuffleArray(char[] array) {
-        int index;
-        Random random = new Random();
-        for (int i = array.length - 1; i > 0; i--)
-        {
-            index = random.nextInt(i + 1);
-            if (index != i)
-            {
-                array[index] ^= array[i];
-                array[i] ^= array[index];
-                array[index] ^= array[i];
-            }
+    private void shuffleArray(ManualAnagramTextView[] array) {
+        Random random = new Random() ;
+        for (int i = array.length - 1 ; i > 0 ; i--) {
+            int index = random.nextInt(i + 1) ;
+            ManualAnagramTextView tempTV = array[index] ;
+            array[index] = array[i] ;
+            array[i] = tempTV ;
         }
     }
+
     public interface OnManualAnagramFragmentListener {
     }
 

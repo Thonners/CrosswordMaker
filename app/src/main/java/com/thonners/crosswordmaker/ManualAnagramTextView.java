@@ -51,27 +51,37 @@ public class ManualAnagramTextView extends TextView {
      * Main constructor.
      * @param context       Application context
      * @param letterChar    Character, i.e. letter, to assign to this view.
-     * @param letterNo      The index number of this letter in relation to the other letters in the anagram. Used to position it in the layout.
      * @param letterCount   The total number of letters in the anagram. Used to determine spacing of letters in results.
      * @param parentView    The view this textView is to be added to.
      * @param anchorViewID  The resource ID of the anchor view - as this will be positioned relative to that.
      */
-    public ManualAnagramTextView(Context context, char letterChar, int letterNo, int letterCount, RelativeLayout parentView, int anchorViewID) {
-        super(context) ;
-        this.letterNo = letterNo ;
-        this.letterCount = letterCount ;
-        this.parentViewID = parentView.getId() ;
-        this.parentView = parentView ;
-        this.anchorViewID = anchorViewID ;
+    public ManualAnagramTextView(Context context, char letterChar, int letterCount, RelativeLayout parentView, int anchorViewID) {
+        super(context);
+        initialise(letterChar, letterCount, parentView, anchorViewID);
+    }
+
+
+    public void initialise(char letterChar, int letterCount, RelativeLayout parentView, int anchorViewID) {
+        this.letterCount = letterCount;
+        this.parentViewID = parentView.getId();
+        this.parentView = parentView;
+        this.anchorViewID = anchorViewID;
 
         // Set the letter
-        this.letter = Character.toString(letterChar) ;
+        this.letter = Character.toString(letterChar);
         this.setText(letter);
 
         // Set the font size
         this.setTextSize(getResources().getDimensionPixelSize(R.dimen.manual_anagram_text_size));
         // Letter spacing radius determines the size of the circle in which the letters will be displayed. Circle size grows as letter count grows, to keep sensible spacing between letters.
-        letterSpacingRadius = (int) (Math.max(((double) letterCount / MAX_LETTERS_PER_CIRCLE),1.0) * this.getTextSize()) ; // Ensure that the radius multiplier will be at least 1 if there are fewer than MAX_LETTERS_PER_CIRCLE letters
+        letterSpacingRadius = (int) (Math.max(((double) letterCount / MAX_LETTERS_PER_CIRCLE), 1.0) * this.getTextSize()); // Ensure that the radius multiplier will be at least 1 if there are fewer than MAX_LETTERS_PER_CIRCLE letters
+
+
+    }
+
+    public void draw(int anchorViewID) {
+        // Set the anchor ID
+        this.anchorViewID = anchorViewID ;
         // Initialise
         calculateMargins() ;
 
@@ -82,10 +92,6 @@ public class ManualAnagramTextView extends TextView {
 
     public void setLetterNo(int letterNo) {
         this.letterNo = letterNo ;
-    }
-
-    public void setLetterCount(int letterCount) {
-        this.letterCount = letterCount;
     }
 
     /**
