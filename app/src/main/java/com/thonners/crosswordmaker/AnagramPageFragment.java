@@ -1,5 +1,6 @@
 package com.thonners.crosswordmaker;
 
+import android.animation.Animator;
 import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
@@ -13,6 +14,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -44,10 +46,11 @@ public class AnagramPageFragment extends Fragment {
 
     private OnAnagramFragmentListener mListener;
 
-    Button searchButton ;
-    EditText inputBox ;
-    LinearLayout resultsLinearLayout ;
-    LinearLayout progressSpinnerLinLayout ;
+    private Button searchButton ;
+    private EditText inputBox ;
+    private LinearLayout resultsLinearLayout ;
+    private LinearLayout progressSpinnerLinLayout ;
+    private int resultCount = 0 ;
 
     public AnagramPageFragment() {
         // Required empty public constructor
@@ -119,14 +122,64 @@ public class AnagramPageFragment extends Fragment {
         // Clear view ready for results, then search
         Log.d(LOG_TAG, "Search button clicked. ");
         hideKeyboard();
-        clearResults();
-        search();
+        clearResults(true); // Move the call to search() into the clearResults method, so it can be executed after any exit animations if required
     }
 
-    private void clearResults() {
+    private void clearResults(boolean search) {
+        // Return to 0
+        resultCount = 0 ;
+
+        // Create the listener reference that will eventually call search(), but for all but the last animation will be null
+        Animator.AnimatorListener animatorListener = null ;
+
         // Clear the results view
         if (resultsLinearLayout.getChildCount() > 0 ) {
-            resultsLinearLayout.removeAllViews();
+            for (int i = resultsLinearLayout.getChildCount() - 1 ; i >= 0 ; i--) {
+                if (i == 0 && search) {
+                    // Create the listener that will call search()
+                    animatorListener = new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animator) {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animator) {
+                            // Actually remove the views
+                            resultsLinearLayout.removeAllViews();
+                            // Search
+                            search();
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animator) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animator) {
+
+                        }
+                    };
+                }
+
+                View view = resultsLinearLayout.getChildAt(i) ;
+                if (view != null) {
+                    Log.d(LOG_TAG, "Animating removal. i = " + i) ;
+                    view.animate()
+                            .alpha(0.0f)
+                            .translationY(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_Y_TRANSLATE)
+                            .setStartDelay(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_STAGGER * resultCount)
+                            .setDuration(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_DURATION)
+                            .setListener(animatorListener);
+                    resultCount++ ;
+                }
+            }
+
+            // Return to 0
+            resultCount = 0 ;
+        } else {
+            if (search) search() ;
         }
 
     }
@@ -216,6 +269,7 @@ public class AnagramPageFragment extends Fragment {
             Log.d(LOG_TAG, "Match found for: " + inputSorted);
             ArrayList<String> answers = dictionaryHM.get(inputSorted);
             // Add results to resultsLinearLayout
+            resultCount = 0 ;   // Set to 0 to allow for correct timing delays to entry animation
             for (String answer : answers) {
                 Log.d(LOG_TAG, "An answer for " + input + " is: " + answer);
                 addToResults(answer);
@@ -255,7 +309,22 @@ public class AnagramPageFragment extends Fragment {
         getActivity().getTheme().resolveAttribute(android.R.attr.selectableItemBackground,outValue,true);
         tv.setBackgroundResource(outValue.resourceId);
 
+        // Prep for Animation
+        cardView.setAlpha(0.0f);
+        cardView.setTranslationY(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_Y_TRANSLATE);
+
         resultsLinearLayout.addView(cardView);
+
+        // Animate
+        cardView.animate()
+                .alpha(1.0f)
+                .translationY(0)
+                .setStartDelay(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_STAGGER * resultCount)
+                .setDuration(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_DURATION)
+                .setListener(null);
+
+        // Increment the result count so subsequent cards will be delayed on their entry animation
+        resultCount++ ;
     }
 
     private void showIllegalCharactersToast() {
@@ -423,6 +492,7 @@ public class AnagramPageFragment extends Fragment {
 
             // Add answers to view
             if (answers != null) {
+                resultCount = 0 ;
                 for (String word : answers) {
                     addToResults(word);
                 }

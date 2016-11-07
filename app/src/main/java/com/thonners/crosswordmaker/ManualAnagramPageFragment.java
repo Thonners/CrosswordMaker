@@ -158,12 +158,6 @@ public class ManualAnagramPageFragment extends Fragment {
      * Method to be called once the shuffle button is clicked. Restructuring required.
      */
     private void shuffleClicked() {
-        // TODO: Restructure:
-        // If new letters, get the letters
-        // Create the views of letters in order
-        // Reshuffle subfunction:
-            // Shuffle order of views
-            // Populate the views
         if (shuffleActive) {
             // Ensure the knownLetterLayout is cleared
             removeKnownLetterViews();

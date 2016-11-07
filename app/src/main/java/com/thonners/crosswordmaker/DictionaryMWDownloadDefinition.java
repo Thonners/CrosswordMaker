@@ -1,5 +1,6 @@
 package com.thonners.crosswordmaker;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
@@ -79,8 +80,14 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        // Show progress bar
+        // Show progress bar - animatedly
+        progressLinearLayout.setAlpha(0.0f);
         progressLinearLayout.setVisibility(View.VISIBLE);
+        progressLinearLayout.animate()
+                .alpha(1.0f)
+                .setListener(null)
+                .setDuration(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_DURATION);
+
         // Set search button not clickable
         searchButton.setClickable(false);
         searchButton.setText(R.string.searching);
@@ -115,19 +122,42 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
     @Override
     protected void onPostExecute(String rawXML) {
         super.onPostExecute(rawXML);
+        // Decode the XML
+        final ViewGroup finalView = decodeXML(rawXML);
         // Hide progress bar
-        progressLinearLayout.setVisibility(View.GONE);
-        // Return search button to normal
-        searchButton.setClickable(true);
-        searchButton.setText(R.string.search);
+        progressLinearLayout.animate()
+                .alpha(0.0f)
+                .setDuration(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_DURATION)
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animator) {
 
-        if (!isCancelled()) {
-            ViewGroup finalView = decodeXML(rawXML);
+                    }
 
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        Log.d(LOG_TAG,"ProgressLayout Exit Animation complete");
+                        // Get rid of the progress view
+                        progressLinearLayout.setVisibility(View.GONE);
+                        // Return search button to normal
+                        searchButton.setClickable(true);
+                        searchButton.setText(R.string.search);
 
-            listener.completionCallBack(finalView, searchSuccess);
-        }
+                        if (!isCancelled()) {
+                            listener.completionCallBack(finalView, searchSuccess);
+                        }
+                    }
 
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animator) {
+
+                    }
+                });
     }
 
     private ViewGroup decodeXML(String rawXML) {
@@ -142,6 +172,7 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
             String wordNotFoundPrompt = context.getResources().getString(R.string.dictionary_word_not_found) + " " + context.getResources().getString(R.string.dictionary_suggestions_prompt);
             TextView promptTV = createTextView(wordNotFoundPrompt, WORD_NOT_FOUND);
             promptTV.setId(PROMPT_TV_ID);
+            promptTV.setAlpha(0.0f);
             view.addView(promptTV,0);
 
             // Get rid of all the closing tags
@@ -156,10 +187,13 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
 
                 Card card = new Card(context,suggestions[i]);
                 view.addView(card, i);
+                // Prep for entry animation
+                card.setTranslationY(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_Y_TRANSLATE);
+                card.setAlpha(0.0f);
             }
         } else if (rawXML.contains(successfulSearchIdentifier)) {
             searchSuccess = SEARCH_SUCCESSFUL;
-            view.addView(parseSuccessfulXML(rawXML));
+            parseSuccessfulXML(rawXML, view);
         } else {
             searchSuccess = SEARCH_NO_SUGGESTIONS;
         }
@@ -167,11 +201,12 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
         return view ;
     }
 
-    private ViewGroup parseSuccessfulXML(String xmlRaw) {
+    //private ViewGroup parseSuccessfulXML(String xmlRaw, LinearLayout viewGroup) {
+    private void parseSuccessfulXML(String xmlRaw, LinearLayout viewGroup) {
         // Method to turn the raw XML into something useful
-        LinearLayout viewGroup = new LinearLayout(context);
-        viewGroup.setOrientation(LinearLayout.VERTICAL);
-            Log.d(LOG_TAG, "Adding results to the results view");
+        //LinearLayout viewGroup = new LinearLayout(context);
+        //viewGroup.setOrientation(LinearLayout.VERTICAL);
+        Log.d(LOG_TAG, "Adding results to the results view");
 
         XmlParser parser = new XmlParser();
         try {
@@ -191,22 +226,23 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
                 card.addView(linearLayout);
                 card.setUseCompatPadding(true); // Forces same padding on Lollipop as is on pre-L
                 viewGroup.addView(card);
+                // Position/transparent it ready for the entry animation
+                card.setTranslationY(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_Y_TRANSLATE);
+                card.setAlpha(0.0f);
             }
         } catch (Exception e) {
             Log.d(LOG_TAG, "Was unable to parse the xmlRaw :(");
             Log.d(LOG_TAG, e.getMessage());
             searchSuccess = SEARCH_NOT_COMPLETED;
         }
-
-
-        return viewGroup;
+    //    return viewGroup;
     }
 
-        // Default methods for creating hidden and visible TextViews
-        private TextView createHiddenTextView(String textToDisplay, int displayType) {
-            return createTextView(textToDisplay, false, displayType);
-        }
-        private TextView createTextView(String textToDisplay, int displayType) {
+    // Default methods for creating hidden and visible TextViews
+    private TextView createHiddenTextView(String textToDisplay, int displayType) {
+        return createTextView(textToDisplay, false, displayType);
+    }
+    private TextView createTextView(String textToDisplay, int displayType) {
         return createTextView(textToDisplay, true, displayType);
     }
     // Proper method that creates the TextView and sets its visibility
