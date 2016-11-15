@@ -11,4 +11,16 @@
         <item name="colorAccent">@color/accent</item>
     </style>
 
+    <!-- Clues checklist textviews -->
+    <style name="clues_checklist" parent="AppTheme">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/clue_checklist_text_size</item>
+        <item name="android:textColor">@color/primary</item>
+    </style>
+        <style name="clues_checklist_header" parent="clues_checklist">
+            <item name="android:textSize">@dimen/clue_checklist_header_text_size</item>
+            <item name="android:textStyle">bold</item>
+        </style>
+
 </resources>

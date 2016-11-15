@@ -1,12 +1,13 @@
 package com.thonners.crosswordmaker;
 
-import android.util.Log;
+import android.content.Context;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
-/** Class to hold all the details of different clues
- * Created by mat on 13/12/14.
+/** Class to hold all the details of a clue
+ *
+ * @author M Thomas
+ * @since 13/12/14
  */
 public class Clue {
 
@@ -19,14 +20,20 @@ public class Clue {
     private Cell startCell ;
     private int length ;
     private ArrayList<Cell> clueCells = new ArrayList<Cell>();
-    private int clueNo ;
+    private int clueID;
+    private int clueDisplayNumber ;
 
     private boolean isHighlighted ;
+    private boolean isCompleted = false ;
 
+    private ClueChecklistEntryTextView checklistEntryTextView = null;
+
+    //public Clue (String clueOrientation , Cell startCell, OnClueInteractionListener crosswordPageFragment) {
     public Clue (String clueOrientation , Cell startCell) {
         this.orientation = clueOrientation;
         this.startCell = startCell ;
         this.isHighlighted = false ;
+        //this.mListener = crosswordPageFragment ;
     }
 
     public void setLength(int l) {
@@ -38,29 +45,50 @@ public class Clue {
     }
 
     public void addCellToClue(Cell newCell) {
- //       Log.d(LOG_TAG , "Adding new cell to clue that starts in " + startCell.getRow() + ", "  + startCell.getColumn());
         clueCells.add(newCell);
     }
 
-    public void setClueNo(int clueNumber){
-        // Set the clue number
-        this.clueNo = clueNumber ;
-    }
-    public int getClueNo(int clueNumber){
-        return this.clueNo ;
+    /**
+     * Method to set the display number, i.e. the number of the clue in its across / down capacity
+     * @param clueDisplayNumber
+     */
+    public void setClueDisplayNumber(int clueDisplayNumber) {
+        this.clueDisplayNumber = clueDisplayNumber ;
     }
 
+    /**
+     * @return The number of this clue, as defined by the crossword
+     */
+    public int getClueDisplayNumber() {
+        return clueDisplayNumber ;
+    }
+    /**
+     * @param clueID The unique ID number of the clue
+     */
+    public void setClueID(int clueID){
+        // Set the clue ID
+        this.clueID = clueID ;
+    }
+    /**
+     * @return The unique ID number of the clue
+     */
+    public int getClueID() {
+        return clueID;
+    }
+
+    /**
+     * Method to highlight the cells in the clue which contains the focus cell.
+     * Sets the focus of the     * non focusCell cells to focusedMinor, whilst setting the focusCell to focusedMajor.
+     * @param focusCell The cell in the clue that is to have the major focus - i.e. the active cell
+     */
     public void highlightClue(Cell focusCell) {
         // Highlight the cells in the clue
-        //Log.d(LOG_TAG, "Highlighting clue with start cell " + startCell.getCellName());
         setIsHighlighted();
         for (Cell cell : clueCells ) {
             cell.setActiveClue(this);
             if (cell.equals(focusCell)) {
-          //      Log.d(LOG_TAG, "Setting cell " + cell.getCellName() + " to major highlight");
                 cell.setFocusedMajor();
             } else {
-          //      Log.d(LOG_TAG, "Setting cell " + cell.getCellName() + " to minor highlight");
                 cell.setFocusedMinor();
             }
         }
@@ -80,17 +108,45 @@ public class Clue {
     public String getClueOrientation() {
         return orientation;
     }
-    public int getClueNo() {
-        return clueNo ;
-    }
+
+    /**
+     * Method to highlight the next cell in a clue, or, if the current cell is the final cell in the
+     * clue, set the clue as complete.
+     *
+     * Checks whether there is a next cell to highlight, and if so, moves the highlight to that cell.
+     * If not, marks the clue as complete.
+     *
+     * @param currentCell The cell which is currently active, and has just been populated by the user.
+     */
     public void highlightNextCell(Cell currentCell) {
-        // Method to highlight the next cell in the clue
-//        Log.d(LOG_TAG, "Call to highlightNextCell made from cell: " + currentCell.getCellName());
+        // Check that it isn't the last cell in the clue
         if (clueCells.indexOf(currentCell) < clueCells.size() - 1) {
             //highlight clue using cell from next in index. Should always be next one due to direction
             // in which cells are searched for and added to clues in findHorizontal/VerticalClues
             this.highlightClue(clueCells.get(clueCells.indexOf(currentCell) + 1));
+        } else {
+            // if it's the last cell, mark the clue as complete
+            setClueComplete() ;
         }
+    }
+
+    /**
+     * Method to check that all cells are filled and then set the clue as complete
+     */
+    private void setClueComplete() {
+        // Set isCompleted to true now, and set it to false if any of the cells aren't actually complete
+        isCompleted = true ;
+        // Loop through and check all cells populated
+        for (Cell cell : clueCells) {
+            // Check if a cell is empty, and if so, set isCompleted to false
+            if (cell.isEmpty()) {
+                isCompleted = false ;
+            }
+        }
+
+        // If still completed, cross it off the list
+        //if (isCompleted) mListener.crossOffClue(this.clueID); // Don't think this complex interface thing is required
+        if (isCompleted) checklistEntryTextView.setChecked(true) ;
     }
     public String getCells() {
         String cellList = "";
@@ -99,5 +155,18 @@ public class Clue {
         }
         return  cellList ;
     }
+
+    /**
+     * Method to return
+     * @return The checklistEntryTextView associated with this clue
+     */
+    public ClueChecklistEntryTextView getChecklistEntryTextView(Context context) {
+        if (checklistEntryTextView == null) {
+            checklistEntryTextView = new ClueChecklistEntryTextView(context, this) ;
+        }
+
+        return checklistEntryTextView ;
+    }
+
 
 }

@@ -263,4 +263,13 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
     public void setActiveClue(Clue clue) {
         activeClue = clue ;
     }
+
+    /**
+     * Method to check whether a cell is empty.
+     *
+     * @return Boolean of whether this cell is empty
+     */
+    public boolean isEmpty() {
+        return this.getText().toString().isEmpty() ;
+    }
 }

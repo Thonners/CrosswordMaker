@@ -10,9 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
 import java.io.File;
+import java.util.ArrayList;
 
 
 /**
@@ -23,7 +25,7 @@ import java.io.File;
  * Use the {@link CrosswordPageFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CrosswordPageFragment extends Fragment {
+public class CrosswordPageFragment extends Fragment implements Clue.OnClueInteractionListener, View.OnLongClickListener{
 
     private static final String ARG_TAB_POSITION = "tabPosition" ;
     private static final String ARG_STRING_ARRAY = "crosswordStringArray" ;
@@ -32,9 +34,10 @@ public class CrosswordPageFragment extends Fragment {
     private CrosswordGrid crosswordGrid;
     private HorizontalScrollViewNoFocus horizontalScrollViewNoFocus ;
     private ScrollView verticalScrollView ;
+    private LinearLayout acrossCluesChecklist, downCluesChecklist ;
 
-    Crossword crossword ;
-    String[] crosswordStringArray;
+    private Crossword crossword ;
+    private String[] crosswordStringArray;
 
     private int tabPosition ;
 
@@ -77,6 +80,8 @@ public class CrosswordPageFragment extends Fragment {
         crosswordGrid = (CrosswordGrid) view.findViewById(R.id.crossword_grid);
         horizontalScrollViewNoFocus = (HorizontalScrollViewNoFocus) view.findViewById(R.id.horizontal_scroll_view_crossword);
         verticalScrollView = (ScrollView) view.findViewById(R.id.vertical_scroll_view_crossword);
+        acrossCluesChecklist = (LinearLayout) view.findViewById(R.id.clues_checklist_across_layout);
+        downCluesChecklist = (LinearLayout) view.findViewById(R.id.clues_checklist_down_layout);
 
         // Pass scroll view instances to the crosswordGrid
         crosswordGrid.setHorizontalScrollView(horizontalScrollViewNoFocus);
@@ -85,6 +90,8 @@ public class CrosswordPageFragment extends Fragment {
         createCrossword();
 
         getActivity().setTitle(crossword.getActivityTitle());
+
+        populateCluesChecklists(acrossCluesChecklist, downCluesChecklist);
 
         return view ;
 
@@ -110,31 +117,21 @@ public class CrosswordPageFragment extends Fragment {
     }
 
     /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
+     * Currently unused interface
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
+        void onFragmentInteraction(Uri uri);
     }
 
 
     private void createCrossword() {
         // Create the crossword
-        //crossword = new Crossword(getActivity().getApplicationContext(), crosswordGrid,crosswordStringArray);
         crossword = new Crossword(getActivity().getApplicationContext(), crosswordGrid,crosswordStringArray,false);
     }
 
     public void zoomCrossword(){
         if(crossword.getIsZoomed()){
             Log.d(LOG_TAG, "Zoom out FAB pressed");
-            // TODO: Set zoom out icon instead of zoom in icon in this set
         } else {
             Log.d(LOG_TAG, "Zoom in FAB pressed");
         }
@@ -146,5 +143,67 @@ public class CrosswordPageFragment extends Fragment {
     }
     public File getCrosswordSaveDir() {
         return crossword.getSaveDir() ;
+    }
+
+    /**
+     * Method to generate textviews and place them inside the appropriate clues checklist layout.
+     * @param acrossLayout The linear layout to contain the checklist views for across clues
+     * @param downLayout The linear layout to contain thd checklist views for the down clues
+     */
+    private void populateCluesChecklists(LinearLayout acrossLayout, LinearLayout downLayout) {
+        Log.d(LOG_TAG,"Populating the clues checklist...");
+        // Cycle through the horizontal clues
+        for (Clue clue : crossword.getHClues()) {
+            ClueChecklistEntryTextView c = clue.getChecklistEntryTextView(getActivity()) ;
+            c.setOnLongClickListener(this);
+            acrossLayout.addView(c) ;
+        }
+        // Cycle through the down clues
+        for (Clue clue : crossword.getVClues()) {
+            ClueChecklistEntryTextView c = clue.getChecklistEntryTextView(getActivity()) ;
+            c.setOnLongClickListener(this);
+            downLayout.addView(c) ;
+        }
+        Log.d(LOG_TAG,"Done.");
+    }
+
+    /**
+     * Method to create the TextView of the clue number to add to the checklist
+     * @param checklistLayout   The layout to which the TextView will be added
+     * @param clueID    The uniqueID of the clue
+     * @param displayNumer  The number to be displayed for the clue
+     */
+    private void makeClueChecklistEntry(LinearLayout checklistLayout, int clueID, int displayNumer) {
+
+    }
+
+    /**
+     * Method to strike-through the clue number in the clue progress view
+     * @param clueID The unique ID of the clue to be crossed off
+     */
+    @Override
+    public void crossOffClue(int clueID) {
+
+    }
+
+    /**
+     * Method to remove the strike-through from the clue number in the clue progress view
+     * @param clueID The unique ID of the clue to be cleared
+     */
+    @Override
+    public void uncrossOffClue(int clueID) {
+
+    }
+
+    @Override
+    public boolean onLongClick(View view) {
+        // Check it's a clueChecklistTV that's been clicked
+        if( view instanceof ClueChecklistEntryTextView) {
+            ((ClueChecklistEntryTextView) view).toggleChecked();
+            return true ;
+        } else {
+            return false ;
+        }
+
     }
 }

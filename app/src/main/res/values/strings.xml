@@ -153,5 +153,9 @@
     <string name="tutorial_snackbar_message">Full instructions available via the menu.</string>
     <string name="show">SHOW</string>
 
+    <!-- Crossword Page Fragment -->
+    <string name="across"><u>Across:</u></string>
+    <string name="down"><u>Down:</u></string>
+
 
 </resources>

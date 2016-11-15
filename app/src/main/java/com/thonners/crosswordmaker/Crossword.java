@@ -25,7 +25,12 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * Created by mat on 28/11/14.
+ * Class to hold all the necessary details for a crossword.
+ *
+ * Manages
+ *
+ * @author M Thomas
+ * @since 28/11/14
  */
 public class Crossword {
 
@@ -86,16 +91,16 @@ public class Crossword {
     private String crosswordImagePath ;
     private String clueImagePath ;
 
-    FileOutputStream fileOutputStream ;
-    File saveDir ;
-    File crosswordFile ;
-    File clueImageFile ;
-    File crosswordImageFile ;
-    String fileName ;
-    String savePath ;
+    private FileOutputStream fileOutputStream ;
+    private File saveDir ;
+    private File crosswordFile ;
+    private File clueImageFile ;
+    private File crosswordImageFile ;
+    private String fileName ;
+    private String savePath ;
 
-    GridLayout grid;
-    CrosswordGrid   crosswordGrid ;
+    private GridLayout grid;
+    private CrosswordGrid   crosswordGrid ;
 
 
     //---------------------------------------------- Constructors --------------------------------------------------
@@ -466,13 +471,14 @@ public class Crossword {
         }
     }
     private void getClueNumbers() {
-        ArrayList<Cell> startCells = new ArrayList<Cell>();
-        ArrayList<Integer[]> startCellCoordsGeneral = new ArrayList<Integer[]>();
-        ArrayList<Integer[]> startCellCoordsOrdered = new ArrayList<Integer[]>();
+        ArrayList<Cell> startCells = new ArrayList<>();
+        ArrayList<Integer[]> startCellCoordsGeneral = new ArrayList<>();
+        ArrayList<Integer[]> startCellCoordsOrdered = new ArrayList<>();
 
         Integer[] lastCellCoords = {rowCount, rowCount};          // Initialise coords as last cell so that it will definitely be corrected on the first run through
         Integer[] nextClueStartCellCoords = lastCellCoords;
-        int clueNo = 1;
+        int displayClueNo = 1;
+        int clueID = 0 ;
 
 
         for (Clue clue : hClues){
@@ -480,7 +486,8 @@ public class Crossword {
                 startCells.add(clue.getStartCell());
                 Integer[] coords = {clue.getStartCell().getRow(), clue.getStartCell().getColumn()} ;
                 startCellCoordsGeneral.add(coords);
-
+                clue.setClueID(clueID);
+                clueID++ ;
             }
         }
         for (Clue clue : vClues){
@@ -488,6 +495,8 @@ public class Crossword {
                 startCells.add(clue.getStartCell());
                 Integer[] coords = {clue.getStartCell().getRow(), clue.getStartCell().getColumn()} ;
                 startCellCoordsGeneral.add(coords);
+                clue.setClueID(clueID);
+                clueID++ ;
             }
         }
 
@@ -517,10 +526,26 @@ public class Crossword {
 
         for (Integer[] coords : startCellCoordsOrdered ) {
             // Loop through and assign each clue its number
-            // i.e. cellViews[row][col].setClueNumber(clueNo);
-            cellViews[coords[0]][coords[1]].setClueNumber(clueNo);
+            // i.e. cellViews[row][col].setClueNumber(displayClueNo);
+            cellViews[coords[0]][coords[1]].setClueNumber(displayClueNo);
 
-            clueNo++;
+            // find the relevant clue and assign the clue number to it
+            // check h clues
+            for (Clue clue : hClues) {
+                if (clue.getStartCell().getRow() == coords[0] && clue.getStartCell().getColumn() == coords[1] ) {
+                    clue.setClueDisplayNumber(displayClueNo);
+                    Log.d(LOG_TAG, "Matched coords for across clue number: "+ displayClueNo) ;
+                }
+            }
+            // check v clues
+            for (Clue clue : vClues) {
+                if (clue.getStartCell().getRow() == coords[0] && clue.getStartCell().getColumn() == coords[1] ) {
+                    clue.setClueDisplayNumber(displayClueNo);
+                    Log.d(LOG_TAG, "Matched coords for down clue number: "+ displayClueNo) ;
+                }
+            }
+
+            displayClueNo++;
         }
     }
 
@@ -673,6 +698,21 @@ public class Crossword {
     public void scrollToCell(Cell cell){
         // Method to call scrollToCell from CrosswordGrid. This will tell the scroll view to scroll to the highlighted cell
         crosswordGrid.scrollToView(cell);
+    }
+
+    public ArrayList<Clue> getHClues() {
+        return hClues;
+    }
+
+    public ArrayList<Clue> getVClues() {
+        return vClues;
+    }
+
+    public int getHClueCount() {
+        return hClueCount ;
+    }
+    public int getVClueCount() {
+        return vClueCount;
     }
 
     // ------------------------------------------- Save / Delete / Initialise methods --------------------------------------------

@@ -70,4 +70,8 @@
     <dimen name="dictionary_definition">12sp</dimen>
     <dimen name="dictionary_suggestion">14sp</dimen>
     <dimen name="dictionary_word_not_found"> 16sp</dimen>
+
+    <dimen name="clue_checklist_header_text_size">16sp</dimen>
+    <dimen name="clue_checklist_text_size">14sp</dimen>
+
 </resources>
