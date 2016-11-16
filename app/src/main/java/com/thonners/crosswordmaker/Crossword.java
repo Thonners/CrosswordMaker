@@ -22,7 +22,9 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Class to hold all the necessary details for a crossword.
@@ -385,6 +387,38 @@ public class Crossword {
         Log.d("Sizes","cellWidth = " + cellWidth);
     }
 
+    /**
+     * Method to sort the collection of vertical clues, such that, if iterated through, they are in
+     * numerical order. Primarily so that when the clues checklist is populated, no sorting need be done.
+     *
+     * Actual sorting algorithm in sortClues(ArrayList<Clue>)
+     */
+
+    /**
+     * Method to sort the passed ArrayList of clues so that they will be in order according to their
+     * display number
+     * @param clues The ArrayList of clues to be sorted
+     */
+    private ArrayList<Clue> sortClues(ArrayList<Clue> clues) {
+        HashMap<Integer, Clue> clueSet = new HashMap<>();
+
+        // Load the clue numbers into the array
+        for (Clue clue : clues) {
+            clueSet.put(clue.getClueDisplayNumber(), clue) ;
+        }
+
+        // Sort the clue numbers
+        Integer[] sortedClueNos = clueSet.keySet().toArray(new Integer[0]) ;
+        Arrays.sort(sortedClueNos);
+
+        // Add clues to a new ArrayList in the right order
+        ArrayList<Clue> newClueList = new ArrayList<>() ;
+        for (int i = 0 ; i < sortedClueNos.length ; i++) {
+            newClueList.add(clueSet.get(sortedClueNos[i])) ;
+        }
+
+        return newClueList ;
+    }
 
     // ---------------------------------------------------- Public get/set methods ------------------------------------------
     public void setTitle(String newTitle) {
@@ -700,12 +734,18 @@ public class Crossword {
         crosswordGrid.scrollToView(cell);
     }
 
+    /**
+     * @return The horizontal (i.e. across) clues, sorted into numerical order according to their display number
+     */
     public ArrayList<Clue> getHClues() {
-        return hClues;
+        return sortClues(hClues);
     }
 
+    /**
+     * @return The vertical (i.e. down) clues, sorted into numerical order according to their display number
+     */
     public ArrayList<Clue> getVClues() {
-        return vClues;
+        return sortClues(vClues);
     }
 
     public int getHClueCount() {

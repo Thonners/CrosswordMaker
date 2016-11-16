@@ -25,7 +25,7 @@ import java.util.ArrayList;
  * Use the {@link CrosswordPageFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CrosswordPageFragment extends Fragment implements Clue.OnClueInteractionListener, View.OnLongClickListener{
+public class CrosswordPageFragment extends Fragment implements  View.OnLongClickListener{
 
     private static final String ARG_TAB_POSITION = "tabPosition" ;
     private static final String ARG_STRING_ARRAY = "crosswordStringArray" ;
@@ -177,23 +177,6 @@ public class CrosswordPageFragment extends Fragment implements Clue.OnClueIntera
 
     }
 
-    /**
-     * Method to strike-through the clue number in the clue progress view
-     * @param clueID The unique ID of the clue to be crossed off
-     */
-    @Override
-    public void crossOffClue(int clueID) {
-
-    }
-
-    /**
-     * Method to remove the strike-through from the clue number in the clue progress view
-     * @param clueID The unique ID of the clue to be cleared
-     */
-    @Override
-    public void uncrossOffClue(int clueID) {
-
-    }
 
     @Override
     public boolean onLongClick(View view) {
