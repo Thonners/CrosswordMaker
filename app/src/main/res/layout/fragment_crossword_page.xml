@@ -46,30 +46,36 @@
             android:id="@+id/clues_checklist_parent_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/clues_checklist_across_header"
+                style="@style/clues_checklist_header"
+                android:text="@string/across"/>
+
+            <!--
             <LinearLayout
                 android:id="@+id/clues_checklist_across_layout"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
                 android:layout_weight="1"
-                android:orientation="vertical">
-                <TextView
-                    android:id="@+id/clues_checklist_across_header"
-                    style="@style/clues_checklist_header"
-                    android:text="@string/across"/>
+                android:orientation="horizontal">
             </LinearLayout>
+            -->
+            <GridLayout
+                android:id="@+id/clues_checklist_across_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/clues_checklist_down_header"
+                style="@style/clues_checklist_header"
+                android:text="@string/down"/>
+            <GridLayout
                 android:id="@+id/clues_checklist_down_layout"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-                <TextView
-                    android:id="@+id/clues_checklist_down_header"
-                    style="@style/clues_checklist_header"
-                    android:text="@string/down"/>
-            </LinearLayout>
+                android:orientation="horizontal">
+            </GridLayout>
         </LinearLayout>
     </LinearLayout>
 

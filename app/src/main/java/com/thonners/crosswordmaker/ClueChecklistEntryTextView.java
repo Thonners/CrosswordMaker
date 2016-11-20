@@ -2,8 +2,9 @@ package com.thonners.crosswordmaker;
 
 import android.content.Context;
 import android.graphics.Paint;
+import android.os.Build;
 import android.util.AttributeSet;
-import android.view.View;
+import android.widget.GridLayout;
 import android.widget.TextView;
 
 /**
@@ -14,6 +15,8 @@ import android.widget.TextView;
  */
 
 public class ClueChecklistEntryTextView extends TextView {
+
+    private final int NUM_COLUMNS = 10 ;    // Number of columns in the GridLayout
 
     private Context context ;
     private Clue clue ;
@@ -75,9 +78,11 @@ public class ClueChecklistEntryTextView extends TextView {
         if (isChecked) {
             // Set strikethrough
             this.setPaintFlags(this.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            this.setTextColor(getResources().getColor(R.color.light_grey));
         } else {
             // Set back to normal
             this.setPaintFlags(this.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+            this.setTextColor(getResources().getColor(R.color.dark_grey));
         }
     }
 

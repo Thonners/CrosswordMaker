@@ -2,19 +2,23 @@ package com.thonners.crosswordmaker;
 
 import android.app.Activity;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 //import android.app.Fragment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
+import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 
 
 /**
@@ -31,10 +35,13 @@ public class CrosswordPageFragment extends Fragment implements  View.OnLongClick
     private static final String ARG_STRING_ARRAY = "crosswordStringArray" ;
     private static final String LOG_TAG = "CrosswordPageFragment";
 
+    private final int MAX_COL_COUNT = 10 ;
+
     private CrosswordGrid crosswordGrid;
     private HorizontalScrollViewNoFocus horizontalScrollViewNoFocus ;
     private ScrollView verticalScrollView ;
-    private LinearLayout acrossCluesChecklist, downCluesChecklist ;
+    private GridLayout acrossCluesChecklist ;
+    private GridLayout downCluesChecklist ;
 
     private Crossword crossword ;
     private String[] crosswordStringArray;
@@ -80,8 +87,8 @@ public class CrosswordPageFragment extends Fragment implements  View.OnLongClick
         crosswordGrid = (CrosswordGrid) view.findViewById(R.id.crossword_grid);
         horizontalScrollViewNoFocus = (HorizontalScrollViewNoFocus) view.findViewById(R.id.horizontal_scroll_view_crossword);
         verticalScrollView = (ScrollView) view.findViewById(R.id.vertical_scroll_view_crossword);
-        acrossCluesChecklist = (LinearLayout) view.findViewById(R.id.clues_checklist_across_layout);
-        downCluesChecklist = (LinearLayout) view.findViewById(R.id.clues_checklist_down_layout);
+        acrossCluesChecklist = (GridLayout) view.findViewById(R.id.clues_checklist_across_layout);
+        downCluesChecklist = (GridLayout) view.findViewById(R.id.clues_checklist_down_layout);
 
         // Pass scroll view instances to the crosswordGrid
         crosswordGrid.setHorizontalScrollView(horizontalScrollViewNoFocus);
@@ -91,7 +98,10 @@ public class CrosswordPageFragment extends Fragment implements  View.OnLongClick
 
         getActivity().setTitle(crossword.getActivityTitle());
 
-        populateCluesChecklists(acrossCluesChecklist, downCluesChecklist);
+        // Populate the horizontal clues checklist:
+        populateCluesChecklists(acrossCluesChecklist, crossword.getHClues());
+        // Populate the vertical clues checklist
+        populateCluesChecklists(downCluesChecklist, crossword.getVClues());
 
         return view ;
 
@@ -146,23 +156,53 @@ public class CrosswordPageFragment extends Fragment implements  View.OnLongClick
     }
 
     /**
-     * Method to generate textviews and place them inside the appropriate clues checklist layout.
-     * @param acrossLayout The linear layout to contain the checklist views for across clues
-     * @param downLayout The linear layout to contain thd checklist views for the down clues
+     * Method to create ClueChecklistEntries for the given collection of clues, and add them to the
+     * appropriate clues checklist layout (either across or down).
+     * @param gridLayout The GridLayout to populate with <ClueChecklistEntryTextView>s
+     * @param clues An ArrayList of clues, for which to populate the GridLayout
      */
-    private void populateCluesChecklists(LinearLayout acrossLayout, LinearLayout downLayout) {
+    private void populateCluesChecklists(GridLayout gridLayout, ArrayList<Clue> clues) {
         Log.d(LOG_TAG,"Populating the clues checklist...");
+        // Get column count, etc.
+        int clueCount = clues.size() ;
+        int colMax = Math.min(MAX_COL_COUNT, clueCount) ;
+        int rowCount = clueCount / colMax ;
+        gridLayout.setColumnCount(colMax);
+        gridLayout.setRowCount(rowCount + 1);
+        // Initialise the counters
+        int row = 0, col = 0 ;
         // Cycle through the horizontal clues
-        for (Clue clue : crossword.getHClues()) {
+        for (Clue clue : clues) {
+            // Check column isn't at colMax
+            if (col == colMax) {
+                row++;
+                col = 0 ;
+            }
+
             ClueChecklistEntryTextView c = clue.getChecklistEntryTextView(getActivity()) ;
             c.setOnLongClickListener(this);
-            acrossLayout.addView(c) ;
-        }
-        // Cycle through the down clues
-        for (Clue clue : crossword.getVClues()) {
-            ClueChecklistEntryTextView c = clue.getChecklistEntryTextView(getActivity()) ;
-            c.setOnLongClickListener(this);
-            downLayout.addView(c) ;
+
+            // Set the layout params
+            GridLayout.LayoutParams param =new GridLayout.LayoutParams();
+            param.height = GridLayout.LayoutParams.WRAP_CONTENT;
+            param.width = GridLayout.LayoutParams.WRAP_CONTENT;
+            param.rightMargin = 5;
+            param.topMargin = 5;
+            param.setGravity(Gravity.CENTER);
+            // Set the column position, and weight if the framework supports it
+            if (Build.VERSION.SDK_INT >= 21) {
+                param.columnSpec = GridLayout.spec(col, 1.0f);
+            } else {
+                param.columnSpec = GridLayout.spec(col);
+            }
+            param.rowSpec = GridLayout.spec(row);
+            c.setLayoutParams(param);
+
+            // Add to the parent view
+            gridLayout.addView(c) ;
+
+            // Increment column
+            col++ ;
         }
         Log.d(LOG_TAG,"Done.");
     }
