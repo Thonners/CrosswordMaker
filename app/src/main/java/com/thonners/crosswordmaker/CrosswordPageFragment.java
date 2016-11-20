@@ -29,7 +29,7 @@ import java.util.Collection;
  * Use the {@link CrosswordPageFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CrosswordPageFragment extends Fragment implements  View.OnLongClickListener{
+public class CrosswordPageFragment extends Fragment implements  View.OnClickListener, View.OnLongClickListener{
 
     private static final String ARG_TAB_POSITION = "tabPosition" ;
     private static final String ARG_STRING_ARRAY = "crosswordStringArray" ;
@@ -180,6 +180,7 @@ public class CrosswordPageFragment extends Fragment implements  View.OnLongClick
             }
 
             ClueChecklistEntryTextView c = clue.getChecklistEntryTextView(getActivity()) ;
+            c.setOnClickListener(this);
             c.setOnLongClickListener(this);
 
             // Set the layout params
@@ -217,7 +218,25 @@ public class CrosswordPageFragment extends Fragment implements  View.OnLongClick
 
     }
 
-
+    /**
+     * Method to highlight the clue if a user clicks its {@link ClueChecklistEntryTextView} in the
+     * checklist GridLayout
+     * @param view The {@link ClueChecklistEntryTextView} that has been clicked.
+     */
+    @Override
+    public void onClick(View view) {
+        // Check it's a clueChecklistTV that's been clicked
+        if( view instanceof ClueChecklistEntryTextView) {
+            Clue clue = ((ClueChecklistEntryTextView) view).getClue();
+            clue.highlightClue(clue.getStartCell());
+        }
+    }
+    /**
+     * Method to manage the user long-clicking a clue checklist entry to override the automatic management
+     * and uncross/cross it off
+     * @param view The {@link ClueChecklistEntryTextView} that has been clicked
+     * @return Whether this method has managed/consumed the long click.
+     */
     @Override
     public boolean onLongClick(View view) {
         // Check it's a clueChecklistTV that's been clicked
@@ -227,6 +246,5 @@ public class CrosswordPageFragment extends Fragment implements  View.OnLongClick
         } else {
             return false ;
         }
-
     }
 }

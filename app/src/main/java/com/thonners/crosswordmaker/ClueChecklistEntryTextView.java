@@ -93,4 +93,8 @@ public class ClueChecklistEntryTextView extends TextView {
         this.clue = clue ;
     }
 
+    public Clue getClue() {
+        return this.clue ;
+    }
+
 }

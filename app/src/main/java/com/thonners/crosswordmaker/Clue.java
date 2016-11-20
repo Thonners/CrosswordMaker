@@ -33,7 +33,6 @@ public class Clue {
         this.orientation = clueOrientation;
         this.startCell = startCell ;
         this.isHighlighted = false ;
-        //this.mListener = crosswordPageFragment ;
     }
 
     public void setLength(int l) {
@@ -145,7 +144,6 @@ public class Clue {
         }
 
         // If still completed, cross it off the list
-        //if (isCompleted) mListener.crossOffClue(this.clueID); // Don't think this complex interface thing is required
         if (isCompleted) checklistEntryTextView.setChecked(true) ;
     }
     public String getCells() {
