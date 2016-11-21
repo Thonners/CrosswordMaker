@@ -202,6 +202,9 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
             // Add to the parent view
             gridLayout.addView(c) ;
 
+            // Check whether text should have strikethrough or not
+            c.getClue().checkClueComplete();
+
             // Increment column
             col++ ;
         }

@@ -123,16 +123,13 @@ public class Clue {
             //highlight clue using cell from next in index. Should always be next one due to direction
             // in which cells are searched for and added to clues in findHorizontal/VerticalClues
             this.highlightClue(clueCells.get(clueCells.indexOf(currentCell) + 1));
-        } else {
-            // if it's the last cell, mark the clue as complete
-            setClueComplete() ;
         }
     }
 
     /**
      * Method to check that all cells are filled and then set the clue as complete
      */
-    private void setClueComplete() {
+    public void checkClueComplete() {
         // Set isCompleted to true now, and set it to false if any of the cells aren't actually complete
         isCompleted = true ;
         // Loop through and check all cells populated
@@ -144,7 +141,11 @@ public class Clue {
         }
 
         // If still completed, cross it off the list
-        if (isCompleted) checklistEntryTextView.setChecked(true) ;
+        if (isCompleted) {
+            checklistEntryTextView.setChecked(true) ;
+        } else {
+            checklistEntryTextView.setChecked(false) ;
+        }
     }
     public String getCells() {
         String cellList = "";

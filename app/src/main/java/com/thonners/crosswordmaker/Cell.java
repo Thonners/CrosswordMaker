@@ -168,6 +168,8 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
                 activeClue.highlightNextCell(this);
             }
         }
+        if (hClue != null) hClue.checkClueComplete();
+        if (vClue != null) vClue.checkClueComplete();
     }
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 // TODO Auto-generated method stub
