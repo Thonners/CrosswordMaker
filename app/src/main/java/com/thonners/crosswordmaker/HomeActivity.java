@@ -7,6 +7,7 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
@@ -26,6 +27,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.kobakei.ratethisapp.RateThisApp;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,7 +39,11 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
 
     private static final String LOG_TAG = "HomeActivity";
 
+    private final int RATE_DAYS = 3 ;
+    private final int RATE_LAUNCHES = 5 ;
+
     private final String firstRunFileName = "firstRun" ;
+    private final String PREFS_NEVER_RATE = "firstRun" ;
 
     private String publication;
     private String date ;
@@ -52,8 +59,8 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_material);
         mainLayout = (LinearLayout) findViewById(R.id.home_main_layout) ;
-        if (mainLayout != null) Log.d(LOG_TAG,"mainLayout is not null!") ;
         checkFirstRun();
+        showRateDialog() ;
     }
 
     @Override
@@ -380,6 +387,51 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
                 Log.d(LOG_TAG,"Error creating first run file: " + exception.getLocalizedMessage()) ;
             }
         }
+    }
+
+
+    /**
+     * Method to provide easy interface to call stopRateDialog when never is clicked.
+      */
+    private void neverRate() {
+        RateThisApp.stopRateDialog(this);
+    }
+
+    /**
+     * Method to show the rate this app dialog when appropriate
+     */
+    private void showRateDialog() {
+
+        // Monitor launch times and interval from installation
+        RateThisApp.onStart(this);
+        // Set the desired frequency
+        RateThisApp.Config  config = new RateThisApp.Config(RATE_DAYS, RATE_LAUNCHES);
+        config.setTitle(R.string.rate_title);
+        config.setMessage(R.string.rate_message);
+        config.setYesButtonText(R.string.rate_yes);
+        config.setNoButtonText(R.string.rate_never);
+        config.setCancelButtonText(R.string.rate_later);
+        // Callback from clicks
+        RateThisApp.init(config);
+        RateThisApp.setCallback(new RateThisApp.Callback() {
+            @Override
+            public void onYesClicked() {
+                //Toast.makeText(HomeActivity.this, "Yes event", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNoClicked() {
+                //Toast.makeText(HomeActivity.this, "No event", Toast.LENGTH_SHORT).show();
+                neverRate();
+            }
+
+            @Override
+            public void onCancelClicked() {
+                //Toast.makeText(HomeActivity.this, "Cancel event", Toast.LENGTH_SHORT).show();
+            }
+        });
+        // If the criteria is satisfied, "Rate this app" dialog will be shown
+        RateThisApp.showRateDialogIfNeeded(this);
     }
 
     @Override

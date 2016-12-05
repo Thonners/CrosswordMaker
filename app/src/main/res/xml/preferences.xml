@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:key="pref_low_ram"
+        android:title="@string/pref_low_ram"
+        android:summary="@string/pref_low_ram_summ"
+        android:defaultValue="false" />
+    <CheckBoxPreference
+        android:key="pref_cloud_sync"
+        android:title="@string/pref_cloud_sync"
+        android:summary="@string/pref_cloud_sync_summ"
+        android:defaultValue="false" />
+    <CheckBoxPreference
+        android:key="pref_autogrid"
+        android:title="@string/pref_autogrid"
+        android:summary="@string/pref_autogrid_summ"
+        android:defaultValue="false" />
+</PreferenceScreen>
