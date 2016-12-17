@@ -9,7 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,7 +19,7 @@ import android.view.inputmethod.InputMethodManager;
 /**
  * Created by mat on 07/03/15.
  */
-public class ToolkitSliderActivity extends ActionBarActivity implements DictionaryPageFragment.OnFragmentInteractionListener, AnagramPageFragment.OnAnagramFragmentListener, WikiPageFragment.OnFragmentInteractionListener {
+public class ToolkitSliderActivity extends AppCompatActivity implements DictionaryPageFragment.OnFragmentInteractionListener, AnagramPageFragment.OnAnagramFragmentListener, WikiPageFragment.OnFragmentInteractionListener {
 
     private static final String LOG_TAG = "ToolkitSliderActivity";
 
@@ -235,4 +235,6 @@ public class ToolkitSliderActivity extends ActionBarActivity implements Dictiona
             }
         }).show();
     }
+
+
 }

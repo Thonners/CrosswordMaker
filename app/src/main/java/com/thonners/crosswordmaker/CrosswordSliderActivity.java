@@ -11,7 +11,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.ActionMenuItemView;
 import android.util.Log;
 import android.view.Menu;
@@ -21,7 +21,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 
-public class CrosswordSliderActivity extends ActionBarActivity implements CrosswordPageFragment.OnFragmentInteractionListener, CluePageFragment.OnFragmentInteractionListener, DictionaryPageFragment.OnFragmentInteractionListener, AnagramPageFragment.OnAnagramFragmentListener, WikiPageFragment.OnFragmentInteractionListener {
+public class CrosswordSliderActivity extends AppCompatActivity implements CrosswordPageFragment.OnFragmentInteractionListener, CluePageFragment.OnFragmentInteractionListener, DictionaryPageFragment.OnFragmentInteractionListener, AnagramPageFragment.OnAnagramFragmentListener, WikiPageFragment.OnFragmentInteractionListener {
 
     private static final String LOG_TAG = "CrosswordSliderActivity";
 
@@ -199,7 +199,7 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
                 break;
             case R.id.action_settings:
                 // Open some settings menu
-                openSettings();
+                HomeActivity.openSettings(this);
                 break ;
 
         }
@@ -379,11 +379,6 @@ public class CrosswordSliderActivity extends ActionBarActivity implements Crossw
     private void showInstructions() {
         InstructionsDialog dialog = new InstructionsDialog() ;
         dialog.show(getSupportFragmentManager(), getResources().getString(R.string.instructions));
-    }
-    private void openSettings() {
-        // TODO: come up with some settings / an activity for settings
-        Toast t = Toast.makeText(this, "Will create a settings option soon", Toast.LENGTH_SHORT);
-        t.show();
     }
 
 }

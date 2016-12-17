@@ -16,7 +16,7 @@ import java.util.Arrays;
 /**
  * CrosswordLibraryManager class
  * Class to control adding/deleting crosswords, and managing the list of recent crosswords.
- * Also controls opening crosswords from the Home or SavedCrosswordSelector activities
+ * Also controls opening crosswords from the Home or CrosswordLibraryActivity activities
  *
  * Created by Thonners on 23/04/15.
  */

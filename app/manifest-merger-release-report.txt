@@ -90,7 +90,7 @@ ADDED from AndroidManifest.xml:35:9
 		ADDED from AndroidManifest.xml:38:13
 	android:name
 		ADDED from AndroidManifest.xml:36:13
-activity#com.thonners.crosswordmaker.SavedCrosswordSelector
+activity#com.thonners.crosswordmaker.CrosswordLibraryActivity
 ADDED from AndroidManifest.xml:44:9
 	android:label
 		ADDED from AndroidManifest.xml:46:13

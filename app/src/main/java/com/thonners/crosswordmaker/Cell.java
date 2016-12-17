@@ -1,5 +1,6 @@
 package com.thonners.crosswordmaker;
 
+import android.app.Activity;
 import android.content.Context;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -170,6 +171,8 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
         }
         if (hClue != null) hClue.checkClueComplete();
         if (vClue != null) vClue.checkClueComplete();
+        // Hide the keyboard if the last cell in the clue is completed
+        if (activeClue != null && activeClue.isCompleted()) HomeActivity.hideKeyboard(getContext(), this);
     }
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 // TODO Auto-generated method stub

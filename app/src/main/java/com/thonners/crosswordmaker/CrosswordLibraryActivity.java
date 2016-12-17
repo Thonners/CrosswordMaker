@@ -3,6 +3,7 @@ package com.thonners.crosswordmaker;
 import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.Menu;
@@ -12,16 +13,16 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 /**
- * SavedCrosswordSelector Activity
+ * CrosswordLibraryActivity Activity
  * Shows a list of all the crosswords saved by the user on their device.
  * Shows completion % of the crossword, calculated as number of filled spaces over total number of white spaces
  *
  * Created by Thonners on 06/05/15.
  */
 
-public class SavedCrosswordSelector extends ActionBarActivity  {
+public class CrosswordLibraryActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = "SavedCrosswordSelector" ;
+    private static final String LOG_TAG = "CrosswordLibActivity" ;
 
     CrosswordLibraryManager libraryManager ;
     RelativeLayout mainLayout ;

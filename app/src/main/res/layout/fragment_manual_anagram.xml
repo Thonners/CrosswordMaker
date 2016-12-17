@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/fragment_parent_layout"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -36,7 +37,6 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_weight="1"
                 android:maxLines="1"
-                android:singleLine="true"
                 android:inputType="text"
                 android:imeOptions="actionSearch" />
             <Button
@@ -70,7 +70,7 @@
         android:layout_marginBottom="@dimen/fab_margin"
         android:layout_alignParentEnd="true"
         android:layout_above="@+id/manual_anagram_known_letters_layout"
-        android:src="@drawable/ic_refresh_white_24dp"
+        app:srcCompat="@drawable/ic_refresh_white_24dp"
         android:scaleType="center"
         android:visibility="gone"/>
 </RelativeLayout>

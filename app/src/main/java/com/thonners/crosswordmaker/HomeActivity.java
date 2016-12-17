@@ -1,17 +1,20 @@
 package com.thonners.crosswordmaker;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Application;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.text.InputType;
 import android.util.Log;
@@ -20,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -35,7 +39,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 
-public class HomeActivity extends ActionBarActivity implements DatePickerDialog.OnDateSetListener {
+public class HomeActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
     private static final String LOG_TAG = "HomeActivity";
 
@@ -57,8 +61,14 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Initialise SharedPreferences (iff they haven't been set before - the false means don't rewrite the defaults if they already exist)
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
+        // Create / get the views
         setContentView(R.layout.activity_home_material);
         mainLayout = (LinearLayout) findViewById(R.id.home_main_layout) ;
+
         checkFirstRun();
         showRateDialog() ;
     }
@@ -184,8 +194,8 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
     public void savedClicked(View view) {
         if (sdcardIsAvailable()) {
             if (new CrosswordLibraryManager(this).getSavedCrosswords().size() > 0 ) {
-                // Open SavedCrosswordSelector
-                Intent intent = new Intent(this, SavedCrosswordSelector.class);
+                // Open CrosswordLibraryActivity
+                Intent intent = new Intent(this, CrosswordLibraryActivity.class);
                 startActivity(intent);
             } else {
                 showToast(getResources().getString(R.string.home_recent_none1) + "\n" + getResources().getString(R.string.home_recent_none2));
@@ -512,7 +522,9 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
         builder.show();
     }
     public static void openSettings(Context context) {
-        Toast.makeText(context, "Will create a settings option soon", Toast.LENGTH_SHORT).show();
+        Intent settingsIntent = new Intent(context, SettingsActivity.class) ;
+        context.startActivity(settingsIntent);
+        // Toast.makeText(context, "Will create a settings option soon", Toast.LENGTH_SHORT).show();
     }
     public static boolean deviceHasCameraCapability(Context context) {
         return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA) ;
@@ -532,5 +544,11 @@ public class HomeActivity extends ActionBarActivity implements DatePickerDialog.
             Log.d("SD-Card", "SD Card not Present - cannot save crosswords");
             return false ;
         }
+    }
+    public static void hideKeyboard(Context context, View view) {
+        // Method to hide the keyboard
+        InputMethodManager inputManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+
     }
 }

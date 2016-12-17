@@ -165,11 +165,17 @@
     <string name="rate_later">MAYBE LATER</string>
 
     <!-- Settings -->
+    <string name="pref_crossword_group_title">New Crosswords</string>
+    <string name="pref_general_group_title">General</string>
     <string name="pref_low_ram">Low RAM</string>
     <string name="pref_low_ram_summ">Enable this setting if you\'re experiencing crashes</string>
     <string name="pref_cloud_sync">Cloud sync</string>
     <string name="pref_cloud_sync_summ">Save progress to the cloud (Coming soon\!)</string>
     <string name="pref_autogrid">Automatic Grid Generation</string>
     <string name="pref_autogrid_summ">Enable automatic grid generation from a picture. (Beta coming soon\!)</string>
+    <string name="pref_no_columns_title">Default Column Count</string>
+    <string name="pref_no_columns_summ">Set the default number of columns for a new crossword</string>
+    <string name="pref_default_publications_title">Default Publications</string>
+    <string name="pref_default_crosswords_list_summ">Edit the list of default publications for a new crossword</string>
 
 </resources>

@@ -167,5 +167,12 @@ public class Clue {
         return checklistEntryTextView ;
     }
 
+    /**
+     * @return Whether all the cells in teh clue have an entry.
+     */
+    public boolean isCompleted() {
+        checkClueComplete();
+        return isCompleted ;
+    }
 
 }
