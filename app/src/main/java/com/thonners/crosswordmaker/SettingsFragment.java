@@ -13,6 +13,12 @@ import android.preference.PreferenceFragment;
  */
 public class SettingsFragment extends PreferenceFragment {
 
+    // Keys are set in preferences.xml, these are just non-linked copies.
+    public final static String KEY_PREF_DEFAULT_COLUMNS = "pref_no_columns" ;
+    public final static String KEY_PREF_LOW_RAM = "pref_low_ram" ;
+    public final static String KEY_PREF_CLOUD_SYNC = "pref_cloud_sync" ;
+    public final static String KEY_PREF_AUTOGRID = "pref_autogrid" ;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

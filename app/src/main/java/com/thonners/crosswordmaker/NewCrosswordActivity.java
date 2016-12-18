@@ -1,33 +1,40 @@
 package com.thonners.crosswordmaker;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.NumberPicker;
 
 /**
- * NewCrossword Activity
+ * NewCrosswordActivity Activity
  * Shows a NumberPicker to select the number of rows/columns in crossword, and an enter FAB.
  * When implemented, will also show camera button to auto-generate grid.
  *
- *  Created by Thonners on 01/07/15
+ * @author M Thomas
+ * @since 01/07/15
  */
 
 
-public class NewCrossword extends ActionBarActivity {
+public class NewCrosswordActivity extends AppCompatActivity {
 
-    static final String AUTO_GRID_GENERATION = "com.thonners.crosswordmaker.autoGeneration" ;
-    String crosswordTitle;
-    String crosswordDate;
+    private static final String LOG_TAG = "NewCrosswordActivity";
 
-    NumberPicker numberPicker ;
+    public static final String AUTO_GRID_GENERATION = "com.thonners.crosswordmaker.autoGeneration" ;
+    private String crosswordTitle;
+    private String crosswordDate;
+
+    private NumberPicker numberPicker ;
 
     private int min = 3 ;
     private int max = 35 ;
-    private int defaultValue = 13 ;
+    private int defaultCols = 13 ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +79,7 @@ public class NewCrossword extends ActionBarActivity {
         numberPicker = (NumberPicker) findViewById(R.id.no_columns);
         numberPicker.setMinValue(min);
         numberPicker.setMaxValue(max);
-        numberPicker.setValue(defaultValue);
+        numberPicker.setValue(getDefaultColumns());
     }
 
 
@@ -106,5 +113,25 @@ public class NewCrossword extends ActionBarActivity {
         startActivity(intent);
     }
 
+    /**
+     * Method to read the value of the shared preferences for the default number of columns
+     * @return The default number of columns for a new crossword
+     */
+    private int getDefaultColumns() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this) ;
+        String defaultColumnsString = sharedPref.getString(SettingsFragment.KEY_PREF_DEFAULT_COLUMNS,"" + defaultCols) ;
+        // Parse the string value to an int
+        try {
+            defaultCols = Integer.parseInt(defaultColumnsString) ;
+        } catch (Exception e) {
+            Log.d(LOG_TAG,"Error parsing default columns String to int: " + defaultColumnsString) ;
+            Log.d(LOG_TAG,"Using default value in NewCrosswordActivity: " + defaultCols) ;
+        }
+        // Check that it's within the limits
+        defaultCols = Math.max(min, defaultCols);
+        defaultCols = Math.min(max, defaultCols);
+
+        return defaultCols ;
+    }
 
 }
