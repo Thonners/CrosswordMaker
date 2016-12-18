@@ -1,10 +1,12 @@
 package com.thonners.crosswordmaker;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Point;
 import android.hardware.display.DisplayManager;
 import android.os.Build;
 import android.os.Environment;
+import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -755,6 +757,42 @@ public class Crossword {
         return vClueCount;
     }
 
+    /**
+     * @return Whether the crossword is complete; i.e. all clues marked 'complete'.
+     */
+    private boolean isComplete() {
+        boolean isComplete = true ;
+        for (Clue clue: hClues) {
+            if (!clue.isCompleted()) isComplete = false ;
+        }
+        for (Clue clue: vClues) {
+            if (!clue.isCompleted()) isComplete = false ;
+        }
+        return isComplete ;
+    }
+
+    /**
+     * Initialise the check of whether this crossword has been completed.
+     */
+    public void checkIsComplete() {
+        if (this.isComplete()) {
+            showVictoryDialog() ;
+        }
+    }
+
+    private void showVictoryDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context) ;
+
+        builder.setTitle(R.string.victory_title) ;
+        builder.setMessage(R.string.victory_message) ;
+        builder.setPositiveButton(R.string.victory_yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        }) ;
+        builder.show() ;
+    }
     // ------------------------------------------- Save / Delete / Initialise methods --------------------------------------------
     public void saveCrossword() {
         // Save file to memory. Use files created by initialiseSaveFiles
@@ -843,4 +881,7 @@ public class Crossword {
         saveCrossword();
     }
 
+    private class VictoryDialogPopup {
+
+    }
 }

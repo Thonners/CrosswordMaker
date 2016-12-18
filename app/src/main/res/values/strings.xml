@@ -157,6 +157,11 @@
     <string name="across"><u>Across:</u></string>
     <string name="down"><u>Down:</u></string>
 
+    <!-- Victory dialog -->
+    <string name="victory_title">Congratulations\!</string>
+    <string name="victory_message">You've completed this crossword\!</string>
+    <string name="victory_yes">DONE</string>
+
     <!-- Rate dialog -->
     <string name="rate_title">Rate Crossword Toolkit</string>
     <string name="rate_message">If you enjoy using Crossword Toolkit, please take a moment to rate it on the Play Store.\n\nDoing so would be greatly appreciated by the developer!\n\nThanks</string>

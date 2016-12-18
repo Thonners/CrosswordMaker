@@ -171,8 +171,14 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
         }
         if (hClue != null) hClue.checkClueComplete();
         if (vClue != null) vClue.checkClueComplete();
-        // Hide the keyboard if the last cell in the clue is completed
-        if (activeClue != null && activeClue.isCompleted()) HomeActivity.hideKeyboard(getContext(), this);
+
+        if (activeClue != null && activeClue.isCompleted()) {
+            // Hide the keyboard if the last cell in the clue is completed
+            HomeActivity.hideKeyboard(getContext(), this);
+            // Check whether this is the last clue to be completed
+            crossword.checkIsComplete() ;
+        }
+
     }
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 // TODO Auto-generated method stub
