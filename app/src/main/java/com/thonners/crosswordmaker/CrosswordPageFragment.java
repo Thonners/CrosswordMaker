@@ -5,20 +5,17 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-//import android.app.Fragment;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
-import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 
 
 /**
@@ -136,7 +133,7 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
 
     private void createCrossword() {
         // Create the crossword
-        crossword = new Crossword(getActivity().getApplicationContext(), crosswordGrid,crosswordStringArray,false);
+        crossword = new Crossword(getActivity(), crosswordGrid,crosswordStringArray,false);
     }
 
     public void zoomCrossword(){

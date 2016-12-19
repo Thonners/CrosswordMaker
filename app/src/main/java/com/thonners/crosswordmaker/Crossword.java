@@ -2,10 +2,12 @@ package com.thonners.crosswordmaker;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.hardware.display.DisplayManager;
 import android.os.Build;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -780,18 +782,28 @@ public class Crossword {
         }
     }
 
+    /**
+     * Method to create and show the victory popup, provided the shared preferences value
+     * for the victory popup is true.
+     */
     private void showVictoryDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context) ;
+        // Check victory popup enabled
+        SharedPreferences sharedPref =  PreferenceManager.getDefaultSharedPreferences(context) ;
+        boolean showDialog = sharedPref.getBoolean(SettingsFragment.KEY_PREF_VICTORY_POPUP, true) ;
+        // If so, show it
+        if (showDialog) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
-        builder.setTitle(R.string.victory_title) ;
-        builder.setMessage(R.string.victory_message) ;
-        builder.setPositiveButton(R.string.victory_yes, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        }) ;
-        builder.show() ;
+            builder.setTitle(R.string.victory_title);
+            builder.setMessage(R.string.victory_message);
+            builder.setPositiveButton(R.string.victory_yes, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            builder.show();
+        }
     }
     // ------------------------------------------- Save / Delete / Initialise methods --------------------------------------------
     public void saveCrossword() {

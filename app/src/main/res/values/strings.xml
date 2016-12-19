@@ -159,7 +159,7 @@
 
     <!-- Victory dialog -->
     <string name="victory_title">Congratulations\!</string>
-    <string name="victory_message">You've completed this crossword\!</string>
+    <string name="victory_message">You\'ve completed this crossword\!</string>
     <string name="victory_yes">DONE</string>
 
     <!-- Rate dialog -->
@@ -172,6 +172,8 @@
     <!-- Settings -->
     <string name="pref_crossword_group_title">New Crosswords</string>
     <string name="pref_general_group_title">General</string>
+    <string name="pref_victory_popup_title">Victory Popup</string>
+    <string name="pref_victory_popup_summ">Display popup when crossword completed</string>
     <string name="pref_low_ram">Low RAM</string>
     <string name="pref_low_ram_summ">Enable this setting if you\'re experiencing crashes</string>
     <string name="pref_cloud_sync">Cloud sync</string>
