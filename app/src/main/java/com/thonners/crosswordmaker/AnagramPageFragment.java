@@ -3,9 +3,10 @@ package com.thonners.crosswordmaker;
 import android.animation.Animator;
 import android.app.Activity;
 import android.content.Context;
-import android.net.Uri;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.util.Log;
@@ -14,7 +15,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -23,7 +23,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -66,8 +65,18 @@ public class AnagramPageFragment extends Fragment {
         long startTime = System.currentTimeMillis() ;
         Log.d(LOG_TAG,"AnagramPageFragment onCreate called @ millis: " + startTime);
 
-        LoadDictionaryTask loadDictionaryTask = new LoadDictionaryTask();
-        loadDictionaryTask.execute();
+        // Check whether Low RAM mode enabled on settings
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity()) ;
+        boolean lowRAM = sharedPreferences.getBoolean(SettingsFragment.KEY_PREF_LOW_RAM, false) ;
+
+        // Load the dictionaries in from the resources, provided low RAM mode not enabled
+        if (!lowRAM){
+            LoadDictionaryTask loadDictionaryTask = new LoadDictionaryTask();
+            loadDictionaryTask.execute();
+        } else {
+            Log.d(LOG_TAG, "Low RAM mode enabled, so not reading the dictionary yet.");
+
+        }
 
         long stopTime = System.currentTimeMillis();
         Log.d(LOG_TAG,"Dictionary loaded after " + (stopTime - startTime) + " millis");
@@ -332,42 +341,134 @@ public class AnagramPageFragment extends Fragment {
         illegalCharactersToast.show();
     }
 
-    private void loadDictionary() {
-        // Load the dictionaries in from the resouces
+    /**
+     * Method to load all words in the dictionary starting with the given letter
+     * @param letter The first letter of the words to load to the dictionary
+     */
+    private void loadLetterToDictionary(String letter) {
+        loadLetterToDictionary(getLetterIndex(letter.toCharArray()[0]));
+    }
 
-        Log.d(LOG_TAG," Reading the dictionary...");
+    /**
+     * Method to load all words in the dictionary starting with the letter given by the index
+     * @param index The index of the letter
+     */
+    private void loadLetterToDictionary(int index) {
+        switch (index) {
+            case 0:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsA));
+                break ;
+            case 1:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsB));
+                break ;
+            case 2:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsC));
+                break ;
+            case 3:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsD));
+                break ;
+            case 4:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsE));
+                break ;
+            case 5:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsF));
+                break ;
+            case 6:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsG));
+                break ;
+            case 7:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsH));
+                break ;
+            case 8:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsI));
+                break ;
+            case 9:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsJ));
+                break ;
+            case 10:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsK));
+                break ;
+            case 11:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsL));
+                break ;
+            case 12:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsM));
+                break ;
+            case 13:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsN));
+                break ;
+            case 14:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsO));
+                break ;
+            case 15:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsP));
+                break ;
+            case 16:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsQ));
+                break ;
+            case 17:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsR));
+                break ;
+            case 18:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsS));
+                break ;
+            case 19:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsT));
+                break ;
+            case 20:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsU));
+                break ;
+            case 21:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsV));
+                break ;
+            case 22:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsW));
+                break ;
+            case 23:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsX));
+                break ;
+            case 24:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsY));
+                break ;
+            case 25:
+                dictionaryByLetter.add(getResources().getStringArray(R.array.wordsZ));
+                break ;
+        }
+    }
 
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsA));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsB));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsC));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsD));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsE));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsF));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsG));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsH));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsI));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsJ));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsK));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsL));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsM));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsN));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsO));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsP));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsQ));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsR));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsS));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsT));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsU));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsV));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsW));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsX));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsY));
-        dictionaryByLetter.add(getResources().getStringArray(R.array.wordsZ));
-        Log.d(LOG_TAG,"DictionaryByLetter Loaded...");
-        // Add all the words to the dictionary
+    /**
+     * Wrapper method to load and process the full dictionary. This will be called to prepare the
+     * dictionaries for the word-fit and anagram tools unless low-RAM mode is enabled.
+     */
+    private void loadFullDictionary() {
+        Log.d(LOG_TAG, " Low RAM mode NOT enabled, so reading the dictionary...");
+
+        // Loop through all letters and add them to the dictionary
         for (int i = 0 ; i < 26 ; i++) {
-        Log.d(LOG_TAG,"i=" + i);
-            for (int j =0 ; j < dictionaryByLetter.get(i).length ; j ++) {
+            loadLetterToDictionary(i);
+        }
+        Log.d(LOG_TAG, "DictionaryByLetter Loaded...");
+
+        Log.d(LOG_TAG, "Processing words for anagram purposes...");
+        processLoadedDictionaryWords();
+
+        Log.d(LOG_TAG, "Dictionary & HashMap loaded...");
+        dictionaryLoaded = true ;
+    }
+
+    /**
+     * Method to process all Strings in the String arrays in the dictionaryByLetter ArrayList, and
+     * to add them to the final dictionary and HashMap.
+     *
+     * The HashMap contains the word, with its letters sorted alphabetically as the key, ready for
+     * use in anagram solving. If the HashMap already has the sorted word as a key, the word is
+     * added to the list of words which are anagrams of one-another.
+     */
+    private void processLoadedDictionaryWords(){
+        // Add all the words to the dictionary
+        for (int i = 0; i < dictionaryByLetter.size() ; i++) {
+            Log.d(LOG_TAG, "i=" + i);
+            for (int j = 0; j < dictionaryByLetter.get(i).length; j++) {
                 String word = dictionaryByLetter.get(i)[j];
                 if (word != null) {
                     dictionary.add(word);
@@ -379,16 +480,15 @@ public class AnagramPageFragment extends Fragment {
                         possibleWords.add(word);
                         dictionaryHM.put(sortedWord, possibleWords);
                     } else {
-                        ArrayList<String> possibleWords = new ArrayList<String>();
+                        ArrayList<String> possibleWords = new ArrayList<>();
                         possibleWords.add(word);
                         dictionaryHM.put(sortedWord, possibleWords);
                     }
                 }
             }
         }
-
-        Log.d(LOG_TAG, "Dictionary & HashMap loaded...");
     }
+
     private void setSearchButtonClickable() {
         // Allow the search button to be pressed once dictionary is loaded
         Log.d(LOG_TAG,"Search button now clickable");
@@ -415,6 +515,11 @@ public class AnagramPageFragment extends Fragment {
         return new String(wordChars);
     }
 
+    /**
+     * Simple method to look up the index of a letter in the alphabet (a = 0)
+     * @param letter
+     * @return
+     */
     private int getLetterIndex(char letter) {
        String alphabet = "abcdefghijklmnopqrstuvwxyz";
         return alphabet.indexOf(letter);
@@ -447,7 +552,7 @@ public class AnagramPageFragment extends Fragment {
         protected String doInBackground(Void... params) {
             Log.d(LOG_TAG," Reading the dictionary in background...");
 
-            loadDictionary();
+            loadFullDictionary();
             Log.d(LOG_TAG, " Dictionary loaded in background!");
 
             return null ;

@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.os.Bundle;
@@ -46,6 +48,9 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
     private final String firstRunFileName = "firstRun" ;
     private final String PREFS_NEVER_RATE = "firstRun" ;
 
+    private ServerConnection serverConnection ;
+    private boolean serverAvailable = false ;
+
     private String publication;
     private String date ;
     private CharSequence[] publications ;
@@ -79,6 +84,7 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
             showToast(getResources().getString(R.string.sdcard_error_1));
             openToolkitActivity();
         }
+        checkServerConnection() ;
     }
 
 
@@ -112,6 +118,10 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Method to populate the recent crosswords list. After getting the list of recent crosswords
+     * from the library manager, this method populates the
+     */
     private void updateRecentCrosswords() {
         // Update recent crosswords list
         Log.d(LOG_TAG, "Searching for recent crossword file... ");
@@ -130,7 +140,6 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
                         libraryManager.openCrossword(recentCrosswords.get(2).crosswordDir);
                     }
                 });
-                //      recentCard3.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
             case 2:
                 TextView recentTV2Title = (TextView) findViewById(R.id.home_card_recent_2_title);
                 TextView recentTV2Date = (TextView) findViewById(R.id.home_card_recent_2_date);
@@ -143,7 +152,6 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
                         libraryManager.openCrossword(recentCrosswords.get(1).crosswordDir);
                     }
                 });
-                //        recentCard2.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
             case 1:
                 TextView recentTV1Title = (TextView) findViewById(R.id.home_card_recent_1_title);
                 TextView recentTV1Date = (TextView) findViewById(R.id.home_card_recent_1_date);
@@ -396,6 +404,30 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
         }
     }
 
+    /**
+     * Method to check whether the CrosswordToolkit Server is available to connect to, and if so,
+     * sets the serverAvailable boolean to true.
+     */
+    private void checkServerConnection() {
+        if (isNetworkAvailable()) {
+            serverConnection = new ServerConnection() ;
+            serverAvailable = serverConnection.testServerConnection() ;
+            Log.d(LOG_TAG,"Network is available, and the state of the server connection test is: " + serverAvailable) ;
+        } else {
+            // Force to false is no network available
+            Log.d(LOG_TAG,"No network detected, so no server available");
+            serverAvailable = false ;
+        }
+    }
+
+    /**
+     * @return Whether the device has a network connection.
+     */
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null;
+    }
 
     /**
      * Method to provide easy interface to call stopRateDialog when never is clicked.
