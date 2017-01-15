@@ -411,8 +411,19 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
     private void checkServerConnection() {
         if (isNetworkAvailable()) {
             serverConnection = new ServerConnection() ;
-            serverAvailable = serverConnection.testServerConnection() ;
-            Log.d(LOG_TAG,"Network is available, and the state of the server connection test is: " + serverAvailable) ;
+            ServerConnection.ServerConnectionListener serverConnectionListener = new ServerConnection.ServerConnectionListener() {
+                @Override
+                public void serverConnectionResponse() {
+
+                }
+
+                @Override
+                public void setServerAvailable() {
+                    serverAvailable = true ;
+                    Log.d(LOG_TAG,"Network is available, and server connection test was successful.") ;
+                }
+            } ;
+            serverConnection.testServerConnection(serverConnectionListener) ;
         } else {
             // Force to false is no network available
             Log.d(LOG_TAG,"No network detected, so no server available");

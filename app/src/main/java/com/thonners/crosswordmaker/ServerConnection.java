@@ -1,12 +1,12 @@
 package com.thonners.crosswordmaker;
 
-import android.os.Build;
-import android.support.annotation.RequiresApi;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 
 /**
  * Class to manage conections to the Crossword Toolkit Server
@@ -27,53 +27,29 @@ public class ServerConnection {
             Log.d(LOG_TAG, "ServerConnection instance created.") ;
     }
 
+    public interface ServerConnectionListener {
+        void serverConnectionResponse() ;
+        void setServerAvailable() ;
+    }
+
     /**
      * @return Whether the server can be reached.
      */
-    public boolean testServerConnection() {
+    public void testServerConnection(final ServerConnectionListener serverConnectionListener) {
         Log.d(LOG_TAG, "Testing connection...") ;
-        return transferData(SocketIdentifier.CONNECTION_TEST) == SocketIdentifier.CONNECTION_TEST_SUCCESSFUL ;
+        DataTransfer.DataTransferListener listener = new DataTransfer.DataTransferListener() {
+            @Override
+            public void serverCallback(Connection resultConnection) {
+                if (resultConnection.getResultIdentifier() == SocketIdentifier.CONNECTION_TEST_SUCCESSFUL) {
+                    serverConnectionListener.setServerAvailable();
+                }
+            }
+        } ;
+        // Create a dataTransfer instance with the appropriate inputs
+        DataTransfer dataTransfer = new DataTransfer(new Connection(SocketIdentifier.CONNECTION_TEST, ""), listener);
+        dataTransfer.execute() ;
     }
 
-    /**
-     * Method to manage the interaction with the server
-     * @param requestIdentifier
-     * @return
-     */
-    private SocketIdentifier transferData(SocketIdentifier requestIdentifier) {
-        try {
-            Log.d(LOG_TAG, "Creating socket...") ;
-            Socket socket = new Socket(serverURL, serverPort);
-
-            // Streams
-            DataOutputStream dOut = null ;
-            DataInputStream dIn = null ;
-
-            Log.d(LOG_TAG, "Socket connection created successfully. Sending data...") ;
-                    try {   // Try with resources requires API 19 (min = 17)
-                        dOut = new DataOutputStream(socket.getOutputStream()) ;
-                        dOut.writeByte(requestIdentifier.id());
-                        dOut.flush();
-
-                        dIn = new DataInputStream(socket.getInputStream()) ;
-                        byte responseIdentifier = dIn.readByte() ;
-
-                        return SocketIdentifier.getSocketIdentifierFromByte(responseIdentifier) ;
-
-                    } catch (Exception e) {
-
-                    } finally {
-                        // Close the streams
-                        if (dOut != null) dOut.close();
-                        if (dIn != null) dIn.close();
-                    }
-        } catch (Exception e) {
-            Log.e(LOG_TAG,"Error creating connection to server. " + e.getLocalizedMessage()) ;
-            e.printStackTrace();
-        }
-        // If we get this far, something's gone wrong.
-        return null ;
-    }
 
     /**
      * Enum to identify the type of connection requested from a client, when connecting to the server.
@@ -123,6 +99,114 @@ public class ServerConnection {
             }
             // If it doesn't match...
             throw new IllegalArgumentException();
+        }
+    }
+
+
+    /**
+     * Class to hold the connection request details and the response
+     */
+    private class Connection {
+        private SocketIdentifier requestIdentifier;
+        private SocketIdentifier resultIdentifier;
+        private String input ;
+        private ArrayList<String> result = null;
+
+        public Connection(SocketIdentifier socketIdentifier, String input) {
+            this.requestIdentifier = socketIdentifier ;
+            this.input = input ;
+        }
+
+        public ArrayList<String> getResult() {
+            return result ;
+        }
+
+        public SocketIdentifier getRequestIdentifier() {
+            return requestIdentifier;
+        }
+
+        public SocketIdentifier getResultIdentifier() {
+            return resultIdentifier;
+        }
+
+        public void setResultIdentifier(SocketIdentifier resultIdentifier) {
+            this.resultIdentifier = resultIdentifier;
+        }
+    }
+
+    /**
+     * ASyncTask to communicate with the CrosswordToolkitServer.
+     */
+    private static class DataTransfer extends AsyncTask<Void, Integer, Connection> {
+
+        private final String LOG_TAG = "DataTransfer" ;
+        private final int serverPort = 28496 ;
+        private final String serverURL = "thonners.ddns.net" ;
+
+        private Connection returnConnection ;
+        private DataTransferListener listener ;
+
+        public DataTransfer(Connection inputConnection, DataTransferListener listener) {
+            this.returnConnection = inputConnection ;
+            this.listener = listener ;
+        }
+
+        public interface DataTransferListener {
+            void serverCallback(Connection returnConnection) ;
+        }
+
+        protected Connection doInBackground(Void... params) {
+            try {
+                Log.d(LOG_TAG, "Creating socket...") ;
+                Socket socket = new Socket(serverURL, serverPort);
+
+                // Streams
+                DataOutputStream dOut = null ;
+                DataInputStream dIn = null ;
+
+                Log.d(LOG_TAG, "Socket connection created successfully. Sending data...") ;
+                try {   // Try with resources requires API 19 (min = 17)
+                    dOut = new DataOutputStream(socket.getOutputStream()) ;
+                    dOut.writeByte(returnConnection.getRequestIdentifier().id());
+                    dOut.flush();
+
+                    dIn = new DataInputStream(socket.getInputStream()) ;
+                    byte responseIdentifier = dIn.readByte() ;
+
+                    // Set the response
+                    returnConnection.setResultIdentifier(SocketIdentifier.getSocketIdentifierFromByte(responseIdentifier)) ;
+
+                    if(returnConnection.getResultIdentifier() == SocketIdentifier.ANAGRAM_SOLUTIONS_SUCCESS) {
+                        // TODO: add stuff to save results
+                    }
+
+                    return returnConnection ;
+
+                } catch (Exception e) {
+
+                } finally {
+                    // Close the streams
+                    if (dOut != null) dOut.close();
+                    if (dIn != null) dIn.close();
+                }
+            } catch (Exception e) {
+                Log.e(LOG_TAG,"Error creating connection to server. " + e.getLocalizedMessage()) ;
+                e.printStackTrace();
+            }
+            // If we get this far, something's gone wrong.
+            return null ;
+        }
+
+        @Override
+        protected void onPostExecute(Connection returnConnection) {
+            super.onPostExecute(returnConnection);
+
+
+            if (returnConnection.getResultIdentifier() == SocketIdentifier.CONNECTION_TEST_SUCCESSFUL) {
+                Log.d(LOG_TAG, "Server connection test successful!") ;
+            } else {
+                Log.d(LOG_TAG, "Server connection test unsuccessful!") ;
+            }
         }
     }
 }
