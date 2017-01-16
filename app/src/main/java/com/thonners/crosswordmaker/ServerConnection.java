@@ -5,6 +5,7 @@ import android.util.Log;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.net.Socket;
 import java.util.ArrayList;
 
@@ -19,23 +20,29 @@ public class ServerConnection {
 
     private final String LOG_TAG = "ServerConnection" ;
 
-    private final int serverPort = 28496 ;
-    private final String serverURL = "thonners.ddns.net" ;
+    private final ServerConnectionListener serverConnectionListener ;
 
-    public ServerConnection() {
-
+    /**
+     * Constructor
+     * @param serverConnectionListener The interface through which responses from the server will be passed back to the initiating fragment/activity.
+     */
+    public ServerConnection(ServerConnectionListener serverConnectionListener) {
+            this.serverConnectionListener = serverConnectionListener ;
             Log.d(LOG_TAG, "ServerConnection instance created.") ;
     }
 
+    /**
+     * The interface through which responses from the server will be passed back to the initiating fragment/activity.
+     */
     public interface ServerConnectionListener {
-        void serverConnectionResponse() ;
+        void serverConnectionResponse(ArrayList<String> answers) ;
         void setServerAvailable() ;
     }
 
     /**
-     * @return Whether the server can be reached.
+     * Method to test the connection to the server, and if successful, to use the listener to call the appropriate method
      */
-    public void testServerConnection(final ServerConnectionListener serverConnectionListener) {
+    public void testServerConnection() {
         Log.d(LOG_TAG, "Testing connection...") ;
         DataTransfer.DataTransferListener listener = new DataTransfer.DataTransferListener() {
             @Override
@@ -112,25 +119,56 @@ public class ServerConnection {
         private String input ;
         private ArrayList<String> result = null;
 
+        /**
+         * Constructor
+         * @param socketIdentifier The SocketIdentifier enum to identify the type of request being made of the server
+         * @param input The String to go with the request, if the request is to solve an anagram or word-fit.
+         */
         public Connection(SocketIdentifier socketIdentifier, String input) {
             this.requestIdentifier = socketIdentifier ;
             this.input = input ;
         }
 
+        /**
+         * @return The resuts received from the server
+         */
         public ArrayList<String> getResult() {
             return result ;
         }
 
+        /**
+         * @return The 'input' to the solver request, i.e. the search string
+         */
+        public String getInput() {
+            return input;
+        }
+
+        /**
+         * @return The SocketIdentifier enum of the request
+         */
         public SocketIdentifier getRequestIdentifier() {
             return requestIdentifier;
         }
 
+        /**
+         * @return The SocketIdentifier enum of the result - received from the server
+         */
         public SocketIdentifier getResultIdentifier() {
             return resultIdentifier;
         }
 
+        /**
+         * @param resultIdentifier The SocketIdentifier enum of the result - received from the server
+         */
         public void setResultIdentifier(SocketIdentifier resultIdentifier) {
             this.resultIdentifier = resultIdentifier;
+        }
+
+        /**
+         * @param result The results received from the server
+         */
+        public void setResult(ArrayList<String> result) {
+            this.result = result;
         }
     }
 
@@ -146,15 +184,30 @@ public class ServerConnection {
         private Connection returnConnection ;
         private DataTransferListener listener ;
 
+        /**
+         * Constructor
+         * @param inputConnection The Connection instance which holds the request information - the type of request and any inputs.
+         * @param listener The DataTransferListener which will be used to interact with the activity/fragment once the ASyncTask returns.
+         */
         public DataTransfer(Connection inputConnection, DataTransferListener listener) {
             this.returnConnection = inputConnection ;
             this.listener = listener ;
         }
 
+        /**
+         * The listener which will be used to pass the results back to the vcalling activity.
+         */
         public interface DataTransferListener {
             void serverCallback(Connection returnConnection) ;
         }
 
+        /**
+         * The method which is actually run in a background thread. This creates the connection,
+         * sends the request and input data, and received any results/responses from the server.
+         * @param params Required field, but this is always null
+         * @return The Connection instance with results data populated from the server's response.
+         */
+        @Override
         protected Connection doInBackground(Void... params) {
             try {
                 Log.d(LOG_TAG, "Creating socket...") ;
@@ -168,6 +221,9 @@ public class ServerConnection {
                 try {   // Try with resources requires API 19 (min = 17)
                     dOut = new DataOutputStream(socket.getOutputStream()) ;
                     dOut.writeByte(returnConnection.getRequestIdentifier().id());
+                    if (returnConnection.getRequestIdentifier() == SocketIdentifier.ANAGRAM || returnConnection.getRequestIdentifier() == SocketIdentifier.WORD_FIT) {
+                        dOut.writeUTF(returnConnection.getInput());
+                    }
                     dOut.flush();
 
                     dIn = new DataInputStream(socket.getInputStream()) ;
@@ -176,8 +232,18 @@ public class ServerConnection {
                     // Set the response
                     returnConnection.setResultIdentifier(SocketIdentifier.getSocketIdentifierFromByte(responseIdentifier)) ;
 
-                    if(returnConnection.getResultIdentifier() == SocketIdentifier.ANAGRAM_SOLUTIONS_SUCCESS) {
-                        // TODO: add stuff to save results
+                    if(returnConnection.getResultIdentifier() == SocketIdentifier.ANAGRAM_SOLUTIONS_SUCCESS || returnConnection.getResultIdentifier() == SocketIdentifier.WORD_FIT_SOLUTIONS_SUCCESS) {
+                        ArrayList<String> answers = new ArrayList<>();
+                        while(dIn.available() > 0) {
+                            try {
+                                String answer = dIn.readUTF() ;
+                                answers.add(answer) ;
+                            } catch(EOFException e) {
+                                Log.d(LOG_TAG,"EOFException caught - must be end of answers") ;
+                                break;
+                            }
+                        }
+                        returnConnection.setResult(answers) ;
                     }
 
                     return returnConnection ;
@@ -197,16 +263,19 @@ public class ServerConnection {
             return null ;
         }
 
+        /**
+         * Executed on the UI thread once the doInBackground method has returned.
+         * @param returnConnection The Connection instance with results data populated from the server's response.
+         */
         @Override
         protected void onPostExecute(Connection returnConnection) {
             super.onPostExecute(returnConnection);
-
-
             if (returnConnection.getResultIdentifier() == SocketIdentifier.CONNECTION_TEST_SUCCESSFUL) {
                 Log.d(LOG_TAG, "Server connection test successful!") ;
             } else {
                 Log.d(LOG_TAG, "Server connection test unsuccessful!") ;
             }
+            listener.serverCallback(returnConnection);
         }
     }
 }

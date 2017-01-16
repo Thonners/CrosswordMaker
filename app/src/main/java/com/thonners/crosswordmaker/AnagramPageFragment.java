@@ -36,10 +36,11 @@ public class AnagramPageFragment extends Fragment {
     private int hashMapSize = 315000 ;   // Size for the hashMap to allow loadFactor < 0.75 whilst fitting all the words in the dictionary
     private HashMap<String, ArrayList<String>> dictionaryHM = new HashMap<String, ArrayList<String>>(hashMapSize);    // Hashmap to store the options in
 
-    private ArrayList<String> dictionary = new ArrayList<String>() ;
-    private ArrayList<String[]> dictionaryByLetter= new ArrayList<String[]>() ;
-    private ArrayList<ArrayList<String>> dictionaryByLength = new ArrayList<ArrayList<String>>() ;
+    private ArrayList<String> dictionary = new ArrayList<>() ;
+    private ArrayList<String[]> dictionaryByLetter= new ArrayList<>() ;
+    private ArrayList<ArrayList<String>> dictionaryByLength = new ArrayList<>() ;
 
+    private boolean serverAvailable = false ;
     private boolean dictionaryLoaded = false ;
     private boolean buttonIsClear  = false ;    // Variable to store whether the button next to the search bar should be 'search' or 'clear'
 
@@ -61,25 +62,7 @@ public class AnagramPageFragment extends Fragment {
         if (getArguments() != null) {
         }
 
-        // Log how long it takes to load the dictionary
-        long startTime = System.currentTimeMillis() ;
-        Log.d(LOG_TAG,"AnagramPageFragment onCreate called @ millis: " + startTime);
 
-        // Check whether Low RAM mode enabled on settings
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity()) ;
-        boolean lowRAM = sharedPreferences.getBoolean(SettingsFragment.KEY_PREF_LOW_RAM, false) ;
-
-        // Load the dictionaries in from the resources, provided low RAM mode not enabled
-        if (!lowRAM){
-            LoadDictionaryTask loadDictionaryTask = new LoadDictionaryTask();
-            loadDictionaryTask.execute();
-        } else {
-            Log.d(LOG_TAG, "Low RAM mode enabled, so not reading the dictionary yet.");
-
-        }
-
-        long stopTime = System.currentTimeMillis();
-        Log.d(LOG_TAG,"Dictionary loaded after " + (stopTime - startTime) + " millis");
     }
 
     @Override
@@ -124,9 +107,54 @@ public class AnagramPageFragment extends Fragment {
     }
 
     public interface OnAnagramFragmentListener {
-        public void searchDictionary(String searchTerm);
+        void searchDictionary(String searchTerm);
     }
 
+    /**
+     * Method to check whether the sever is accessible, and if not, to load the dictionary locally
+     */
+    private void checkServer() {
+        ServerConnection.ServerConnectionListener listener = new ServerConnection.ServerConnectionListener() {
+            @Override
+            public void serverConnectionResponse(ArrayList<String> answers) {
+
+            }
+
+            @Override
+            public void setServerAvailable() {
+                serverAvailable = true ;
+            }
+        } ;
+        ServerConnection serverConnection = new ServerConnection(listener) ;
+        serverConnection.testServerConnection();
+    }
+
+    /**
+     * Method to load the local copy of the sopwads dictionary into memory and prepare it for anagram/wordfit lookup
+     */
+    private void loadDictionaryLocally() {
+        // Log how long it takes to load the dictionary
+        long startTime = System.currentTimeMillis() ;
+        Log.d(LOG_TAG,"AnagramPageFragment onCreate called @ millis: " + startTime);
+
+        // Check whether Low RAM mode enabled on settings
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity()) ;
+        boolean lowRAM = sharedPreferences.getBoolean(SettingsFragment.KEY_PREF_LOW_RAM, false) ;
+
+        // Load the dictionaries in from the resources, provided low RAM mode not enabled
+        if (!lowRAM){
+            LoadDictionaryTask loadDictionaryTask = new LoadDictionaryTask();
+            loadDictionaryTask.execute();
+        } else {
+            Log.d(LOG_TAG, "Low RAM mode enabled, so not reading the dictionary yet.");
+            // Show a toast to explain why the solver isn't available
+            Toast.makeText(getContext(),"Cannot connect to server, so anagram/wordfit solver unavailable when 'Low-RAM' mode enabled",Toast.LENGTH_LONG).show(); ;
+        }
+
+        long stopTime = System.currentTimeMillis();
+        Log.d(LOG_TAG,"Dictionary loaded after " + (stopTime - startTime) + " millis");
+
+    }
     private void searchClicked() {
         // Clear view ready for results, then search
         Log.d(LOG_TAG, "Search button clicked. ");
