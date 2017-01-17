@@ -36,7 +36,7 @@ public class ServerConnection {
      */
     public interface ServerConnectionListener {
         void serverConnectionResponse(ArrayList<String> answers) ;
-        void setServerAvailable() ;
+        void setServerAvailable(boolean serverAvailable) ;
     }
 
     /**
@@ -47,8 +47,10 @@ public class ServerConnection {
         DataTransfer.DataTransferListener listener = new DataTransfer.DataTransferListener() {
             @Override
             public void serverCallback(Connection resultConnection) {
-                if (resultConnection.getResultIdentifier() == SocketIdentifier.CONNECTION_TEST_SUCCESSFUL) {
-                    serverConnectionListener.setServerAvailable();
+                if (resultConnection != null && resultConnection.getResultIdentifier() == SocketIdentifier.CONNECTION_TEST_SUCCESSFUL) {
+                    serverConnectionListener.setServerAvailable(true);
+                } else {
+                    serverConnectionListener.setServerAvailable(false);
                 }
             }
         } ;
@@ -256,8 +258,7 @@ public class ServerConnection {
                     if (dIn != null) dIn.close();
                 }
             } catch (Exception e) {
-                Log.e(LOG_TAG,"Error creating connection to server. " + e.getLocalizedMessage()) ;
-                e.printStackTrace();
+                Log.d(LOG_TAG,"Error creating connection to server. " + e.getLocalizedMessage()) ;
             }
             // If we get this far, something's gone wrong.
             return null ;
@@ -270,7 +271,7 @@ public class ServerConnection {
         @Override
         protected void onPostExecute(Connection returnConnection) {
             super.onPostExecute(returnConnection);
-            if (returnConnection.getResultIdentifier() == SocketIdentifier.CONNECTION_TEST_SUCCESSFUL) {
+            if (returnConnection != null && returnConnection.getResultIdentifier() == SocketIdentifier.CONNECTION_TEST_SUCCESSFUL) {
                 Log.d(LOG_TAG, "Server connection test successful!") ;
             } else {
                 Log.d(LOG_TAG, "Server connection test unsuccessful!") ;

@@ -34,7 +34,7 @@ public class AnagramPageFragment extends Fragment {
     private static final String LOG_TAG = "AnagramPageFragment" ;
 
     private int hashMapSize = 315000 ;   // Size for the hashMap to allow loadFactor < 0.75 whilst fitting all the words in the dictionary
-    private HashMap<String, ArrayList<String>> dictionaryHM = new HashMap<String, ArrayList<String>>(hashMapSize);    // Hashmap to store the options in
+    private HashMap<String, ArrayList<String>> dictionaryHM = new HashMap<>(hashMapSize);    // Hashmap to store the options in
 
     private ArrayList<String> dictionary = new ArrayList<>() ;
     private ArrayList<String[]> dictionaryByLetter= new ArrayList<>() ;
@@ -121,8 +121,13 @@ public class AnagramPageFragment extends Fragment {
             }
 
             @Override
-            public void setServerAvailable() {
-                serverAvailable = true ;
+            public void setServerAvailable(boolean isAvailable) {
+                serverAvailable = isAvailable ;
+                if (serverAvailable) {
+                    setSearchButtonClickable();
+                } else {
+                    loadDictionaryLocally();
+                }
             }
         } ;
         ServerConnection serverConnection = new ServerConnection(listener) ;
@@ -155,6 +160,10 @@ public class AnagramPageFragment extends Fragment {
         Log.d(LOG_TAG,"Dictionary loaded after " + (stopTime - startTime) + " millis");
 
     }
+
+    /**
+     * Called when the search button is clicked. Clears results view and hides the keyboard.
+     */
     private void searchClicked() {
         // Clear view ready for results, then search
         Log.d(LOG_TAG, "Search button clicked. ");
@@ -162,6 +171,11 @@ public class AnagramPageFragment extends Fragment {
         clearResults(true); // Move the call to search() into the clearResults method, so it can be executed after any exit animations if required
     }
 
+    /**
+     * Method to animate the clearing of the results views. The call to search() is at the end of this
+     * method to
+     * @param search If true, and there are no results in the results view, calls {@link AnagramPageFragment#search()}
+     */
     private void clearResults(boolean search) {
         // Return to 0
         resultCount = 0 ;
@@ -221,6 +235,11 @@ public class AnagramPageFragment extends Fragment {
 
     }
 
+    /**
+     * Execute the search for the solution to either the anagram or word-fit. (Called by clearResults(true))
+     *
+     * Anagram or word-fit is decided based on whether the search term contains '.' (unknown letters) or not.
+     */
     private void search() {
         // Search for either anagrams or word fits depending on whether the input text contains a '.'
 
@@ -230,6 +249,7 @@ public class AnagramPageFragment extends Fragment {
         String searchString = "";
         boolean containsIllegalCharacters = false ;
 
+        // Check all characters in the search are legal for either anagram or word-fit (i.e. letters or '.')
         for (int i = 0 ; i < searchStringOriginal.length() ; i++ ) {
             if (Character.isLetter(searchStringOriginal.toLowerCase().charAt(i)) || searchStringOriginal.charAt(i) == '.') {
                 Log.d(LOG_TAG, "Adding '" + searchStringOriginal.substring(i,i+1) + "' to search string (currently = " + searchString + " as this is a valid character for input.");
@@ -258,12 +278,24 @@ public class AnagramPageFragment extends Fragment {
         }
     }
 
+    /**
+     * Method to initialise the ASyncTask to solve word-fit.
+     * @param input
+     */
     private void searchWordFit(String input) {
         // Load Async task to search the word-fit to stop it haning the UI Thread
         GetWordSolverAnswers getWordSolverAnswers = new GetWordSolverAnswers() ;
         getWordSolverAnswers.execute(input);
     }
 
+    /**
+     * Method to solve the word-fit.
+     * If the first letter is known, only searches words starting with that letter.
+     * Otherwise searches the whole dictionary.
+     *
+     * @param input The unknown word, with '.' in place of unknown letters
+     * @return An ArrayList with all the words which fir the input string
+     */
     private ArrayList<String> getWordFitAnswers(String input) {
         // Cycle through dictionary to find possible matches
         ArrayList<String> answers = new ArrayList<>() ;
@@ -297,6 +329,13 @@ public class AnagramPageFragment extends Fragment {
         return answers ;
     }
 
+    /**
+     * Method to solve the anagram.
+     *
+     * Sorts the letters of the search term into alphabetical order, then checks whether the dictionary
+     * HashSet contains a key with the same string. If so, the values are all anagrams of the search string.
+     * @param input
+     */
     private void searchAnagram(String input) {
         // Order letters, then check if hashset contains a match. If so, print the output options
         // Sort letters
@@ -318,10 +357,21 @@ public class AnagramPageFragment extends Fragment {
 
     }
 
+    /**
+     * {@code searchDictioary} defaults to true
+     *
+     * {@see AnagramPageFragment#addToResults(String, boolean)}
+     */
     private void addToResults(String result) {
         // Default to search dictionary if result returned
         addToResults(result,true);
     }
+
+    /**
+     * Method to add a result to the view displaying all the results.
+     * @param result The result to be added to the list of results.
+     * @param searchDictionary Whether to search the dictionary when the results card is clicked.
+     */
     private void addToResults(String result, boolean searchDictionary) {
         Log.d(LOG_TAG, "Adding results TextView for " + result);
         CardView cardView = new CardView(getActivity());
@@ -364,6 +414,9 @@ public class AnagramPageFragment extends Fragment {
         resultCount++ ;
     }
 
+    /**
+     * Shows a toast explaining that only letters and '.' are legal for searching with.
+     */
     private void showIllegalCharactersToast() {
         Toast illegalCharactersToast = Toast.makeText(getActivity(), getString(R.string.illegalCharacterToast), Toast.LENGTH_SHORT);
         illegalCharactersToast.show();
@@ -517,6 +570,9 @@ public class AnagramPageFragment extends Fragment {
         }
     }
 
+    /**
+     * Method to make the search button clickable, changing the text and setting the onClickListener.
+     */
     private void setSearchButtonClickable() {
         // Allow the search button to be pressed once dictionary is loaded
         Log.d(LOG_TAG,"Search button now clickable");
@@ -529,6 +585,10 @@ public class AnagramPageFragment extends Fragment {
             }
         });
     }
+
+    /**
+     * Stop the search button being clicked again once it has been clicked and a word-fit search is on-going.
+     */
     private void setSearchButtonNotClickable() {
         // Prevent the search button being pressed while looking up word-solver answers
         Log.d(LOG_TAG,"Search button not clickable");
@@ -536,6 +596,12 @@ public class AnagramPageFragment extends Fragment {
         searchButton.setText(R.string.searching);
         searchButton.setPressed(true);
     }
+
+    /**
+     * Method to sort the letters of a word into alphabetical order.
+     * @param input The word whose letters are to be sorted
+     * @return The sorted letters
+     */
     private String sortWord(String input) {
         // Sort the letters into alphabetical order
         char[] wordChars = input.toLowerCase().toCharArray();
@@ -545,35 +611,53 @@ public class AnagramPageFragment extends Fragment {
 
     /**
      * Simple method to look up the index of a letter in the alphabet (a = 0)
-     * @param letter
-     * @return
+     * @param letter The letter to be looked up
+     * @return The index of the letter
      */
     private int getLetterIndex(char letter) {
        String alphabet = "abcdefghijklmnopqrstuvwxyz";
         return alphabet.indexOf(letter);
     }
 
+    /**
+     * Method to hide the keyboard
+     */
     private void hideKeyboard() {
     // Method to hide the keyboard
         InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
+    /**
+     * Method to search the MW dictionary on the DictionaryPageFragment
+     * @param searchTerm The word to search
+     */
     private void searchDictionary(String searchTerm) {
         // Search dictionary in DictionaryFragment
         Log.d(LOG_TAG,"Try to search for: " + searchTerm);
         mListener.searchDictionary(searchTerm);
     }
 
+    /**
+     * Method to make the input box request focus.
+     */
     public void inputBoxRequestFocus() {
         inputBox.requestFocus();
         inputBox.selectAll();
     }
+
+    /**
+     * @return The EditText instance of the input/search box.
+     */
     public EditText getInputBox() {
         return inputBox;
     }
 
 
+    /**
+     * ASyncTask to read the dictionary resource and load it into memory.
+     * Sets the search button clickable once complete.
+     */
     private class LoadDictionaryTask extends AsyncTask<Void,Void,String> {
         // Load the dictionary in the background to prevent hanging the main thread
         @Override
@@ -592,6 +676,11 @@ public class AnagramPageFragment extends Fragment {
 
     }
 
+    /**
+     * Method to run a search for word-fit solutions on a background thread.
+     * Displays a 'loading' spinner and stops the search button being clickable before executing,
+     * removes the spinner and returns the search button to normal on completion.
+     */
     private class GetWordSolverAnswers extends AsyncTask<String,Void,String> {
         /**
          *  Async task to compute the word-solver answers. Allows it to be moved off the main UI Thread.
