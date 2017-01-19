@@ -412,7 +412,7 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
         if (isNetworkAvailable()) {
             ServerConnection.ServerConnectionListener serverConnectionListener = new ServerConnection.ServerConnectionListener() {
                 @Override
-                public void serverConnectionResponse(ArrayList<String> answers) {
+                public void serverConnectionResponse(ServerConnection.SocketIdentifier requestSuccess, ArrayList<String> answers) {
 
                 }
                 @Override

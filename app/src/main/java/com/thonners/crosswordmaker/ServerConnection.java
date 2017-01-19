@@ -35,7 +35,7 @@ public class ServerConnection {
      * The interface through which responses from the server will be passed back to the initiating fragment/activity.
      */
     public interface ServerConnectionListener {
-        void serverConnectionResponse(ArrayList<String> answers) ;
+        void serverConnectionResponse(SocketIdentifier requestSuccess, ArrayList<String> answers) ;
         void setServerAvailable(boolean serverAvailable) ;
     }
 
@@ -59,6 +59,53 @@ public class ServerConnection {
         dataTransfer.execute() ;
     }
 
+    /**
+     * Method to solicit the answers from the server for the word-fit given.
+     * Results will be passed back by the ServerConnectionListener.
+     *
+     * @param input The String describing the word-fit request, with '.'s in place of unknown letters.
+     */
+    public void getWordFitResults(String input) {
+        Log.d(LOG_TAG, "Getting word-fit solutions for: " + input) ;
+        DataTransfer.DataTransferListener listener = new DataTransfer.DataTransferListener() {
+            @Override
+            public void serverCallback(Connection resultConnection) {
+                if (resultConnection != null && resultConnection.getResultIdentifier() == SocketIdentifier.WORD_FIT_SOLUTIONS_SUCCESS) {
+                    serverConnectionListener.serverConnectionResponse(SocketIdentifier.WORD_FIT_SOLUTIONS_SUCCESS, resultConnection.getResult());
+                } else {
+                    serverConnectionListener.serverConnectionResponse(SocketIdentifier.WORD_FIT_SOLUTIONS_EMPTY, null);
+                }
+
+            }
+        } ;
+        // Create a dataTransfer instance with the appropriate inputs
+        DataTransfer dataTransfer = new DataTransfer(new Connection(SocketIdentifier.WORD_FIT, input), listener);
+        dataTransfer.execute() ;
+    }
+
+    /**
+     * Method to solicit the answers from the server for the anagram given.
+     * Results will be passed back by the ServerConnectionListener.
+     *
+     * @param input The String of the letters in the anagram.
+     */
+    public void getAnagramResults(String input) {
+        Log.d(LOG_TAG, "Getting anagram solutions for: " + input) ;
+        DataTransfer.DataTransferListener listener = new DataTransfer.DataTransferListener() {
+            @Override
+            public void serverCallback(Connection resultConnection) {
+                if (resultConnection != null && resultConnection.getResultIdentifier() == SocketIdentifier.ANAGRAM_SOLUTIONS_SUCCESS) {
+                    serverConnectionListener.serverConnectionResponse(SocketIdentifier.ANAGRAM_SOLUTIONS_SUCCESS, resultConnection.getResult());
+                } else {
+                    serverConnectionListener.serverConnectionResponse(SocketIdentifier.ANAGRAM_SOLUTIONS_EMPTY, null);
+                }
+
+            }
+        } ;
+        // Create a dataTransfer instance with the appropriate inputs
+        DataTransfer dataTransfer = new DataTransfer(new Connection(SocketIdentifier.ANAGRAM, input), listener);
+        dataTransfer.execute() ;
+    }
 
     /**
      * Enum to identify the type of connection requested from a client, when connecting to the server.

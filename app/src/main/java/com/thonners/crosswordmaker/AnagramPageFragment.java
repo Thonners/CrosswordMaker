@@ -92,6 +92,7 @@ public class AnagramPageFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        checkServer();
         try {
             mListener = (OnAnagramFragmentListener) activity;
         } catch (ClassCastException e) {
@@ -116,7 +117,7 @@ public class AnagramPageFragment extends Fragment {
     private void checkServer() {
         ServerConnection.ServerConnectionListener listener = new ServerConnection.ServerConnectionListener() {
             @Override
-            public void serverConnectionResponse(ArrayList<String> answers) {
+            public void serverConnectionResponse(ServerConnection.SocketIdentifier requestSuccess, ArrayList<String> answers) {
 
             }
 
@@ -236,7 +237,7 @@ public class AnagramPageFragment extends Fragment {
     }
 
     /**
-     * Execute the search for the solution to either the anagram or word-fit. (Called by clearResults(true))
+     * Execute the search for the solution to either the anagram or word-fit. (Called by clearResults(true), so it only occurs once the animations have finished)
      *
      * Anagram or word-fit is decided based on whether the search term contains '.' (unknown letters) or not.
      */
@@ -283,9 +284,30 @@ public class AnagramPageFragment extends Fragment {
      * @param input
      */
     private void searchWordFit(String input) {
-        // Load Async task to search the word-fit to stop it haning the UI Thread
-        GetWordSolverAnswers getWordSolverAnswers = new GetWordSolverAnswers() ;
-        getWordSolverAnswers.execute(input);
+        // Get it from the server if available, otherwise do it locally
+        if (serverAvailable) {
+            ServerConnection.ServerConnectionListener listener = new ServerConnection.ServerConnectionListener() {
+                @Override
+                public void serverConnectionResponse(ServerConnection.SocketIdentifier requestSuccess, ArrayList<String> answers) {
+                    if (requestSuccess == ServerConnection.SocketIdentifier.WORD_FIT_SOLUTIONS_SUCCESS) {
+                        addToResults(answers);
+                    } else {
+                        addResultNotFound();
+                    }
+                }
+
+                @Override
+                public void setServerAvailable(boolean serverAvailable) {
+
+                }
+            } ;
+            ServerConnection serverConnection = new ServerConnection(listener) ;
+            serverConnection.getWordFitResults(input);
+        } else {
+            // Load Async task to search the word-fit to stop it haning the UI Thread
+            GetWordSolverAnswers getWordSolverAnswers = new GetWordSolverAnswers();
+            getWordSolverAnswers.execute(input);
+        }
     }
 
     /**
@@ -337,26 +359,66 @@ public class AnagramPageFragment extends Fragment {
      * @param input
      */
     private void searchAnagram(String input) {
-        // Order letters, then check if hashset contains a match. If so, print the output options
-        // Sort letters
-        String inputSorted = sortWord(input);
-        // Check if in HashMap
-        if (dictionaryHM.containsKey(inputSorted)) {
-            Log.d(LOG_TAG, "Match found for: " + inputSorted);
-            ArrayList<String> answers = dictionaryHM.get(inputSorted);
-            // Add results to resultsLinearLayout
-            resultCount = 0 ;   // Set to 0 to allow for correct timing delays to entry animation
-            for (String answer : answers) {
-                Log.d(LOG_TAG, "An answer for " + input + " is: " + answer);
-                addToResults(answer);
-            }
+        // If server available, get answer from there, otherwise do it locally
+        if (serverAvailable) {
+            ServerConnection.ServerConnectionListener listener = new ServerConnection.ServerConnectionListener() {
+                @Override
+                public void serverConnectionResponse(ServerConnection.SocketIdentifier requestSuccess, ArrayList<String> answers) {
+                    if (requestSuccess == ServerConnection.SocketIdentifier.ANAGRAM_SOLUTIONS_SUCCESS) {
+                        addToResults(answers);
+                    } else {
+                        addResultNotFound();
+                    }
+                }
+
+                @Override
+                public void setServerAvailable(boolean serverAvailable) {
+
+                }
+            } ;
+            ServerConnection serverConnection = new ServerConnection(listener) ;
+            serverConnection.getAnagramResults(input);
         } else {
-            Log.d(LOG_TAG, "No match found for: " + inputSorted + ", which originally came from " + input);
-            addToResults(getString(R.string.no_match_found), false);
+            // Order letters, then check if hashset contains a match. If so, print the output options
+            // Sort letters
+            String inputSorted = sortWord(input);
+            // Check if in HashMap
+            if (dictionaryHM.containsKey(inputSorted)) {
+                Log.d(LOG_TAG, "Match found for: " + inputSorted);
+                ArrayList<String> answers = dictionaryHM.get(inputSorted);
+            } else {
+                Log.d(LOG_TAG, "No match found for: " + inputSorted + ", which originally came from " + input);
+                addToResults(getString(R.string.no_match_found), false);
+            }
         }
 
     }
 
+    /**
+     * Adds all results in an ArrayList to the answers, by recursively calling
+     * {@link AnagramPageFragment#addToResults(String)}.
+     * @param answers The ArrayList of the answers
+     */
+    private void addToResults(ArrayList<String> answers) {
+        if (answers != null) {
+            // Add results to resultsLinearLayout
+            resultCount = 0;   // Set to 0 to allow for correct timing delays to entry animation
+            for (String answer : answers) {
+                addToResults(answer);
+            }
+        } else {
+            addResultNotFound();
+        }
+    }
+
+    /**
+     * Method to display a note that there are no results for the given input.
+     * Calls {@link AnagramPageFragment#addToResults(String, boolean)} with the not found message
+     * and 'false' to prevent clicking trying to search the dictionary.
+     */
+    private void addResultNotFound() {
+        addToResults(getString(R.string.no_match_found), false);
+    }
     /**
      * {@code searchDictioary} defaults to true
      *
