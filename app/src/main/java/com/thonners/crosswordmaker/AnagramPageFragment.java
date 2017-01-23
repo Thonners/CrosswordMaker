@@ -130,6 +130,14 @@ public class AnagramPageFragment extends Fragment {
                     loadDictionaryLocally();
                 }
             }
+            @Override
+            public void callShowLoadingSpinner() {
+                showLoadingSpinner();
+            }
+            @Override
+            public void callHideLoadingSpinner() {
+                hideLoadingSpinner();
+            }
         } ;
         ServerConnection serverConnection = new ServerConnection(listener) ;
         serverConnection.testServerConnection();
@@ -290,8 +298,10 @@ public class AnagramPageFragment extends Fragment {
                 @Override
                 public void serverConnectionResponse(ServerConnection.SocketIdentifier requestSuccess, ArrayList<String> answers) {
                     if (requestSuccess == ServerConnection.SocketIdentifier.WORD_FIT_SOLUTIONS_SUCCESS) {
+                        Log.d(LOG_TAG,"Word-fit results received from server: " + answers.toString()) ;
                         addToResults(answers);
                     } else {
+                        Log.d(LOG_TAG,"No word-fit results received from server.") ;
                         addResultNotFound();
                     }
                 }
@@ -299,6 +309,14 @@ public class AnagramPageFragment extends Fragment {
                 @Override
                 public void setServerAvailable(boolean serverAvailable) {
 
+                }
+                @Override
+                public void callShowLoadingSpinner() {
+                    showLoadingSpinner();
+                }
+                @Override
+                public void callHideLoadingSpinner() {
+                    hideLoadingSpinner();
                 }
             } ;
             ServerConnection serverConnection = new ServerConnection(listener) ;
@@ -365,8 +383,10 @@ public class AnagramPageFragment extends Fragment {
                 @Override
                 public void serverConnectionResponse(ServerConnection.SocketIdentifier requestSuccess, ArrayList<String> answers) {
                     if (requestSuccess == ServerConnection.SocketIdentifier.ANAGRAM_SOLUTIONS_SUCCESS) {
+                        Log.d(LOG_TAG,"Anagram results received from server: " + answers.toString()) ;
                         addToResults(answers);
                     } else {
+                        Log.d(LOG_TAG,"No anagram results received from server.") ;
                         addResultNotFound();
                     }
                 }
@@ -374,6 +394,15 @@ public class AnagramPageFragment extends Fragment {
                 @Override
                 public void setServerAvailable(boolean serverAvailable) {
 
+                }
+
+                @Override
+                public void callShowLoadingSpinner() {
+                    showLoadingSpinner();
+                }
+                @Override
+                public void callHideLoadingSpinner() {
+                    hideLoadingSpinner();
                 }
             } ;
             ServerConnection serverConnection = new ServerConnection(listener) ;
@@ -754,10 +783,7 @@ public class AnagramPageFragment extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            // Show the progress spinner
-            progressSpinnerLinLayout.setVisibility(View.VISIBLE);
-            // Stop the search button from being pressed
-            setSearchButtonNotClickable();
+            showLoadingSpinner();
         }
         @Override
         protected String doInBackground(String... input) {
@@ -784,6 +810,35 @@ public class AnagramPageFragment extends Fragment {
                 addToResults(getString(R.string.no_match_found), false);
             }
         }
+    }
+
+    private void showLoadingSpinner() {
+        // Show the progress spinner
+        progressSpinnerLinLayout.setTranslationY(300);
+        progressSpinnerLinLayout.setAlpha(0.0f);
+        progressSpinnerLinLayout.setVisibility(View.VISIBLE);
+        progressSpinnerLinLayout.animate()
+                .alpha(1.0f)
+                .translationY(0)
+                .setDuration(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_DURATION)
+                .setListener(null);
+
+        // Stop the search button from being pressed
+        setSearchButtonNotClickable();
+
+    }
+
+    private void hideLoadingSpinner() {
+        // Show the progress spinner
+        progressSpinnerLinLayout.animate()
+                .alpha(0.0f)
+                .translationY(300)
+                .setDuration(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_DURATION)
+                .setListener(null);
+        progressSpinnerLinLayout.setVisibility(View.GONE);
+
+        // Stop the search button from being pressed
+        setSearchButtonClickable();
     }
 
 }

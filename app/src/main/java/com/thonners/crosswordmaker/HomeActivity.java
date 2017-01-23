@@ -424,6 +424,13 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
                         Log.d(LOG_TAG, "Network is available, and server connection test was UNsuccessful.");
                     }
                 }
+
+                @Override
+                public void callShowLoadingSpinner() {
+                }
+                @Override
+                public void callHideLoadingSpinner() {
+                }
             } ;
             serverConnection = new ServerConnection(serverConnectionListener) ;
             serverConnection.testServerConnection() ;

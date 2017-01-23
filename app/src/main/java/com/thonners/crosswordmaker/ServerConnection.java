@@ -37,6 +37,8 @@ public class ServerConnection {
     public interface ServerConnectionListener {
         void serverConnectionResponse(SocketIdentifier requestSuccess, ArrayList<String> answers) ;
         void setServerAvailable(boolean serverAvailable) ;
+        void callShowLoadingSpinner();
+        void callHideLoadingSpinner();
     }
 
     /**
@@ -47,6 +49,7 @@ public class ServerConnection {
         DataTransfer.DataTransferListener listener = new DataTransfer.DataTransferListener() {
             @Override
             public void serverCallback(Connection resultConnection) {
+                Log.d(LOG_TAG,"ServerCallback called (inside testServerConnection).");
                 if (resultConnection != null && resultConnection.getResultIdentifier() == SocketIdentifier.CONNECTION_TEST_SUCCESSFUL) {
                     serverConnectionListener.setServerAvailable(true);
                 } else {
@@ -56,7 +59,8 @@ public class ServerConnection {
         } ;
         // Create a dataTransfer instance with the appropriate inputs
         DataTransfer dataTransfer = new DataTransfer(new Connection(SocketIdentifier.CONNECTION_TEST, ""), listener);
-        dataTransfer.execute() ;
+        //dataTransfer.execute() ;
+        dataTransfer.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     /**
@@ -70,6 +74,8 @@ public class ServerConnection {
         DataTransfer.DataTransferListener listener = new DataTransfer.DataTransferListener() {
             @Override
             public void serverCallback(Connection resultConnection) {
+                Log.d(LOG_TAG,"ServerCallback called (inside getWordFitResults).");
+                serverConnectionListener.callHideLoadingSpinner();
                 if (resultConnection != null && resultConnection.getResultIdentifier() == SocketIdentifier.WORD_FIT_SOLUTIONS_SUCCESS) {
                     serverConnectionListener.serverConnectionResponse(SocketIdentifier.WORD_FIT_SOLUTIONS_SUCCESS, resultConnection.getResult());
                 } else {
@@ -80,7 +86,8 @@ public class ServerConnection {
         } ;
         // Create a dataTransfer instance with the appropriate inputs
         DataTransfer dataTransfer = new DataTransfer(new Connection(SocketIdentifier.WORD_FIT, input), listener);
-        dataTransfer.execute() ;
+        serverConnectionListener.callShowLoadingSpinner();
+        dataTransfer.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     /**
@@ -94,9 +101,13 @@ public class ServerConnection {
         DataTransfer.DataTransferListener listener = new DataTransfer.DataTransferListener() {
             @Override
             public void serverCallback(Connection resultConnection) {
+                Log.d(LOG_TAG,"ServerCallback called (inside getAnagramResults).");
+                serverConnectionListener.callHideLoadingSpinner();
                 if (resultConnection != null && resultConnection.getResultIdentifier() == SocketIdentifier.ANAGRAM_SOLUTIONS_SUCCESS) {
+                    Log.d(LOG_TAG,"Results for anagram: " + resultConnection.getInput() + " = " + resultConnection.getResult().toString()) ;
                     serverConnectionListener.serverConnectionResponse(SocketIdentifier.ANAGRAM_SOLUTIONS_SUCCESS, resultConnection.getResult());
                 } else {
+                    Log.d(LOG_TAG,"No results for anagram: " + resultConnection.getInput()) ;
                     serverConnectionListener.serverConnectionResponse(SocketIdentifier.ANAGRAM_SOLUTIONS_EMPTY, null);
                 }
 
@@ -104,7 +115,10 @@ public class ServerConnection {
         } ;
         // Create a dataTransfer instance with the appropriate inputs
         DataTransfer dataTransfer = new DataTransfer(new Connection(SocketIdentifier.ANAGRAM, input), listener);
-        dataTransfer.execute() ;
+        //dataTransfer.execute() ;
+        serverConnectionListener.callShowLoadingSpinner();
+        dataTransfer.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
     }
 
     /**
@@ -250,6 +264,12 @@ public class ServerConnection {
             void serverCallback(Connection returnConnection) ;
         }
 
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Log.d(LOG_TAG, "onPreExecuteCalled");
+        }
+
         /**
          * The method which is actually run in a background thread. This creates the connection,
          * sends the request and input data, and received any results/responses from the server.
@@ -318,10 +338,10 @@ public class ServerConnection {
         @Override
         protected void onPostExecute(Connection returnConnection) {
             super.onPostExecute(returnConnection);
-            if (returnConnection != null && returnConnection.getResultIdentifier() == SocketIdentifier.CONNECTION_TEST_SUCCESSFUL) {
-                Log.d(LOG_TAG, "Server connection test successful!") ;
+            if (returnConnection != null) {
+                Log.d(LOG_TAG, "Server connection successful! ASyncTask complete.") ;
             } else {
-                Log.d(LOG_TAG, "Server connection test unsuccessful!") ;
+                Log.d(LOG_TAG, "Server connection failed! ASyncTask complete.") ;
             }
             listener.serverCallback(returnConnection);
         }
