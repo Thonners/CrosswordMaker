@@ -297,16 +297,18 @@ public class ServerConnection {
 
                     dIn = new DataInputStream(socket.getInputStream()) ;
                     byte responseIdentifier = dIn.readByte() ;
-
+                    Log.d(LOG_TAG,"Received byte: " + responseIdentifier) ;
                     // Set the response
                     returnConnection.setResultIdentifier(SocketIdentifier.getSocketIdentifierFromByte(responseIdentifier)) ;
 
                     if(returnConnection.getResultIdentifier() == SocketIdentifier.ANAGRAM_SOLUTIONS_SUCCESS || returnConnection.getResultIdentifier() == SocketIdentifier.WORD_FIT_SOLUTIONS_SUCCESS) {
                         ArrayList<String> answers = new ArrayList<>();
-                        while(dIn.available() > 0) {
+                        // Wait until EOF is received, to signify end of data transmission
+                        while(true) {
                             try {
                                 String answer = dIn.readUTF() ;
                                 answers.add(answer) ;
+                                Log.d(LOG_TAG,"Answer received = " + answer) ;
                             } catch(EOFException e) {
                                 Log.d(LOG_TAG,"EOFException caught - must be end of answers") ;
                                 break;
