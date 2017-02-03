@@ -812,6 +812,9 @@ public class AnagramPageFragment extends Fragment {
         }
     }
 
+    /**
+     * Method to show the loading spinner
+     */
     private void showLoadingSpinner() {
         // Show the progress spinner
         progressSpinnerLinLayout.setTranslationY(300);
@@ -828,6 +831,9 @@ public class AnagramPageFragment extends Fragment {
 
     }
 
+    /**
+     * Method to hide the loading spinner
+     */
     private void hideLoadingSpinner() {
         // Show the progress spinner
         progressSpinnerLinLayout.animate()

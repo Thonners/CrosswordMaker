@@ -28,7 +28,8 @@ import java.util.ArrayList;
  * DictionaryMWDownloadDefinition
  * Async task to download definition from Merriam-Webster.
  *
- * Created by Thonners on 02/02/15.
+ * @author M Thomas
+ * @since 02/02/15
  */
 public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> {
 
@@ -49,23 +50,29 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
     private static final int DEFINITION = 2 ;
     private static final int SUGGESTIONS = 3 ;
 
-    public static interface DictionaryMWDownloadDefinitionListener {
-        public abstract void completionCallBack(ViewGroup theFinalView, int searchSucessState);
+    public interface DictionaryMWDownloadDefinitionListener {
+        void completionCallBack(ViewGroup theFinalView, int searchSuccessState);
     }
     public DictionaryMWDownloadDefinitionListener listener;
     private Context context ;
     public String searchTerm;
     private int searchSuccess ;
-    public String definition ;
 
-    LinearLayout progressLinearLayout ;
-    Button searchButton ;
+    private LinearLayout progressLinearLayout ;
+    private Button searchButton ;
 
     private String urlPrefix = "http://www.dictionaryapi.com/api/v1/references/collegiate/xml/";
     private String urlSuffix = "?key=";
     private String url ;
-//    private View finalView ;    // Final view to be passed back to the DictionaryPageFragment to be put in the answers
 
+    /**
+     * Constructor.
+     * @param appContext Application context
+     * @param aSearchTerm The search term entered by the user, to be looked up in the MW dictionary.
+     * @param progressLinLayout The LinearLayout containing the progress/loading spinner.
+     * @param aSearchButton The search button
+     * @param aListener The listener instance of the main activity, to pass the results to at the end.
+     */
     public DictionaryMWDownloadDefinition (Context appContext, String aSearchTerm, LinearLayout progressLinLayout, Button aSearchButton, DictionaryMWDownloadDefinitionListener aListener) {
         context = appContext ;
         listener = aListener;
@@ -77,6 +84,10 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
         url = urlPrefix + searchTerm + urlSuffix + context.getString(R.string.dictionary_mw_api_key);
     }
 
+    /**
+     * Method called before the {@link #doInBackground(Void...)} method, to show the loading spinner
+     * and change the search button to be non-clickable and display 'searching...'.
+     */
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
@@ -93,6 +104,12 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
         searchButton.setText(R.string.searching);
     }
 
+    /**
+     * Method to run 'in background', i.e. not on UI thread. Creates the connection to the MW
+     * website and downloads the returned results.
+     * @param params No params are passed in
+     * @return A String representation of the raw XML downloaded from the MW website.
+     */
     @Override
     protected String doInBackground(Void... params) {
         HttpClient client = new DefaultHttpClient();
@@ -119,6 +136,13 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
         return xmlRaw;
     }
 
+    /**
+     * Method called once the definition download has completed. Hides the loading spinner, parses
+     * the downloaded XML and turns it into views, and, once the exit animation is complete, calls the
+     * {@link DictionaryMWDownloadDefinitionListener#completionCallBack(ViewGroup, int)}
+     * method on the listener from the main activity to pass the final results view back.
+     * @param rawXML The raw XML that has been downloaded from the MW website.
+     */
     @Override
     protected void onPostExecute(String rawXML) {
         super.onPostExecute(rawXML);
@@ -134,6 +158,11 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
 
                     }
 
+                    /**
+                     * Called once the exit-animation for the spinner is complete, to pass the
+                     * results back to the main Activity.
+                     * @param animator The animator controlling the removal of the loading spinner.
+                     */
                     @Override
                     public void onAnimationEnd(Animator animator) {
                         Log.d(LOG_TAG,"ProgressLayout Exit Animation complete");
@@ -160,6 +189,16 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
                 });
     }
 
+    /**
+     * Method to decode the XML downloaded from Merriam-Webster and to process it into the views
+     * which are to be displayed in the results view.
+     *
+     * This method checks that the results were successful using the tag-keywords denoting successs
+     * or failure with regards to looking up the word.
+     *
+     * @param rawXML The ram XML data as received from Merriam-Webster
+     * @return The ViewGroup containing cards with TextViews containing the sorted, formatted results.
+     */
     private ViewGroup decodeXML(String rawXML) {
         // Turn the raw XML into a view
         LinearLayout view = new LinearLayout(context);
@@ -201,11 +240,17 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
         return view ;
     }
 
-    //private ViewGroup parseSuccessfulXML(String xmlRaw, LinearLayout viewGroup) {
+    /**
+     * Method to parse the downloaded XML, and turn it into a card entry.
+     * The card will be transparent, (alpha = 0f) and offset, ready to be animated into view.
+     *
+     * Actual parsing done by separate {@link XmlParser} class. This method just adds the results to
+     * a new CardView, and adds that card to the parent view.
+     *
+     * @param xmlRaw The XML as received
+     * @param viewGroup The parent view to which to add the resulting card.
+     */
     private void parseSuccessfulXML(String xmlRaw, LinearLayout viewGroup) {
-        // Method to turn the raw XML into something useful
-        //LinearLayout viewGroup = new LinearLayout(context);
-        //viewGroup.setOrientation(LinearLayout.VERTICAL);
         Log.d(LOG_TAG, "Adding results to the results view");
 
         XmlParser parser = new XmlParser();
@@ -235,17 +280,21 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
             Log.d(LOG_TAG, e.getMessage());
             searchSuccess = SEARCH_NOT_COMPLETED;
         }
-    //    return viewGroup;
     }
 
-    // Default methods for creating hidden and visible TextViews
-    private TextView createHiddenTextView(String textToDisplay, int displayType) {
-        return createTextView(textToDisplay, false, displayType);
-    }
+    /**
+     * See {@link #createTextView(String, boolean, int)}. Defaults to true for createVisible.
+     */
     private TextView createTextView(String textToDisplay, int displayType) {
         return createTextView(textToDisplay, true, displayType);
     }
-    // Proper method that creates the TextView and sets its visibility
+
+    /**
+     * @param textToDisplay The text to be shown
+     * @param createVisible Whether to make the TextView visible, or create it hidden.
+     * @param displayType The type of text to be displayed - from the public static options of this class.
+     * @return A text view of the input text, with the correct formatting as specified by the displayType.
+     */
     private TextView createTextView(String textToDisplay, boolean createVisible, int displayType) {
         TextView tv = new TextView(context);
         tv.setText(textToDisplay);
