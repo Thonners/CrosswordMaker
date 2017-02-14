@@ -7,6 +7,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 
 /**
@@ -241,6 +242,7 @@ public class ServerConnection {
     private static class DataTransfer extends AsyncTask<Void, Integer, Connection> {
 
         private final String LOG_TAG = "DataTransfer" ;
+        private final int TIMEOUT = 10000 ; // Set timeout to 10s.
         private final int serverPort = 28496 ;
         private final String serverURL = "thonners.ddns.net" ;
 
@@ -281,6 +283,8 @@ public class ServerConnection {
             try {
                 Log.d(LOG_TAG, "Creating socket...") ;
                 Socket socket = new Socket(serverURL, serverPort);
+                // Set a timeout so that it won't hang indefinitely if the server can't be reached
+                socket.setSoTimeout(TIMEOUT);
 
                 // Streams
                 DataOutputStream dOut = null ;
@@ -318,6 +322,8 @@ public class ServerConnection {
                     }
 
                     return returnConnection ;
+
+                } catch (SocketTimeoutException sTO) {
 
                 } catch (Exception e) {
 

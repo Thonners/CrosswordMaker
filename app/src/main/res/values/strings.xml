@@ -48,6 +48,7 @@
 
     <!-- Home Activity -->
     <string name="home_old">Old Crosswords</string>
+    <string name="server_available_toast">CrosswordToolkit server connection available</string>
     <string name="sdcard_error_1">Sorry, no external storage found.\nThis required for saving new crosswords, so functionality is limited to the toolkit.</string>
     <string name="home_new">New Crossword</string>
     <string name="home_new2">Save a new crossword</string>
@@ -184,5 +185,7 @@
     <string name="pref_no_columns_summ">Set the default number of columns for a new crossword</string>
     <string name="pref_default_publications_title">Default Publications</string>
     <string name="pref_default_crosswords_list_summ">Edit the list of default publications for a new crossword</string>
+    <string name="pref_offline">Disable server connection</string>
+    <string name="pref_offline_summ">Prevent connections to the CrosswordToolkit Servers</string>
 
 </resources>

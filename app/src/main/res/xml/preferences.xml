@@ -22,6 +22,11 @@
             android:defaultValue="true"
             />
         <CheckBoxPreference
+            android:key="pref_offline_mode"
+            android:title="@string/pref_offline"
+            android:summary="@string/pref_offline_summ"
+            android:defaultValue="false" />
+        <CheckBoxPreference
             android:key="pref_low_ram"
             android:title="@string/pref_low_ram"
             android:summary="@string/pref_low_ram_summ"

@@ -111,40 +111,57 @@ public class AnagramPageFragment extends Fragment {
         void searchDictionary(String searchTerm);
     }
 
+
     /**
-     * Method to check whether the sever is accessible, and if not, to load the dictionary locally
+     * Method to check whether the sever is accessible, and if not, to load the dictionary locally.
+     * Before actually trying to connect to the server, check that offline mode is not enabled -
+     * otherwise proceed to load the dictionary locally.
      */
     private void checkServer() {
-        ServerConnection.ServerConnectionListener listener = new ServerConnection.ServerConnectionListener() {
-            @Override
-            public void serverConnectionResponse(ServerConnection.SocketIdentifier requestSuccess, ArrayList<String> answers) {
+        // Get the SharedPrefs to check that offline mode isn't enabled
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity()) ;
+        boolean offlineMode = prefs.getBoolean(SettingsFragment.KEY_PREF_OFFLINE_MODE, false) ;
 
-            }
+        // Load locally if offline mode, otherwise proceed to check server connection. If connection fails,
+        // dictionary will be loaded locally anyway.
+        if (offlineMode) {
+            loadDictionaryLocally();
+        } else {
+            // Test server connection
+            ServerConnection.ServerConnectionListener listener = new ServerConnection.ServerConnectionListener() {
+                @Override
+                public void serverConnectionResponse(ServerConnection.SocketIdentifier requestSuccess, ArrayList<String> answers) {
 
-            @Override
-            public void setServerAvailable(boolean isAvailable) {
-                serverAvailable = isAvailable ;
-                if (serverAvailable) {
-                    setSearchButtonClickable();
-                } else {
-                    loadDictionaryLocally();
                 }
-            }
-            @Override
-            public void callShowLoadingSpinner() {
-                showLoadingSpinner();
-            }
-            @Override
-            public void callHideLoadingSpinner() {
-                hideLoadingSpinner();
-            }
-        } ;
-        ServerConnection serverConnection = new ServerConnection(listener) ;
-        serverConnection.testServerConnection();
+
+                @Override
+                public void setServerAvailable(boolean isAvailable) {
+                    serverAvailable = isAvailable;
+                    if (serverAvailable) {
+                        setSearchButtonClickable();
+                    } else {
+                        loadDictionaryLocally();
+                    }
+                }
+
+                @Override
+                public void callShowLoadingSpinner() {
+                    showLoadingSpinner();
+                }
+
+                @Override
+                public void callHideLoadingSpinner() {
+                    hideLoadingSpinner();
+                }
+            };
+            ServerConnection serverConnection = new ServerConnection(listener);
+            serverConnection.testServerConnection();
+        }
     }
 
     /**
-     * Method to load the local copy of the sopwads dictionary into memory and prepare it for anagram/wordfit lookup
+     * Method to load the local copy of the sopwads dictionary into memory and prepare it for anagram/wordfit lookup.
+     * If low RAM mode enabled, show error message instead of loading
      */
     private void loadDictionaryLocally() {
         // Log how long it takes to load the dictionary
@@ -158,7 +175,7 @@ public class AnagramPageFragment extends Fragment {
         // Load the dictionaries in from the resources, provided low RAM mode not enabled
         if (!lowRAM){
             LoadDictionaryTask loadDictionaryTask = new LoadDictionaryTask();
-            loadDictionaryTask.execute();
+            loadDictionaryTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         } else {
             Log.d(LOG_TAG, "Low RAM mode enabled, so not reading the dictionary yet.");
             // Show a toast to explain why the solver isn't available
