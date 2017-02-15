@@ -7,6 +7,7 @@ import android.app.DialogFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -405,11 +406,20 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
     /**
+     * @return Whether or not offline mode is enabled in the app's settings.
+     */
+    private boolean getOfflineMode() {
+        // Get the SharedPrefs to check that offline mode isn't enabled
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this) ;
+        return prefs.getBoolean(SettingsFragment.KEY_PREF_OFFLINE_MODE, false) ;
+    }
+
+    /**
      * Method to check whether the CrosswordToolkit Server is available to connect to, and if so,
      * sets the serverAvailable boolean to true.
      */
     private void checkServerConnection() {
-        if (isNetworkAvailable()) {
+        if (!getOfflineMode() && isNetworkAvailable()) {
             ServerConnection.ServerConnectionListener serverConnectionListener = new ServerConnection.ServerConnectionListener() {
                 @Override
                 public void serverConnectionResponse(ServerConnection.SocketIdentifier requestSuccess, ArrayList<String> answers) {

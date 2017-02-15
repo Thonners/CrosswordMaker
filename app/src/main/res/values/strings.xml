@@ -93,6 +93,7 @@
     <string name="illegalCharacterToast">Ignoring illegal input.\nOnly letters and \'.\' allowed in input\!</string>
     <string name="clear">Clear</string>
     <string name="anagram_prompt">Enter letters for anagram:\nTo use \'word-fit\', use \'.\' for unknown letters:</string>
+    <string name="anagram_low_ram_no_server_error">Server connection required when in low RAM mode.\n\nPlease try again when you have an active internet connection.</string>
     <string name="manual_anagram_prompt">Enter letters for anagram:\nHit \'Shuffle\' below to randomise letters:\nMore instructions available via the menu.</string>
     <string name="dictionary_prompt">Enter word to search:</string>
 

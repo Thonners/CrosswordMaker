@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -85,6 +86,10 @@ public class AnagramPageFragment extends Fragment {
         });
         resultsLinearLayout = (LinearLayout) view.findViewById(R.id.anagram_results_layout);
         progressSpinnerLinLayout = (LinearLayout) view.findViewById(R.id.linlaHeaderProgress) ;
+
+        // Check the server connection
+        checkServer();
+
         return view ;
     }
 
@@ -92,7 +97,6 @@ public class AnagramPageFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        checkServer();
         try {
             mListener = (OnAnagramFragmentListener) activity;
         } catch (ClassCastException e) {
@@ -111,6 +115,14 @@ public class AnagramPageFragment extends Fragment {
         void searchDictionary(String searchTerm);
     }
 
+    /**
+     * @return Whether or not offline mode is enabled in the app's settings.
+     */
+    private boolean getOfflineMode() {
+        // Get the SharedPrefs to check that offline mode isn't enabled
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity()) ;
+        return prefs.getBoolean(SettingsFragment.KEY_PREF_OFFLINE_MODE, false) ;
+    }
 
     /**
      * Method to check whether the sever is accessible, and if not, to load the dictionary locally.
@@ -118,13 +130,10 @@ public class AnagramPageFragment extends Fragment {
      * otherwise proceed to load the dictionary locally.
      */
     private void checkServer() {
-        // Get the SharedPrefs to check that offline mode isn't enabled
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity()) ;
-        boolean offlineMode = prefs.getBoolean(SettingsFragment.KEY_PREF_OFFLINE_MODE, false) ;
 
         // Load locally if offline mode, otherwise proceed to check server connection. If connection fails,
         // dictionary will be loaded locally anyway.
-        if (offlineMode) {
+        if (getOfflineMode()) {
             loadDictionaryLocally();
         } else {
             // Test server connection
@@ -160,6 +169,15 @@ public class AnagramPageFragment extends Fragment {
     }
 
     /**
+     * @return Whether low RAM mode is enabled in the app's settings
+     */
+    private boolean getLowRAMMode() {
+        // Check whether Low RAM mode enabled on settings
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity()) ;
+        return sharedPreferences.getBoolean(SettingsFragment.KEY_PREF_LOW_RAM, false) ;
+    }
+
+    /**
      * Method to load the local copy of the sopwads dictionary into memory and prepare it for anagram/wordfit lookup.
      * If low RAM mode enabled, show error message instead of loading
      */
@@ -168,18 +186,15 @@ public class AnagramPageFragment extends Fragment {
         long startTime = System.currentTimeMillis() ;
         Log.d(LOG_TAG,"AnagramPageFragment onCreate called @ millis: " + startTime);
 
-        // Check whether Low RAM mode enabled on settings
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity()) ;
-        boolean lowRAM = sharedPreferences.getBoolean(SettingsFragment.KEY_PREF_LOW_RAM, false) ;
 
         // Load the dictionaries in from the resources, provided low RAM mode not enabled
-        if (!lowRAM){
+        if (!getLowRAMMode()){
             LoadDictionaryTask loadDictionaryTask = new LoadDictionaryTask();
             loadDictionaryTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         } else {
-            Log.d(LOG_TAG, "Low RAM mode enabled, so not reading the dictionary yet.");
-            // Show a toast to explain why the solver isn't available
-            Toast.makeText(getContext(),"Cannot connect to server, so anagram/wordfit solver unavailable when 'Low-RAM' mode enabled",Toast.LENGTH_LONG).show(); ;
+            Log.d(LOG_TAG, "Low RAM mode enabled, so not reading the dictionary. Showing error instead.");
+            // Show an error to explain why the solver isn't available
+            addLowRamNoServerError();
         }
 
         long stopTime = System.currentTimeMillis();
@@ -432,6 +447,7 @@ public class AnagramPageFragment extends Fragment {
             if (dictionaryHM.containsKey(inputSorted)) {
                 Log.d(LOG_TAG, "Match found for: " + inputSorted);
                 ArrayList<String> answers = dictionaryHM.get(inputSorted);
+                addToResults(answers);
             } else {
                 Log.d(LOG_TAG, "No match found for: " + inputSorted + ", which originally came from " + input);
                 addToResults(getString(R.string.no_match_found), false);
@@ -520,6 +536,26 @@ public class AnagramPageFragment extends Fragment {
 
         // Increment the result count so subsequent cards will be delayed on their entry animation
         resultCount++ ;
+    }
+
+    /**
+     * Method to add a text view to the results layout showing an error explaining that either a
+     * server connection or not low RAM mode are required.
+     */
+    private void addLowRamNoServerError() {
+        // Disable the search button
+        setSearchButtonDisabled();
+
+        // Show the error message
+        TextView tv = new TextView(getActivity());
+        // Set the text
+        tv.setText(getString(R.string.anagram_low_ram_no_server_error));
+        // Centre the text
+        tv.setGravity(Gravity.CENTER_HORIZONTAL);
+        //tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        // Set the height/width to match parent
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT) ;
+        resultsLinearLayout.addView(tv,params);
     }
 
     /**
@@ -684,6 +720,7 @@ public class AnagramPageFragment extends Fragment {
     private void setSearchButtonClickable() {
         // Allow the search button to be pressed once dictionary is loaded
         Log.d(LOG_TAG,"Search button now clickable");
+        searchButton.setEnabled(true);
         searchButton.setClickable(true);
         searchButton.setText(getResources().getString(R.string.search));
         searchButton.setOnClickListener(new View.OnClickListener() {
@@ -703,6 +740,18 @@ public class AnagramPageFragment extends Fragment {
         searchButton.setClickable(false);
         searchButton.setText(R.string.searching);
         searchButton.setPressed(true);
+    }
+
+    /**
+     * Disable the search button because the dictionary isn't loaded.
+     * This will usually be becuase there's no server connection and the user has selected 'low RAM mode'.
+     */
+    private void setSearchButtonDisabled() {
+        // Disable search button
+        Log.d(LOG_TAG,"Search button now clickable");
+        searchButton.setEnabled(false);
+        searchButton.setClickable(false);
+        searchButton.setText(getResources().getString(R.string.search));
     }
 
     /**
