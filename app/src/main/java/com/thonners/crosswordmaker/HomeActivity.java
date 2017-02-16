@@ -430,7 +430,7 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
                     serverAvailable = isAvailable ;
                     if (serverAvailable) {
                         Log.d(LOG_TAG, "Network is available, and server connection test was successful.");
-                        Toast.makeText(getApplicationContext(),getString(R.string.server_available_toast),Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getApplicationContext(),getString(R.string.server_available_toast),Toast.LENGTH_SHORT).show();
                     } else {
                         Log.d(LOG_TAG, "Network is available, and server connection test was UNsuccessful.");
                     }
