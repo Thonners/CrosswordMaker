@@ -14,6 +14,7 @@ import android.preference.PreferenceFragment;
 public class SettingsFragment extends PreferenceFragment {
 
     // Keys are set in preferences.xml, these are just non-linked copies.
+    public final static String KEY_PREF_DEFAULT_AUTO_SAVE = "pref_auto_save" ;
     public final static String KEY_PREF_DEFAULT_COLUMNS = "pref_no_columns" ;
     public final static String KEY_PREF_VICTORY_POPUP = "pref_victory_popup" ;
     public final static String KEY_PREF_OFFLINE_MODE = "pref_offline_mode" ;

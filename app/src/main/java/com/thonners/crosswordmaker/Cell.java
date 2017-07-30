@@ -15,7 +15,7 @@ import android.widget.EditText;
 /**
  * Created by mat on 30/11/14.
  */
-public class Cell extends EditText implements View.OnClickListener, View.OnFocusChangeListener , TextWatcher {
+public class Cell extends android.support.v7.widget.AppCompatEditText implements View.OnClickListener, View.OnFocusChangeListener , TextWatcher {
 
     private static final String LOG_TAG = "Cell" ;
 
@@ -91,9 +91,13 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
 
     private void setBlackCell() {
         this.setBackground(getResources().getDrawable(R.drawable.cell_black));
+        this.setFocusable(false);
+        this.setFocusableInTouchMode(false);
     }
     private void setWhiteCell() {
         this.setBackground(getResources().getDrawable(R.drawable.cell_white));
+        this.setFocusable(true);
+        this.setFocusableInTouchMode(true);
     }
     public void setFocusedMajor() {
         if (! this.hasFocus()) {
@@ -178,7 +182,8 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
             // Check whether this is the last clue to be completed
             crossword.checkIsComplete() ;
         }
-
+        // Update the fact that it hasn't been saved
+        if (crossword != null) crossword.setNotSaved();
     }
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 // TODO Auto-generated method stub

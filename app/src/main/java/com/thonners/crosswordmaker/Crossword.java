@@ -15,6 +15,7 @@ import android.util.TypedValue;
 import android.view.WindowManager;
 import android.widget.GridLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -61,6 +62,8 @@ public class Crossword {
     public static final int SAVE_ARRAY_START_INDEX = 6 ;       // Update this if format of saveArray changes, i.e. if more fields are added before the grid is saved.
 
     private Context context;
+
+    private boolean saved = true ; // Whether the crossword has been saved since it was last edited
 
     public String title = "Default title";   // Add the displayDate to the default title?
     public String date ;    // Save displayDate format (yyyyMMdd)          //= getFormattedDate() ;       // Default displayDate
@@ -782,6 +785,15 @@ public class Crossword {
         }
     }
 
+    public void setNotSaved() {
+        saved = false ;
+    }
+    /**
+     * @return Whether this crossword has been saved since it was last edited
+     */
+    public boolean isSaved() {
+        return saved ;
+    }
     /**
      * Method to create and show the victory popup, provided the shared preferences value
      * for the victory popup is true.
@@ -821,10 +833,16 @@ public class Crossword {
                 fileWriter.write(saveArray[i] + "\n");
             }
             fileWriter.close();
-
-
+            // Update the saved flag
+            saved = true ;
+            // Show a toast
+            Toast toast = Toast.makeText(context,"Crossword progress saved.", Toast.LENGTH_SHORT);
+            toast.show();
         }catch (Exception e) {
             Log.e(LOG_TAG, "Couldn't open fileWriter to save the crossword file.");
+
+            Toast toast = Toast.makeText(context,"Saving crossword progress failed.\nPlease try again.", Toast.LENGTH_SHORT);
+            toast.show();
         }
     }
     public void initialiseSaveFiles() {
@@ -890,7 +908,7 @@ public class Crossword {
         }
 
         // Save the grid
-        saveCrossword();
+//        saveCrossword();
     }
 
     private class VictoryDialogPopup {

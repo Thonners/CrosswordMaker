@@ -484,23 +484,6 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
         config.setCancelButtonText(R.string.rate_later);
         // Callback from clicks
         RateThisApp.init(config);
-        RateThisApp.setCallback(new RateThisApp.Callback() {
-            @Override
-            public void onYesClicked() {
-                //Toast.makeText(HomeActivity.this, "Yes event", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onNoClicked() {
-                //Toast.makeText(HomeActivity.this, "No event", Toast.LENGTH_SHORT).show();
-                neverRate();
-            }
-
-            @Override
-            public void onCancelClicked() {
-                //Toast.makeText(HomeActivity.this, "Cancel event", Toast.LENGTH_SHORT).show();
-            }
-        });
         // If the criteria is satisfied, "Rate this app" dialog will be shown
         RateThisApp.showRateDialogIfNeeded(this);
     }

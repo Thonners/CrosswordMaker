@@ -16,6 +16,12 @@
         android:title="@string/pref_general_group_title"
         android:key="pref_general_group_settings">
         <CheckBoxPreference
+            android:key="pref_auto_save"
+            android:title="@string/pref_auto_save_title"
+            android:summary="@string/pref_auto_save_summ"
+            android:defaultValue="true"
+            />
+        <CheckBoxPreference
             android:key="pref_victory_popup"
             android:title="@string/pref_victory_popup_title"
             android:summary="@string/pref_victory_popup_summ"

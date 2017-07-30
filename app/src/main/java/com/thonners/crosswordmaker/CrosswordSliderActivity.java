@@ -1,16 +1,21 @@
 package com.thonners.crosswordmaker;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.ActionMenuItemView;
 import android.util.Log;
@@ -18,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.Toast;
 
 
@@ -52,7 +58,7 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
     private boolean firstVisitManualAnagram = true ;
 
     private String[] crosswordStringArray;
-    private Crossword crossword ;
+//    private Crossword crossword ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,9 +74,15 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
     @Override
     protected void onPause() {
         super.onPause();    // Always call superclass first
-        Log.d(LOG_TAG, "onPaused called - saving crossword.");
+        Log.d(LOG_TAG, "onPaused called - saving crossword if auto-save is on, otherwise showing dialog.");
 
-        crosswordPageFragment.getCrossword().saveCrossword();
+        // If not zoomed in and on crossword fragment, go home.
+//        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this) ;
+//        if (sharedPreferences.getBoolean(SettingsFragment.KEY_PREF_DEFAULT_AUTO_SAVE,true) && !crosswordPageFragment.getCrossword().isSaved()) {
+//            // If auto-save on, save the grid without prompting
+//            crosswordPageFragment.getCrossword().saveCrossword();
+//        }
+
     }
 
     //onRestart called only when activity is being restarted after being stopped.Try redirecting here back to home page.
@@ -91,7 +103,7 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
         pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
         pager.setOffscreenPageLimit(NUM_PAGES);
-        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrollStateChanged(int state) {
                 if (state == ViewPager.SCROLL_STATE_IDLE) {
@@ -169,6 +181,9 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
         // as you specify a parent activity in AndroidManifest.xml.
 
         switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true ;
             case R.id.action_zoom:
                 // Toggle the zoom
                 toggleZoom();
@@ -218,14 +233,52 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
                 crosswordPageFragment.getCrossword().toggleZoom();
             } else {
                 // If not zoomed in and on crossword fragment, go home.
-                Intent homeIntent = new Intent(this, HomeActivity.class);
-                homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(homeIntent);
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this) ;
+                if (sharedPreferences.getBoolean(SettingsFragment.KEY_PREF_DEFAULT_AUTO_SAVE,true)) {
+                    // If auto-save on, save the grid without prompting
+                    crosswordPageFragment.getCrossword().saveCrossword();
+                    Log.d(LOG_TAG,"goHome() called...");
+                    goHome();
+                } else if (!crosswordPageFragment.getCrossword().isSaved()){
+                    // If not autosaving, and if not saved since last edit, prompt to save
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this) ;
+                    builder.setTitle(this.getString(R.string.dialog_save_title))
+                            .setMessage(this.getString(R.string.dialog_save_message))
+                            .setPositiveButton(this.getString(R.string.dialog_save_save), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    crosswordPageFragment.getCrossword().saveCrossword();
+                                    goHome() ;
+                                }
+                            })
+                            .setNegativeButton(this.getString(R.string.dialog_save_dont_save), new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    goHome();
+                                }
+                            /*})
+                            .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                @Override
+                                public void onDismiss(DialogInterface dialog) {
+                                }*/
+                            });
+                    // Build and show the dialog
+                    builder.create().show();
+                } else {
+                    Log.d(LOG_TAG,"goHome() called...");
+                    goHome();
+                }
             }
         } else {
             // Otherwise, return to the crossword Activity
             pager.setCurrentItem(0);
         }
+    }
+
+    private void goHome() {
+        Intent homeIntent = new Intent(this, HomeActivity.class);
+        homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(homeIntent);
     }
 
     public interface OnFragmentInteractionListener {
