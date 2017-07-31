@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -40,7 +41,7 @@ import java.util.ArrayList;
  *  Created by Thonners on 06/05/15
  */
 
-public class GridMaker extends ActionBarActivity {
+public class GridMaker extends AppCompatActivity {
 
     private static final String LOG_TAG = "GridMaker";
     static final int REQUEST_IMAGE_CAPTURE = 1;

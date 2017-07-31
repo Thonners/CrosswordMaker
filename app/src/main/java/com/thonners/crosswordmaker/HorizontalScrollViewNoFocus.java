@@ -17,7 +17,7 @@ import java.util.ArrayList;
  */
 public class HorizontalScrollViewNoFocus extends HorizontalScrollView {
 
-    private static String LOG_TAG = "HorizontalScrollViewNoFocus";
+    private static String LOG_TAG = "HorizScrollViewNoFocus";
 
     public HorizontalScrollViewNoFocus(Context context){
         super(context);
@@ -45,7 +45,7 @@ public class HorizontalScrollViewNoFocus extends HorizontalScrollView {
     @Override
     public void requestChildFocus(View child, View focused) {
         // avoid scrolling to focused view
-        super.requestChildFocus(child, focused);
+//        super.requestChildFocus(child, focused);
         Log.d(LOG_TAG, "requestChildFocus called...");
     }
 }

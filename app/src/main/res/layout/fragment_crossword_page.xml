@@ -5,9 +5,6 @@
     xmlns:android.support.design="http://schemas.android.com/apk/res-auto"
     tools:context="com.thonners.crosswordmaker.CrosswordPageFragment">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
         <LinearLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
@@ -45,6 +42,10 @@
                 </ScrollView>
             </com.thonners.crosswordmaker.HorizontalScrollViewNoFocus>
 
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:windowSoftInputMode="adjustNothing">
             <LinearLayout
                 android:id="@+id/clues_checklist_parent_view"
                 android:layout_width="match_parent"
@@ -71,6 +72,6 @@
                     android:orientation="horizontal">
                 </GridLayout>
             </LinearLayout>
+            </ScrollView>
         </LinearLayout>
-    </ScrollView>
 </FrameLayout>

@@ -97,18 +97,6 @@ public class CluePageFragment extends Fragment {
                 return true;
             }
         });
-        /* //-------------- Old standard ImageView - remove if pinch-to-zoom works
-        clueImageView = (ImageView) view.findViewById(R.id.image_view_clues);
-        clueImageView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                // Offer option to retake clues picture if user long-clicks
-                Log.d(LOG_TAG,"Long-click on clue image detected");
-                retakePicture();
-                return true;
-            }
-        });
-        */
 
         if (clueImageFileExists()) {
             setClueImageInView();
@@ -129,7 +117,6 @@ public class CluePageFragment extends Fragment {
             }
         }
 
-     //   loadClueImage();
     }
 
     @Override
@@ -169,8 +156,13 @@ public class CluePageFragment extends Fragment {
         clueImageBitmap = getImage(clueImageFile);
 
         Log.d(LOG_TAG, "Setting image");
-        //clueImageView.setImageBitmap(clueImageBitmap);
         clueImageViewTouch.setImageBitmap(clueImageBitmap);
+        // Fade image back in
+        clueImageViewTouch.animate()
+                .alpha(1.0f)
+                .setDuration(300)
+                .start();
+
     }
     private void removePhotoButton() {
         //Remove button from view
@@ -181,13 +173,7 @@ public class CluePageFragment extends Fragment {
             takeCluePhotoButton = null ;    // Force to null. Not sure what it would be without this.
         }
     }
-    /*
-    private void loadClueImage() {
-        // Load clue image if one already exists
-        if (clueImageFileExists()) {
-            setClueImageInView();
-        }
-    }//*/
+
     private boolean clueImageFileExists() {        // Initialise the file required
         try {
             clueImageFile = new File(imageFilePath);
@@ -203,6 +189,12 @@ public class CluePageFragment extends Fragment {
 
     public void dispatchTakePictureIntent() {
         Log.d(LOG_TAG, "dispatchPictureIntent method started");
+        // Fade out old image if it's there
+        clueImageViewTouch.animate()
+                .alpha(0.0f)
+                .setDuration(300)
+                .start();
+
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if(takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
 
@@ -288,6 +280,13 @@ public class CluePageFragment extends Fragment {
         return size.x;
     }
 
+    public void retakePicture() {
+        if (clueImageFileExists()) {
+            showOverwriteClueImageFileDialog();
+        } else {
+            dispatchTakePictureIntent();
+        }
+    }
     private void showOverwriteClueImageFileDialog() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(getResources().getString(R.string.dialog_overwrite_clue_image_message));
@@ -303,11 +302,29 @@ public class CluePageFragment extends Fragment {
                 dialog.cancel();
             }
         });
+        builder.setNeutralButton(R.string.dialog_rotate, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+                rotatePicture() ;
+            }
+        });
         builder.show();
     }
-    public void retakePicture() {
+
+    private void rotatePicture() {
         if (clueImageFileExists()) {
-            showOverwriteClueImageFileDialog();
+            // Fade out old image if it's there
+            clueImageViewTouch.animate()
+                    .alpha(0.0f)
+                    .setDuration(300)
+                    .start();
+
+            // Use ImageEditor helper class
+            ImageEditor ie = new ImageEditor();
+            ie.rotateImage(clueImageFile);
+            // Reload the image
+            setClueImageInView();
         } else {
             dispatchTakePictureIntent();
         }

@@ -126,14 +126,15 @@
 
     <!-- Publication name selector Dialog -->
     <string name="dialog_ok">OK</string>
-    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_cancel">CANCEL</string>
     <string name="pub_name_dialog_title">Select the publication</string>
     <string name="pub_name_other_dialog_title">Enter the publication name:</string>
     <string name="pub_date_dialog_title">Select the date</string>
     <string name="pub_other">Other</string>
-    <string name="dialog_overwrite">Overwrite</string>
+    <string name="dialog_overwrite">OVERWRITE</string>
+    <string name="dialog_rotate">ROTATE</string>
     <string name="dialog_overwrite_crossword_message">A save file for this crossword already exists.\nDo you wish to overwrite it\?</string>
-    <string name="dialog_overwrite_clue_image_message">Retake picture? This will overwrite the existing clue image\?</string>
+    <string name="dialog_overwrite_clue_image_message">Retake or rotate picture? This will overwrite the existing clue image\?</string>
 
     <array name="publications">
         <item name="pub0">The Evening Standard</item>

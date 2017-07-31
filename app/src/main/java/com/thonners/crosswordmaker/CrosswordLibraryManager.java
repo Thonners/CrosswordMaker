@@ -328,9 +328,12 @@ public class CrosswordLibraryManager {
 
             Log.d(LOG_TAG, "Number of cells: " + cells + " & number of nonBlanks = " + nonBlanks);
 
-            int percentage = (int) (nonBlanks * 100) / cells ;
-
-            return percentage + "";
+            if (cells > 0) {
+                int percentage = (int) (nonBlanks * 100) / cells;
+                return percentage + "" ;
+            } else {
+                return "0";
+            }
         }
         public String getTitle() {
             return title;
