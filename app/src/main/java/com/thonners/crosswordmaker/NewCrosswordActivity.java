@@ -94,7 +94,8 @@ public class NewCrosswordActivity extends AppCompatActivity {
         intent.putExtra(Crossword.CROSSWORD_EXTRA_TITLE,crosswordTitle);
         intent.putExtra(Crossword.CROSSWORD_EXTRA_DATE, crosswordDate);
         intent.putExtra(Crossword.CROSSWORD_EXTRA_NO_ROWS, rows);
-        intent.putExtra(AUTO_GRID_GENERATION,false);
+        intent.putExtra(AUTO_GRID_GENERATION,true);
+        //intent.putExtra(AUTO_GRID_GENERATION,false);
         startActivity(intent);
 
     }
