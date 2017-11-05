@@ -3,6 +3,8 @@ package com.thonners.crosswordmaker;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.NumberPicker;
+import android.widget.Toast;
 
 /**
  * NewCrosswordActivity Activity
@@ -29,6 +32,7 @@ public class NewCrosswordActivity extends AppCompatActivity {
     public static final String AUTO_GRID_GENERATION = "com.thonners.crosswordmaker.autoGeneration" ;
     private String crosswordTitle;
     private String crosswordDate;
+    private boolean autoEnabled = true ;
 
     private NumberPicker numberPicker ;
 
@@ -44,6 +48,14 @@ public class NewCrosswordActivity extends AppCompatActivity {
         getIntents();
         setupNumberPicker();
 
+        // Grey out the auto-create button if it's not set in the settings
+        FloatingActionButton fabAuto = (FloatingActionButton) findViewById(R.id.fab_auto) ;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this) ;
+        if (!prefs.getBoolean(SettingsFragment.KEY_PREF_AUTOGRID, false)) {
+            fabAuto.setBackgroundColor(ContextCompat.getColor(this,R.color.light_grey));
+            fabAuto.setCompatElevation(getResources().getDimension(R.dimen.cardview_default_elevation));
+            autoEnabled = false ;
+        }
     }
 
     private void getIntents() {
@@ -101,17 +113,22 @@ public class NewCrosswordActivity extends AppCompatActivity {
     }
 
     public void autoEnterClicked(View view) {
-        // Work out the grid from a photo. Put the boolean value into the gridmaker intent and have that deal with getting the image
-        // Get number entered
-        int rows = numberPicker.getValue();
+        // Check that auto is enabled first, otherwise prompt to enable it in settings
+        if (autoEnabled) {
+            // Work out the grid from a photo. Put the boolean value into the gridmaker intent and have that deal with getting the image
+            // Get number entered
+            int rows = numberPicker.getValue();
 
-        // Pass to new activity
-        Intent intent = new Intent(this, GridMaker.class);
-        intent.putExtra(Crossword.CROSSWORD_EXTRA_TITLE,crosswordTitle);
-        intent.putExtra(Crossword.CROSSWORD_EXTRA_DATE, crosswordDate);
-        intent.putExtra(Crossword.CROSSWORD_EXTRA_NO_ROWS, rows);
-        intent.putExtra(AUTO_GRID_GENERATION,true);
-        startActivity(intent);
+            // Pass to new activity
+            Intent intent = new Intent(this, GridMaker.class);
+            intent.putExtra(Crossword.CROSSWORD_EXTRA_TITLE, crosswordTitle);
+            intent.putExtra(Crossword.CROSSWORD_EXTRA_DATE, crosswordDate);
+            intent.putExtra(Crossword.CROSSWORD_EXTRA_NO_ROWS, rows);
+            intent.putExtra(AUTO_GRID_GENERATION, true);
+            startActivity(intent);
+        } else {
+            Toast.makeText(this,"To enable auto grid generation from an image, please enable it in the settings. Note that this feature is currently in beta!",Toast.LENGTH_SHORT);
+        }
     }
 
     /**

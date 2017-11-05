@@ -89,15 +89,17 @@ public class Cell extends android.support.v7.widget.AppCompatEditText implements
         this.crossword = cwd ;
     }
 
-    private void setBlackCell() {
+    public void setBlackCell() {
         this.setBackground(getResources().getDrawable(R.drawable.cell_black));
         this.setFocusable(false);
         this.setFocusableInTouchMode(false);
+        blackCell = true ;
     }
-    private void setWhiteCell() {
+    public void setWhiteCell() {
         this.setBackground(getResources().getDrawable(R.drawable.cell_white));
         this.setFocusable(true);
         this.setFocusableInTouchMode(true);
+        blackCell = false ;
     }
     public void setFocusedMajor() {
         if (! this.hasFocus()) {

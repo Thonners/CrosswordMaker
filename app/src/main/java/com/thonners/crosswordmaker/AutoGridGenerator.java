@@ -47,7 +47,7 @@ public class AutoGridGenerator {
                 int y = row * cellRes ;
                 for (int i = 0 ; i < cellRes ; i++) {
                     for (int j = 0 ; j < cellRes ; j++) {
-                        total += Color.red(image.getPixel(x + i, y+j)) ;
+                        total += (Color.red(image.getPixel(x + i, y+j)) + Color.blue(image.getPixel(x + i, y+j)) + Color.green(image.getPixel(x + i, y+j))) / 3 ;
                     }
                 }
                 int average = total / (cellRes * cellRes) ;
@@ -68,6 +68,55 @@ public class AutoGridGenerator {
                 } else {
                     grid[index] = true ;
                 }
+                Log.d("AGG", "col = " + col + ", row = " + row + ", netTotal = " + netTotal + ", netAve = " + netAve + " & therefore: white cell = " + grid[index]) ;
+            }
+        }
+
+        for (int col = 0 ; col <= gridSize/2 ; col++) {
+            for (int row = 0 ; row <= gridSize/2 ; row++) {
+                int oppRow = gridSize - row - 1;
+                int oppCol = gridSize - col - 1;
+                int netTotal = gridAve[Math.max(0,col-1)][Math.max(0,row-1)] + gridAve[col][Math.max(0,row-1)] + gridAve[Math.min(gridSize-1,col+1)][Math.max(0,row-1)] ;
+                netTotal += gridAve[Math.max(0,col-1)][row] + gridAve[col][row] + gridAve[Math.min(gridSize-1,col+1)][row] ;
+                netTotal += gridAve[Math.max(0,col-1)][Math.min(gridSize-1,row+1)] + gridAve[col][Math.min(gridSize-1,row+1)] + gridAve[Math.min(gridSize-1,col+1)][Math.min(gridSize-1,row+1)] ;
+
+                int netTotalOpp = gridAve[Math.max(0,oppCol-1)][Math.max(0,oppRow-1)] + gridAve[oppCol][Math.max(0,oppRow-1)] + gridAve[Math.min(gridSize-1,oppCol+1)][Math.max(0,oppRow-1)] ;
+                netTotalOpp += gridAve[Math.max(0,oppCol-1)][oppRow] + gridAve[oppCol][oppRow] + gridAve[Math.min(gridSize-1,oppCol+1)][oppRow] ;
+                netTotalOpp += gridAve[Math.max(0,oppCol-1)][Math.min(gridSize-1,oppRow+1)] + gridAve[col][Math.min(gridSize-1,oppRow+1)] + gridAve[Math.min(gridSize-1,oppCol+1)][Math.min(gridSize-1,oppRow+1)] ;
+
+                double netAve = netTotal / 9.0 ;
+                double netAveOpp = netTotalOpp / 9.0 ;
+
+                int index = col + row*gridSize;
+                int indexOpp = oppCol + oppRow*gridSize;
+
+                // Doesn't matter if they're the same or not, always take the one with the bigger delta from the mean. ( if they're the same then it doesn't matter which one to use)
+//                 //Check whether the results from the comparison is the same
+//                if ((gridAve[col][row] > netAve) ^ (gridAve[oppCol][oppRow] > netAveOpp)) {
+                    // If they're different, pick the main one
+                double diff = netAve - gridAve[col][row] ;
+                double oppDiff = netAveOpp - gridAve[oppCol][oppRow] ;
+                boolean whiteCell ;
+                if (Math.abs(diff) >= Math.abs(oppDiff)) {
+                    // If the difference between mean and individual value is greater for the original cell, assume that is the correct answer
+                    whiteCell = gridAve[col][row] > netAve;
+                } else {
+                    whiteCell = gridAve[oppCol][oppRow] > netAveOpp;
+                }
+                grid[index] = whiteCell;
+                grid[indexOpp] = whiteCell;
+//                } else {
+//                        grid[index] = gridAve[col][row] > netAve;
+//                        grid[indexOpp] = gridAve[col][row] > netAve;
+//
+//                }
+
+//                int index = col + row*gridSize;
+//                if (gridAve[col][row] < netAve) {
+//                    grid[index] = false ;
+//                } else {
+//                    grid[index] = true ;
+//                }
                 Log.d("AGG", "col = " + col + ", row = " + row + ", netTotal = " + netTotal + ", netAve = " + netAve + " & therefore: white cell = " + grid[index]) ;
             }
         }
@@ -219,6 +268,7 @@ public class AutoGridGenerator {
         rawImage.setPixels(array,0,rawImage.getWidth(),0,0,rawImage.getWidth(),rawImage.getHeight());
         return rawImage ;
     }
+
     /**
      * @param rawImage The image to have blurring applied
      * @return The blurred image

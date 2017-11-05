@@ -197,9 +197,12 @@ public class GridMaker extends AppCompatActivity implements View.OnClickListener
         toast.show();
     }
 
-
-
-    /****************************************** Auto Grid Generation *************************************/
+    /**
+     * Called when the camera activity returns from taking a picture of the grid
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Automatically called when activity is resumed post photo taking.
@@ -207,47 +210,17 @@ public class GridMaker extends AppCompatActivity implements View.OnClickListener
         iv.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         linearLayout.addView(iv,0);
         iv.setOnTouchListener(this);
-        autoGenerateGrid();
-    }
-
-    private void autoGenerateGrid() {
-        Log.d(LOG_TAG,"autoGenerateGrid() called with imageCount = " + imageCount) ;
         AutoGridGenerator generator = new AutoGridGenerator() ;
-        switch (imageCount) {
-            case 0:
-                latestBitmap = generator.resize(BitmapFactory.decodeFile(tempImageFile.getAbsolutePath()), screenWidth);
-                showBitmap() ;
-                break ;/*
-            case 1:
-                latestBitmap = generator.convertToBlackAndWhite(latestBitmap) ;
-                showBitmap() ;
-                break;
-            case 2:
-                latestBitmap = generator.invertColours(latestBitmap);
-                showBitmap();
-                break;
-            case 3:
-                latestBitmap = generator.addBlur(latestBitmap);
-                showBitmap();
-                break;
-            case 4:
-                latestBitmap = generator.addThreshold(latestBitmap);
-                showBitmap();
-                break;*/
-            case 100:
-                showBitmap();
-                break;
-            default:
-        }
+        latestBitmap = generator.resize(BitmapFactory.decodeFile(tempImageFile.getAbsolutePath()), screenWidth);
+        showBitmap() ;
+
     }
 
+    /**
+     * Sets the image in the main imageview to latestBitmap
+     */
     private void showBitmap() {
         Log.d(LOG_TAG,"showBitmap called with imageCount = " + imageCount) ;
-        /*int originalHeight = latestBitmap.getHeight();
-        int originalWidth = latestBitmap.getWidth();
-        double scaleRatio = (double) screenWidth / (double) originalWidth ;
-        scaledBitmap = Bitmap.createScaledBitmap(latestBitmap, (int) (originalWidth * scaleRatio), (int) (originalHeight * scaleRatio),false);*/
-//        iv.setImageBitmap(scaledBitmap);
         iv.setImageBitmap(latestBitmap);
     }
 
@@ -330,6 +303,8 @@ public class GridMaker extends AppCompatActivity implements View.OnClickListener
             generateGrid(tempImageFile);
         }
     }
+
+
     private void dispatchTakePictureIntent() {
         Log.d(LOG_TAG, "dispatchPictureIntent method started");
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -356,7 +331,7 @@ public class GridMaker extends AppCompatActivity implements View.OnClickListener
         }
     }
 
-    // Auto reading of grid
+    // OLD Auto reading of grid
     private void generateGrid(File crosswordImage) {
         // Start by working out the image orientation and size
         int width = scaledBitmap.getWidth();
@@ -576,7 +551,7 @@ public class GridMaker extends AppCompatActivity implements View.OnClickListener
 
     }
 
-    // Lifted from th'internet.
+    // OLD Lifted from th'internet.
     private Bitmap convertToBlackAndWhite(Bitmap orginalBitmap) {
 
         Log.d(LOG_TAG,"Converting bitmap to B&W");
@@ -603,8 +578,6 @@ public class GridMaker extends AppCompatActivity implements View.OnClickListener
     public void onClick(View v) {
 
         Log.d(LOG_TAG,"Image clicked") ;
-        imageCount++ ;
-        autoGenerateGrid();
     }
 
     @Override
@@ -653,8 +626,10 @@ public class GridMaker extends AppCompatActivity implements View.OnClickListener
                     case 5:
                         Log.d(LOG_TAG, "generating grid");
                         boolean[] grid = generator.getGridFromImage(latestBitmap,15);
-                        latestBitmap = generator.resize(latestBitmap, screenWidth);
-                        showBitmap();
+                        launchCrossword(grid) ;
+//
+//                        latestBitmap = generator.resize(latestBitmap, screenWidth);
+//                        showBitmap();
                         break;
                     default:
                         break;
@@ -668,5 +643,30 @@ public class GridMaker extends AppCompatActivity implements View.OnClickListener
         }
 
         return true;
+    }
+
+    private void launchCrossword(boolean[] gridBool) {
+
+        Crossword c = new Crossword(this, crosswordRowCount, grid, crosswordTitle, crosswordDate);
+
+        c.saveCrossword();
+//        String[] cGrid = new String[gridBool.length + 6];
+
+        for (int i = 0 ; i < gridBool.length ; i++) {
+            int j = i+6 ;
+            int x = i / crosswordRowCount ;
+            int y = i % crosswordRowCount ;
+            if (gridBool[i]) {
+                c.getCell(x,y).setWhiteCell();
+//                cGrid[j] = "" ;
+            } else {
+                c.getCell(x,y).setBlackCell();
+//                cGrid[i] = "-";
+            }
+        }
+
+        c.saveCrossword();
+        CrosswordLibraryManager clm = new CrosswordLibraryManager(this) ;
+        clm.openCrossword(c.getSaveArray());
     }
 }

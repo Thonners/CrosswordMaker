@@ -224,7 +224,7 @@ public class CrosswordLibraryManager {
             openCrossword(savedCrosswordArray);
         }
     }
-    private void openCrossword(String[] savedCrossword) {
+    public void openCrossword(String[] savedCrossword) {
 
         showLoadingToast();
             Log.d(LOG_TAG,"Opening crossword " + savedCrossword[Crossword.SAVED_ARRAY_INDEX_TITLE] + " " + savedCrossword[Crossword.SAVED_ARRAY_INDEX_DATE]);
