@@ -87,12 +87,16 @@ public class AnagramPageFragment extends Fragment {
         resultsLinearLayout = (LinearLayout) view.findViewById(R.id.anagram_results_layout);
         progressSpinnerLinLayout = (LinearLayout) view.findViewById(R.id.linlaHeaderProgress) ;
 
-        // Check the server connection
-        checkServer();
 
         return view ;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Check the server connection
+        checkServer();
+    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -121,6 +125,9 @@ public class AnagramPageFragment extends Fragment {
     private boolean getOfflineMode() {
         // Get the SharedPrefs to check that offline mode isn't enabled
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity()) ;
+        if (prefs == null) {
+            return false ;
+        }
         return prefs.getBoolean(SettingsFragment.KEY_PREF_OFFLINE_MODE, false) ;
     }
 
@@ -174,6 +181,9 @@ public class AnagramPageFragment extends Fragment {
     private boolean getLowRAMMode() {
         // Check whether Low RAM mode enabled on settings
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity()) ;
+        if (sharedPreferences == null) {
+            return false ;
+        }
         return sharedPreferences.getBoolean(SettingsFragment.KEY_PREF_LOW_RAM, false) ;
     }
 
@@ -286,7 +296,7 @@ public class AnagramPageFragment extends Fragment {
 
         Log.d(LOG_TAG, "Checking input... ");
         // First check input and ignore any non letters or '.'s
-        String searchStringOriginal = inputBox.getText().toString().replaceAll(" ",""); // Remove all spaces
+        String searchStringOriginal = inputBox.getText().toString().trim().replaceAll(" ",""); // Remove all spaces
         String searchString = "";
         boolean containsIllegalCharacters = false ;
 
@@ -380,7 +390,7 @@ public class AnagramPageFragment extends Fragment {
             Log.d(LOG_TAG, "searching entire dictionary. Will be slow...");
             dictionaryToSearch = dictionary ;
         } else {
-            Log.d(LOG_TAG, "searching words beginning with " + input.charAt(0) + " ...");
+            Log.d(LOG_TAG, "searching words beginning with " + input.charAt(0) + " ... dictionaryByLetter.length = " + dictionaryByLetter.size());
             String[] dic = dictionaryByLetter.get(getLetterIndex(input.charAt(0)));
 
             dictionaryToSearch = Arrays.asList(dic);
