@@ -42,41 +42,37 @@
             </ScrollView>
         </com.thonners.crosswordmaker.HorizontalScrollViewNoFocus>
 
-        <LinearLayout
-            android:id="@+id/clues_checklist_parent_view"
+        <ScrollView
+            android:id="@+id/clues_checklist_parent_scroll_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/clues_checklist_across_header"
-                style="@style/clues_checklist_header"
-                android:text="@string/across"/>
-
-            <!--
+            android:layout_height="wrap_content">
             <LinearLayout
-                android:id="@+id/clues_checklist_across_layout"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-            </LinearLayout>
-            -->
-            <GridLayout
-                android:id="@+id/clues_checklist_across_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
-            <TextView
-                android:id="@+id/clues_checklist_down_header"
-                style="@style/clues_checklist_header"
-                android:text="@string/down"/>
-            <GridLayout
-                android:id="@+id/clues_checklist_down_layout"
+                android:id="@+id/clues_checklist_parent_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-            </GridLayout>
-        </LinearLayout>
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/clues_checklist_across_header"
+                    style="@style/clues_checklist_header"
+                    android:text="@string/across"/>
+
+                <GridLayout
+                    android:id="@+id/clues_checklist_across_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+                <TextView
+                    android:id="@+id/clues_checklist_down_header"
+                    style="@style/clues_checklist_header"
+                    android:text="@string/down"/>
+                <GridLayout
+                    android:id="@+id/clues_checklist_down_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                </GridLayout>
+            </LinearLayout>
+        </ScrollView>
     </LinearLayout>
 
 </FrameLayout>

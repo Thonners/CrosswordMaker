@@ -735,7 +735,9 @@ public class Crossword {
 
     public void scrollToCell(Cell cell){
         // Method to call scrollToCell from CrosswordGrid. This will tell the scroll view to scroll to the highlighted cell
-        crosswordGrid.scrollToView(cell);
+        if (crosswordGrid != null && cell != null) {
+            crosswordGrid.scrollToView(cell);
+        }
     }
 
     /**
