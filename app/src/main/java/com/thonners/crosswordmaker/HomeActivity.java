@@ -368,13 +368,15 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
             public void onClick(DialogInterface dialog, int which) {
                 // Set selectedPublication to the text entered in the box
                 if (input.getText().toString().equals("")) {
+                    Log.d(LOG_TAG,"Blank entry for publication name. Reopening the dialog");
                     popupOtherPublicationDialog();  // If it is blank, call this alert again. User can press cancel to get out of it if requried.
+                    Toast.makeText(getApplicationContext(),"A name for the publication is required to continue.",Toast.LENGTH_SHORT).show();
                 } else {
+                    Log.d(LOG_TAG,"Entry for publication name given as:");
                     publication = input.getText().toString();
+                    // Date dialog popup
+                    popupDateDialog();
                 }
-
-                // Date dialog popup
-                popupDateDialog();
             }
         });
         builder.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {

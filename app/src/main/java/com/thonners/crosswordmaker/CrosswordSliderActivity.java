@@ -215,7 +215,7 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
             // If the user is currently looking at the first step, i.e. the crossword activity, allow the system to handle the
             // Back button. This calls finish() on this activity and pops the back stack.
             //super.onBackPressed();
-            if (crosswordPageFragment.getCrossword().getIsZoomed()) {
+            if (crosswordPageFragment != null && crosswordPageFragment.getCrossword().getIsZoomed()) {
                 // Zoom out if zoomed in and back pressed
                 crosswordPageFragment.getCrossword().toggleZoom();
             } else {

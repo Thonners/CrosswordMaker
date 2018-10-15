@@ -162,7 +162,7 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
         Log.d(LOG_TAG,"Populating the clues checklist...");
         // Get column count, etc.
         int clueCount = clues.size() ;
-        int colMax = Math.min(MAX_COL_COUNT, clueCount) ;
+        int colMax = Math.max(Math.min(MAX_COL_COUNT, clueCount),1) ; // Force the colMax to be between 1 and the MAX_COL_COUNT value
         int rowCount = clueCount / colMax ;
         gridLayout.setColumnCount(colMax);
         gridLayout.setRowCount(rowCount + 1);

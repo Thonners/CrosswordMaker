@@ -100,7 +100,7 @@ public class ToolkitSliderActivity extends AppCompatActivity implements Dictiona
 
     private void initialise() {
         // Initialise pager
-        pager = (ViewPager) findViewById(R.id.pager);
+        pager = findViewById(R.id.pager);
         pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
         pager.setOffscreenPageLimit(NUM_PAGES);
@@ -162,7 +162,7 @@ public class ToolkitSliderActivity extends AppCompatActivity implements Dictiona
         Log.d(LOG_TAG, "Show keyboard called");
         // Method to hide the keyboard
         InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputManager.showSoftInput(view, inputManager.SHOW_IMPLICIT);
+        inputManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
     }
     /**
      * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in

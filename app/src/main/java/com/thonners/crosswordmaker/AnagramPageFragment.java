@@ -124,11 +124,11 @@ public class AnagramPageFragment extends Fragment {
      */
     private boolean getOfflineMode() {
         // Get the SharedPrefs to check that offline mode isn't enabled
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity()) ;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         if (prefs == null) {
-            return false ;
+            return false;
         }
-        return prefs.getBoolean(SettingsFragment.KEY_PREF_OFFLINE_MODE, false) ;
+        return prefs.getBoolean(SettingsFragment.KEY_PREF_OFFLINE_MODE, false);
     }
 
     /**
@@ -180,11 +180,14 @@ public class AnagramPageFragment extends Fragment {
      */
     private boolean getLowRAMMode() {
         // Check whether Low RAM mode enabled on settings
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity()) ;
-        if (sharedPreferences == null) {
-            return false ;
+        Activity activity = getActivity();
+        if (activity != null) {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            if (sharedPreferences != null) {
+                return sharedPreferences.getBoolean(SettingsFragment.KEY_PREF_LOW_RAM, false);
+            }
         }
-        return sharedPreferences.getBoolean(SettingsFragment.KEY_PREF_LOW_RAM, false) ;
+        return false;
     }
 
     /**
@@ -838,7 +841,9 @@ public class AnagramPageFragment extends Fragment {
         }
 
         protected void onPostExecute(String result) {
-            setSearchButtonClickable();
+            if (getActivity() != null){
+                setSearchButtonClickable();
+            }
         }
 
     }
