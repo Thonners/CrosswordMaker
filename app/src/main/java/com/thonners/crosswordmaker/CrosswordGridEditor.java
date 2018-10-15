@@ -4,7 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -15,7 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 
-public class CrosswordGridEditor extends ActionBarActivity {
+public class CrosswordGridEditor extends AppCompatActivity {
 
     private static final String LOG_TAG = "CrosswordEditorActivity";
 

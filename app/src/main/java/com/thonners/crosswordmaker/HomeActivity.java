@@ -1,5 +1,7 @@
 package com.thonners.crosswordmaker;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -12,8 +14,11 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.text.InputType;
@@ -42,6 +47,8 @@ import java.util.Calendar;
 public class HomeActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
     private static final String LOG_TAG = "HomeActivity";
+
+    private static final int REQUEST_CODE_WRITE_EXTERNAL_STORAGE_PERMISSION = 123;
 
     private final int RATE_DAYS = 3 ;
     private final int RATE_LAUNCHES = 5 ;
@@ -74,12 +81,14 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
 
         checkFirstRun();
         showRateDialog() ;
+
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (sdcardIsAvailable()) {
+        if (sdcardIsAvailable(this)) {
             updateRecentCrosswords();
         } else {
             showToast(getResources().getString(R.string.sdcard_error_1));
@@ -198,7 +207,7 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
     public void savedClicked(View view) {
-        if (sdcardIsAvailable()) {
+        if (sdcardIsAvailable(this)) {
             if (new CrosswordLibraryManager(this).getSavedCrosswords().size() > 0 ) {
                 // Open CrosswordLibraryActivity
                 Intent intent = new Intent(this, CrosswordLibraryActivity.class);
@@ -213,7 +222,7 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
 
     public void newClicked(View view) {
         // Check SD card is available to save to, otherwise show toast and ignore press
-        if (sdcardIsAvailable()) {
+        if (sdcardIsAvailable(this)) {
             // Open something to let the person enter the details
             publications = getResources().getTextArray(R.array.publications);
             popupPublicationDialogOptions();
@@ -590,11 +599,19 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
     public static boolean deviceHasCameraCapability(Context context) {
         return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA) ;
     }
-    public static boolean sdcardIsAvailable() {
+    public static boolean sdcardIsAvailable(Activity activity) {
         // Check to see if SD Card is available - This is required to save crosswords
         Boolean isSDPresent = android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED);
         if(isSDPresent)
         {
+            // Check whether this app has write external storage permission or not.
+            int writeExternalStoragePermission = ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            // If do not grant write external storage permission.
+            if(writeExternalStoragePermission != PackageManager.PERMISSION_GRANTED) {
+                // Request user to grant write external storage permission.
+                ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_WRITE_EXTERNAL_STORAGE_PERMISSION);
+                Log.d(LOG_TAG,"No permission for writing to external storage");
+            }
             // yes SD-card is present
             Log.d("SD-Card", "SD Card is Present");
             return true ;
@@ -611,5 +628,19 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
         InputMethodManager inputManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_CODE_WRITE_EXTERNAL_STORAGE_PERMISSION) {
+            int grantResultsLength = grantResults.length;
+            if (grantResultsLength > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getApplicationContext(), "Thanks. Saving progress is now possible", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "You denied permission to write to storage. This is required to save files.", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 }

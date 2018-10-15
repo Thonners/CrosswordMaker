@@ -1,13 +1,19 @@
 package com.thonners.crosswordmaker;
 
+import android.Manifest;
+import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.hardware.display.DisplayManager;
 import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -827,14 +833,20 @@ public class Crossword {
 
         }catch (Exception e) {
             Log.e(LOG_TAG, "Couldn't open fileWriter to save the crossword file.");
+            e.printStackTrace();
         }
     }
     public void initialiseSaveFiles() {
         // Format File name
         fileName = date + "-" + title.replaceAll(" ","_").replaceAll("-","__"); //.toLowerCase() ; // Delete this if it works
         // Create the save files/directories
+
         // Directory
         File docsDirectory = new File(Environment.getExternalStorageDirectory() + "/.CrosswordToolkit");
+        if (!(docsDirectory.exists() && docsDirectory.isDirectory())) {
+            docsDirectory.mkdirs();
+        }
+
         if (!docsDirectory.mkdir()) {
             Log.e(LOG_TAG, "Error creating documents directory! In big trouble here...");
         }

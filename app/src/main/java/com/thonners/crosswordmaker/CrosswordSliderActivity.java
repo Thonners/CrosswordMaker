@@ -70,7 +70,9 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
         super.onPause();    // Always call superclass first
         Log.d(LOG_TAG, "onPaused called - saving crossword.");
 
-        crosswordPageFragment.getCrossword().saveCrossword();
+        if (crosswordPageFragment != null) {
+            crosswordPageFragment.getCrossword().saveCrossword();
+        }
     }
 
     //onRestart called only when activity is being restarted after being stopped.Try redirecting here back to home page.
@@ -355,10 +357,15 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
     }
     public void saveGrid() {
         // Save the grid
-        crosswordPageFragment.getCrossword().saveCrossword();
+        if (crosswordPageFragment != null) {
+            crosswordPageFragment.getCrossword().saveCrossword();
 
-        Toast toast = Toast.makeText(this,"Crossword progress saved.", Toast.LENGTH_SHORT);
-        toast.show();
+            Toast toast = Toast.makeText(this, "Crossword progress saved.", Toast.LENGTH_SHORT);
+            toast.show();
+        } else {
+            Toast toast = Toast.makeText(this, "Something went wrong when trying to save. Please try again.", Toast.LENGTH_LONG);
+            toast.show();
+        }
     }
     private void showAboutDialog() {
         HomeActivity.showAboutDialog(this);

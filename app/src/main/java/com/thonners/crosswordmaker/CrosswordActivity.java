@@ -6,7 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -20,7 +20,7 @@ import android.widget.Toast;
 import java.io.File;
 
 
-public class CrosswordActivity extends ActionBarActivity {
+public class CrosswordActivity extends AppCompatActivity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1 ;
 

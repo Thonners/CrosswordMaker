@@ -61,8 +61,8 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void,Void,String> 
     private LinearLayout progressLinearLayout ;
     private Button searchButton ;
 
-    private String urlPrefix = "http://www.dictionaryapi.com/api/v1/references/collegiate/xml/";
-    private String urlSuffix = "?key=";
+    private final String urlPrefix = "https://www.dictionaryapi.com/api/v1/references/collegiate/xml/";
+    private final String urlSuffix = "?key=";
     private String url ;
 
     /**

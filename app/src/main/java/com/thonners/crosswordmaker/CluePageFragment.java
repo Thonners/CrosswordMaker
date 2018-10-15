@@ -1,17 +1,23 @@
 package com.thonners.crosswordmaker;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 //import android.app.Fragment;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,8 +25,11 @@ import android.view.ViewGroup;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
+
+import static android.support.v4.content.PermissionChecker.PERMISSION_GRANTED;
 
 
 /**
@@ -34,7 +43,8 @@ import java.io.File;
 public class CluePageFragment extends Fragment {
 
     private static final String LOG_TAG = "CluePageFragment";
-    static final int REQUEST_IMAGE_CAPTURE = 1 ;    // Int used in camera intent
+    private static final int REQUEST_IMAGE_CAPTURE = 1 ;    // Int used in camera intent
+    private static final int REQUEST_CAMERA_PERMISSION = 2;
     private static int MIN_CLUE_IMAGE_RES = 100 ;  // Minimum number of pixels for clue image width to use for resampling
     private static final String ARG_FILE_PATH = "filePath" ;
 
@@ -86,8 +96,8 @@ public class CluePageFragment extends Fragment {
 
     private void initialise(View view) {
 
-        takeCluePhotoButton = (View) view.findViewById(R.id.take_picture_clues_button) ;
-        clueImageViewTouch = (TouchImageView) view.findViewById(R.id.image_view_clues) ;
+        takeCluePhotoButton = view.findViewById(R.id.take_picture_clues_button) ;
+        clueImageViewTouch = view.findViewById(R.id.image_view_clues) ;
         clueImageViewTouch.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -97,18 +107,6 @@ public class CluePageFragment extends Fragment {
                 return true;
             }
         });
-        /* //-------------- Old standard ImageView - remove if pinch-to-zoom works
-        clueImageView = (ImageView) view.findViewById(R.id.image_view_clues);
-        clueImageView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                // Offer option to retake clues picture if user long-clicks
-                Log.d(LOG_TAG,"Long-click on clue image detected");
-                retakePicture();
-                return true;
-            }
-        });
-        */
 
         if (clueImageFileExists()) {
             setClueImageInView();
@@ -124,12 +122,10 @@ public class CluePageFragment extends Fragment {
                 });
             } else {
                 // If no picture file found and device doesn't have camera availability, display error message
-                TextView textView = (TextView) view.findViewById(R.id.take_picture_clues_text_view);
+                TextView textView = view.findViewById(R.id.take_picture_clues_text_view);
                 textView.setText(getResources().getString(R.string.take_clue_picture_error));
             }
         }
-
-     //   loadClueImage();
     }
 
     @Override
@@ -171,23 +167,20 @@ public class CluePageFragment extends Fragment {
         Log.d(LOG_TAG, "Setting image");
         //clueImageView.setImageBitmap(clueImageBitmap);
         clueImageViewTouch.setImageBitmap(clueImageBitmap);
+        Log.d(LOG_TAG, "Image should be set.");
+        clueImageViewTouch.setZoom(2.0f);
+        clueImageViewTouch.setZoom(1.0f);
     }
+
     private void removePhotoButton() {
         //Remove button from view
-        //Check image exists
         if (takeCluePhotoButton != null) {
             Log.d(LOG_TAG, "Removing photo button");
             ((ViewGroup) takeCluePhotoButton.getParent()).removeView(takeCluePhotoButton);
             takeCluePhotoButton = null ;    // Force to null. Not sure what it would be without this.
         }
     }
-    /*
-    private void loadClueImage() {
-        // Load clue image if one already exists
-        if (clueImageFileExists()) {
-            setClueImageInView();
-        }
-    }//*/
+
     private boolean clueImageFileExists() {        // Initialise the file required
         try {
             clueImageFile = new File(imageFilePath);
@@ -203,19 +196,26 @@ public class CluePageFragment extends Fragment {
 
     public void dispatchTakePictureIntent() {
         Log.d(LOG_TAG, "dispatchPictureIntent method started");
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if(takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) == PERMISSION_GRANTED) {
+            Log.d(LOG_TAG,"Camera permissions granted. Starting the takePictureIntent");
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
 
-            // Check file exists
-            if (clueImageFile != null) {
-                Log.d(LOG_TAG, "clueImage != null");
-                //Give intent the save path
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(clueImageFile));
+                // Check file exists
+                if (clueImageFile != null) {
+                    Log.d(LOG_TAG, "clueImage != null");
+                    //Give intent the save path
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(getActivity(),
+                                        getActivity().getPackageName() + ".provider",clueImageFile));
 
-                Log.d(LOG_TAG, "taking the picture");
-                //Take the picture
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                    Log.d(LOG_TAG, "taking the picture");
+                    //Take the picture
+                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                }
             }
+        } else {
+            Log.d(LOG_TAG,"Requesting Camera permission.");
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
         }
     }
 
@@ -223,15 +223,29 @@ public class CluePageFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         // Called when camera intent returns. Now load image just taken
-        if(resultCode != Activity.RESULT_CANCELED) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode != Activity.RESULT_CANCELED) {
+            Log.d(LOG_TAG, "Camera activity returned.");
             setClueImageInView();
             removePhotoButton();
+            Log.d(LOG_TAG, "Image set and button removed.");
         } else {
-            Log.d(LOG_TAG,"resultCode = RESULT_CANCELLED, so not doing anything.") ;
+            Log.d(LOG_TAG, "resultCode = RESULT_CANCELLED, (or the request code did not match REQUEST_IMAGE_CAPTURE) so not doing anything.");
         }
-
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            int grantResultsLength = grantResults.length;
+            if (grantResultsLength > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                dispatchTakePictureIntent();
+            } else {
+                Toast.makeText(getActivity(), "Camera permissions are required to take a picture of the clues.", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
     private Bitmap getImage(File bitmapFile) {
         // Decode bitmapFile and return the bitmap for use in an ImageView
         Log.d(LOG_TAG, "trying to get the photo from: " + bitmapFile.getAbsolutePath());
@@ -248,9 +262,6 @@ public class CluePageFragment extends Fragment {
 
         Log.d(LOG_TAG,"clueImageView.getWidth() = " + clueImageViewTouch.getWidth());
         options.inSampleSize = calculateInSampleSize(options,clueImageViewTouch.getWidth());
-        // Old - delete if touch works
-        //Log.d(LOG_TAG,"clueImageView.getWidth() = " + clueImageView.getWidth());
-        //options.inSampleSize = calculateInSampleSize(options,clueImageView.getWidth());
         // Turn off justDecodeBounds so that the file is properly decoded
         options.inJustDecodeBounds = false ;
 

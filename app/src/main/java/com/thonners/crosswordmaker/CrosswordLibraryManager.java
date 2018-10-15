@@ -26,18 +26,18 @@ public class CrosswordLibraryManager {
     private static final String LOG_TAG = "CrosswordLibraryManager" ;
     private static final String RECENT_CROSSWORD_LOG_FILE_NAME = "recent.log";
 
-    Context context ;
-    File[] foundCrosswordFiles;    // Note that this is the directory in which the crossword and images (if they exist) will be saved
-    ArrayList<String> foundCrosswordFilePathsList = new ArrayList<String>() ;
-    File rootDir;
+    private Context context ;
+    private File[] foundCrosswordFiles;    // Note that this is the directory in which the crossword and images (if they exist) will be saved
+    private ArrayList<String> foundCrosswordFilePathsList = new ArrayList<>() ;
+    private File rootDir;
 
-    File recentCrosswordsFile ;
+    private File recentCrosswordsFile ;
 
-    int noRecentCrosswords = 3 ;    // Number of recent crosswords to track
+    private int noRecentCrosswords = 3 ;    // Number of recent crosswords to track
 
-    ArrayList<SavedCrossword>   savedCrosswords = new ArrayList<SavedCrossword>() ;
-    ArrayList<File>             savedCrosswordFiles =new ArrayList<File>();
-    ArrayList<SavedCrossword>   recentCrosswords = new ArrayList<SavedCrossword>();
+    private ArrayList<SavedCrossword>   savedCrosswords = new ArrayList<>() ;
+    private ArrayList<File>             savedCrosswordFiles =new ArrayList<>();
+    private ArrayList<SavedCrossword>   recentCrosswords = new ArrayList<>();
 
     public CrosswordLibraryManager(Context context) {
         this.context = context;
