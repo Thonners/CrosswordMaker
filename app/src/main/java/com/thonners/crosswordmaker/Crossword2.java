@@ -101,7 +101,17 @@ public class Crossword2 implements Cell2.CellInteractionListener {
         }
     }
 
-    private void checkClueComplete() {
+    private void checkClueComplete(int currentRow, int currentCol) {
+        // Initialise the complete to true - set to false if any cells are blank
+        boolean isComplete = true;
+        // Loop through the cells
+        int row = currentRow, col = currentCol;
+        if (activeClueOrientation == Clue2.Orientation.HORIZONTAL) {
+            while (--col >= 0 && !cells[row][col].isBlackCell()){
+                cells[row][col].
+            }
+        }
+        while()
         // TODO: Check the clue's complete
 
         // TODO: Check whether the crossword is complete

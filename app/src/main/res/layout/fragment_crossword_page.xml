@@ -42,17 +42,10 @@
                 </ScrollView>
             </com.thonners.crosswordmaker.HorizontalScrollViewNoFocus>
 
-<<<<<<< HEAD
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:windowSoftInputMode="adjustNothing">
-=======
         <ScrollView
             android:id="@+id/clues_checklist_parent_scroll_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
->>>>>>> master
             <LinearLayout
                 android:id="@+id/clues_checklist_parent_view"
                 android:layout_width="match_parent"
