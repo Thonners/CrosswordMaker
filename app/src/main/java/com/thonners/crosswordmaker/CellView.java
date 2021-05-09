@@ -1,9 +1,11 @@
 package com.thonners.crosswordmaker;
 
 import android.content.Context;
+import android.util.Log;
 import android.util.TypedValue;
+import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridLayout;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -12,7 +14,7 @@ import java.io.Serializable;
 /**
  * Created by mat on 28/12/14.
  */
-public class CellView extends RelativeLayout implements Serializable {
+public class CellView extends RelativeLayout implements Serializable, View.OnLongClickListener {
 
     private Cell cell ;
     private int clueNumber ;
@@ -22,11 +24,19 @@ public class CellView extends RelativeLayout implements Serializable {
 
     public CellView(Context context, Crossword crossword, int r, int c) {
         super(context);
-        cell = new Cell(getContext(), crossword, r, c) ;
+        cell = new Cell(context, crossword, r, c) ;
+        cell.setOnLongClickListener(this);
         
         initialiseLayoutParams();
         
         this.addView(cell, 0, cellLP);
+
+
+        // Create a dummy view for now
+        FrameLayout fl = new FrameLayout(context);
+        fl.setBackground(getResources().getDrawable(R.drawable.cell_hyphen_end));
+        this.addView(fl,cellLP);
+
     }
     
     private void initialiseLayoutParams() {
@@ -72,5 +82,18 @@ public class CellView extends RelativeLayout implements Serializable {
 
     public Cell getCell() {
         return this.cell ;
+    }
+
+
+    @Override
+    public boolean onLongClick(View view) {
+
+        Log.d("CellView", "Cell long clicked:") ; // (" + cell.row + "," + cell.column + ")");
+
+        cell.incrementDecorationIndex();
+
+        fl.setBackground(getResources().getDrawable(cell.getDecorationBG()));
+
+        return true;
     }
 }

@@ -1,11 +1,19 @@
 package com.thonners.crosswordmaker;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.util.Base64;
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
@@ -122,6 +130,79 @@ public class ServerConnection {
 
     }
 
+    public void getGridFromPhoto(String imageFilePath, String cornerCoordsAsPercentage) {
+
+        Log.d(LOG_TAG, "Getting grid from image/ FilePath = " + imageFilePath + ", corner coords: " + cornerCoordsAsPercentage) ;
+
+        DataTransfer.DataTransferListener listener = new DataTransfer.DataTransferListener() {
+            @Override
+            public void serverCallback(Connection resultConnection) {
+                Log.d(LOG_TAG,"ServerCallback called (inside getGridFromPhoto).");
+                serverConnectionListener.callHideLoadingSpinner();
+                if (resultConnection != null && resultConnection.getResultIdentifier() == SocketIdentifier.GRID_FROM_PHOTO_SUCCESS) {
+                    Log.d(LOG_TAG,"Results for gridFromPhoto: " );//+ resultConnection.getResult().toString()) ;
+                    serverConnectionListener.serverConnectionResponse(SocketIdentifier.GRID_FROM_PHOTO_SUCCESS, resultConnection.getResult());
+                } else {
+                    Log.d(LOG_TAG,"No results for gridFromPhoto: ");// + resultConnection.getInput()) ;
+                    serverConnectionListener.serverConnectionResponse(SocketIdentifier.GRID_FROM_PHOTO_EMPTY, null);
+                }
+
+            }
+        } ;
+        // Create a String rep of the grid image for JSON transmission
+        String imageAsString = createStringFromImage(imageFilePath);
+        // Create a dataTransfer instance with the appropriate inputs
+//        DataTransfer dataTransfer = new DataTransfer(new Connection(SocketIdentifier.GRID_FROM_PHOTO, imageFilePath), listener);
+        Log.d(LOG_TAG,"Creating dataTransfer... ");
+        DataTransfer dataTransfer = new DataTransfer(new Connection(SocketIdentifier.GRID_FROM_PHOTO, imageAsString), listener);
+        Log.d(LOG_TAG,"dataTransfer created... ");
+        //dataTransfer.execute() ;
+        serverConnectionListener.callShowLoadingSpinner();
+        dataTransfer.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+    }
+
+    private String createStringFromImage(String imageFilePath) {
+        Bitmap bm = BitmapFactory.decodeFile(imageFilePath);
+        bm = scaleBitmap(bm);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bm.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object
+        byte[] byteArrayImage = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(byteArrayImage, Base64.DEFAULT);
+        Log.d(LOG_TAG,"Created string from image. First 20 chars: " + encodedImage.substring(0,20));
+        return encodedImage;
+    }
+
+    private Bitmap scaleBitmap(Bitmap bm) {
+        int maxWidth = 800;
+        int maxHeight = 800;
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+
+        Log.v("Pictures", "Width and height are " + width + "--" + height);
+
+        if (width > height) {
+            // landscape
+            float ratio = (float) width / maxWidth;
+            width = maxWidth;
+            height = (int)(height / ratio);
+        } else if (height > width) {
+            // portrait
+            float ratio = (float) height / maxHeight;
+            height = maxHeight;
+            width = (int)(width / ratio);
+        } else {
+            // square
+            height = maxHeight;
+            width = maxWidth;
+        }
+
+        Log.v("Pictures", "after scaling Width and height are " + width + "--" + height);
+
+        bm = Bitmap.createScaledBitmap(bm, width, height, true);
+        return bm;
+    }
+
     /**
      * Enum to identify the type of connection requested from a client, when connecting to the server.
      *
@@ -145,7 +226,11 @@ public class ServerConnection {
         // Word fit
         WORD_FIT((byte) 110),
         WORD_FIT_SOLUTIONS_EMPTY((byte) 111),
-        WORD_FIT_SOLUTIONS_SUCCESS((byte) 112);
+        WORD_FIT_SOLUTIONS_SUCCESS((byte) 112),
+        // Imag Processing
+        GRID_FROM_PHOTO((byte) 200),
+        GRID_FROM_PHOTO_EMPTY((byte)201),
+        GRID_FROM_PHOTO_SUCCESS((byte) 202);
 
         private byte id ;
 
@@ -243,8 +328,10 @@ public class ServerConnection {
 
         private final String LOG_TAG = "DataTransfer" ;
         private final int TIMEOUT = 10000 ; // Set timeout to 10s.
-        private final int serverPort = 28496 ;
-        private final String serverURL = "thonners.ddns.net" ;
+//        private final int serverPort = 28496 ;
+//        private final String serverURL = "thonners.ddns.net" ;
+        private final int serverPort = 10000 ;
+        private final String serverURL = "192.168.1.99" ;
 
         private Connection returnConnection ;
         private DataTransferListener listener ;
@@ -296,6 +383,40 @@ public class ServerConnection {
                     dOut.writeByte(returnConnection.getRequestIdentifier().id());
                     if (returnConnection.getRequestIdentifier() == SocketIdentifier.ANAGRAM || returnConnection.getRequestIdentifier() == SocketIdentifier.WORD_FIT) {
                         dOut.writeUTF(returnConnection.getInput());
+                    } else if (returnConnection.getRequestIdentifier() == SocketIdentifier.GRID_FROM_PHOTO) {
+                        // Just fake the server interaction for now
+//                        Thread.sleep(3000);
+//                        dOut.writeUTF(returnConnection.getInput());
+                        JSONObject requestJson = new JSONObject();
+                        JSONObject dataJson = new JSONObject();
+                        try {
+                            dataJson.put("corners","{0.0, 0.8, 0.3, 0.4}");
+                            dataJson.put("image",returnConnection.getInput());
+                            dataJson.put("publication","evening_standard");
+                            dataJson.put("date","20190812");
+                            dataJson.put("grid_size",13);
+                            dataJson.put("rotationally_symmetric",true);
+                            requestJson.put("Request Type ID",200);
+                            requestJson.put("data",dataJson);
+                        } catch (JSONException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        String jsonString = requestJson.toString();
+                        Log.d(LOG_TAG,"JSON String: " + jsonString);
+                        PrintWriter pw = new PrintWriter(dOut);
+                        pw.println(jsonString);
+                        pw.flush();
+                        Log.d(LOG_TAG,"JSON String sent" );
+//                        dOut.writeUTF(jsonString);
+
+//                        dOut.flush();
+
+                        returnConnection.setResultIdentifier(SocketIdentifier.GRID_FROM_PHOTO_SUCCESS);
+                        ArrayList<String> answers = new ArrayList<>();
+                        answers.add("Got the grid...");
+                        returnConnection.setResult(answers) ;
+                        return returnConnection;
                     }
                     dOut.flush();
 

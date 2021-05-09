@@ -27,7 +27,7 @@ public class CrosswordLibraryManager {
     private static final String RECENT_CROSSWORD_LOG_FILE_NAME = "recent.log";
 
     private Context context ;
-    private File[] foundCrosswordFiles;    // Note that this is the directory in which the crossword and images (if they exist) will be saved
+    private File[] foundCrosswordFiles = null;    // Note that this is the directory in which the crossword and images (if they exist) will be saved
     private ArrayList<String> foundCrosswordFilePathsList = new ArrayList<>() ;
     private File rootDir;
 

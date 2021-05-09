@@ -40,6 +40,7 @@
 
     <dimen name="cell_size">15dp</dimen>
     <dimen name="cell_size_zoomed_in">30dp</dimen>
+    <dimen name="cell_hypen_half_length">5dp</dimen>
 
     <dimen name="clue_image_padding">16dp</dimen>
     <dimen name="grid_padding">1dp</dimen>

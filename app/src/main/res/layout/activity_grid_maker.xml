@@ -30,6 +30,31 @@
 
         </GridLayout>
 
+        <LinearLayout
+            android:id="@+id/image_view_wrapper"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
+            <TextView
+                android:id="@+id/grid_image_view_text_prompt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Position the dots over the corners of the grid"
+                android:textSize="24dp"
+                android:textAlignment="center"/>
+            <com.thonners.crosswordmaker.GridMakerImageView
+                android:id="@+id/grid_image_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerInside"/>
+            <!--<ImageView-->
+                <!--android:id="@+id/grid_image_view"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:scaleType="centerInside"/>-->
+        </LinearLayout>
+
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
@@ -37,14 +62,42 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_add"
+        android:tint="@color/black"
         android:layout_marginBottom="20dp"
         android:layout_marginRight="20dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android.support.design:fabSize="normal"
-        android:onClick="enterClicked"
+        android:onClick="fabClicked"
         android:elevation="@dimen/fab_elevation"
         android.support.design:borderWidth="0dp" />
 
-
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_photo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/baseline_camera_alt_white_18dp"
+        android:tint="@color/black"
+        android:layout_marginBottom="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@id/fab"
+        android.support.design:fabSize="normal"
+        android:onClick="fabClicked"
+        android:elevation="@dimen/fab_elevation"
+        android.support.design:borderWidth="0dp" />
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_rotationally_symmetric"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_refresh_white_48dp"
+        android:tint="@color/black"
+        android:layout_marginBottom="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@id/fab_photo"
+        android.support.design:fabSize="normal"
+        android:onClick="fabClicked"
+        android:elevation="@dimen/fab_elevation"
+        android.support.design:borderWidth="0dp" />
 </RelativeLayout>

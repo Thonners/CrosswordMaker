@@ -1,6 +1,5 @@
 package com.thonners.crosswordmaker;
 
-import android.app.Activity;
 import android.content.Context;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -15,7 +14,7 @@ import android.widget.EditText;
 /**
  * Created by mat on 30/11/14.
  */
-public class Cell extends EditText implements View.OnClickListener, View.OnFocusChangeListener , TextWatcher {
+public class Cell extends EditText implements View.OnClickListener, View.OnLongClickListener, View.OnFocusChangeListener , TextWatcher {
 
     private static final String LOG_TAG = "Cell" ;
 
@@ -24,6 +23,68 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
     private int row ;
     private int column ;
     private String cellName ; // String to make it quicker to include in debugging. Format (X,Y)
+    private CellDecoration decoration ;
+
+    private class CellDecoration {
+//        NONE (0),
+//        HYPEN_START (1),
+//        HYPHEN_END (2),
+//        WORD_END (3),
+//        WORD_START (4);
+
+        private int decorationIndex;
+
+        CellDecoration(int decorationIndex) {
+            this.decorationIndex = decorationIndex;
+        }
+
+        public void incrementIndex() {
+            this.decorationIndex =  (decorationIndex + 1) % 5;
+        }
+
+        public int getWhiteCellBG() {
+            switch (decorationIndex) {
+                case 1:
+                    return R.drawable.cell_hyphen_start;
+                case 2:
+                    return R.drawable.cell_hyphen_end;
+                case 3:
+                    return R.drawable.cell_word_end;
+                case 4:
+                    return R.drawable.cell_word_start;
+                default:
+                    return R.drawable.cell_white;
+            }
+        }
+        public int getFocusMainBG() {
+            switch (decorationIndex) {
+//                case 1:
+//                    return R.drawable.cell_focus_main_hyphen_start;
+//                case 2:
+//                    return R.drawable.cell_focus_main_hyphen_end;
+//                case 3:
+//                    return R.drawable.cell_focus_main_word_end;
+//                case 4:
+//                    return R.drawable.cell_focus_main_word_start;
+                default:
+                    return R.drawable.cell_focus_main;
+            }
+        }
+        public int getFocusMinorBG() {
+            switch (decorationIndex) {
+//                case 1:
+//                    return R.drawable.cell_focus_minor_hyphen_start;
+//                case 2:
+//                    return R.drawable.cell_focus_minor_hyphen_end;
+//                case 3:
+//                    return R.drawable.cell_focus_minor_word_end;
+//                case 4:
+//                    return R.drawable.cell_focus_minor_word_start;
+                default:
+                    return R.drawable.cell_focus_minor;
+            }
+        }
+    }
 
     private Clue hClue = null ;  // Horizontal clue to which cell belongs - initialise as null, and set later if required.
     private Clue vClue = null  ; // Vertical clue to which cell belongs
@@ -59,8 +120,10 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
         setColumn(c);
         setCellName(row,column);
         setBlackCellStatus(false) ; // Force all cells to start life white
+        decoration = new CellDecoration(0) ; // Start life without decoration
 
-        this.setBackground(getResources().getDrawable(R.drawable.cell_white));
+//        this.setBackground(getResources().getDrawable(R.drawable.cell_white));
+        this.setBackground(getResources().getDrawable(decoration.getWhiteCellBG()));
         this.setTextColor(context.getResources().getColor(R.color.black));
         this.setClickable(true);
         this.setFocusable(false);   // Initialise as false for gridMaker
@@ -71,6 +134,7 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
 
         setOnClickListener(this);
         setOnFocusChangeListener(this);
+//        setOnLongClickListener(this);
       //  setOnKeyListener(this);
     }
 
@@ -93,16 +157,19 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
         this.setBackground(getResources().getDrawable(R.drawable.cell_black));
     }
     private void setWhiteCell() {
-        this.setBackground(getResources().getDrawable(R.drawable.cell_white));
+        this.setBackground(getResources().getDrawable(decoration.getWhiteCellBG()));
+//        this.setBackground(getResources().getDrawable(R.drawable.cell_white));
     }
     public void setFocusedMajor() {
         if (! this.hasFocus()) {
             requestFocus();
         }
-        this.setBackground(getResources().getDrawable(R.drawable.cell_focus_main));
+//        this.setBackground(getResources().getDrawable(R.drawable.cell_focus_main));
+        this.setBackground(getResources().getDrawable(decoration.getFocusMainBG()));
     }
     public void setFocusedMinor() {
-        this.setBackground(getResources().getDrawable(R.drawable.cell_focus_minor));
+//        this.setBackground(getResources().getDrawable(R.drawable.cell_focus_minor));
+        this.setBackground(getResources().getDrawable(decoration.getFocusMinorBG()));
     }
 
     public void toggleBlackCell() {
@@ -130,6 +197,30 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
         Log.d(LOG_TAG, " Cell click repeated, swapping clue highlight orientation");
         swapClueHighlightOrientation();
 
+    }
+
+    public void setOnLongClickListener(OnLongClickListener listener) {
+        this.setOnLongClickListener(listener);
+    }
+
+    public void incrementDecorationIndex() {
+        decoration.incrementIndex();
+    }
+
+    public int getDecorationBG() {
+        return decoration.getWhiteCellBG() ;
+    }
+
+    @Override
+    public boolean onLongClick(View view) {
+
+        Log.d(LOG_TAG, "Cell long clicked: (" + row + "," + column + ")");
+
+        decoration.incrementIndex();
+
+        this.setBackground(getResources().getDrawable(decoration.getWhiteCellBG()));
+
+        return true;
     }
 
     // For highlighting active cell & clue during normal operation
