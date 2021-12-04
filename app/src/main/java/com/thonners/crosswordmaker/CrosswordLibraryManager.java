@@ -2,6 +2,7 @@ package com.thonners.crosswordmaker;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
@@ -41,7 +42,13 @@ public class CrosswordLibraryManager {
 
     public CrosswordLibraryManager(Context context) {
         this.context = context;
-        rootDir = new File(Environment.getExternalStorageDirectory() + "/.CrosswordToolkit");
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            rootDir = context.getFilesDir();
+        } else {
+            rootDir = new File(Environment.getExternalStorageDirectory() + "/.CrosswordToolkit");
+        }
 
         Log.d(LOG_TAG, "Root directory being used = " + rootDir.getPath());
 
@@ -55,7 +62,7 @@ public class CrosswordLibraryManager {
     public ArrayList<SavedCrossword> getRecentCrosswords() {
         getRecentFile();
         processRecentFile();
-    return recentCrosswords ;
+        return recentCrosswords ;
     }
 
     private void getSavedFiles() {

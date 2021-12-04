@@ -164,7 +164,7 @@ public class GridMaker extends AppCompatActivity {
         crossword.saveCrossword();
 
 
-        Log.d(LOG_TAG,"Crossword dir =  " + crossword.getSaveDir().getAbsolutePath() );
+//        Log.d(LOG_TAG,"Crossword dir =  " + crossword.getSaveDir().getAbsolutePath() );
 
         startCrosswordActivity();
 
@@ -173,13 +173,14 @@ public class GridMaker extends AppCompatActivity {
     private void startCrosswordActivity(){
         // Start the com.thonners.CrosswordMaker.CrosswordActivity using the CrosswordLibraryManager
         CrosswordLibraryManager clm = new CrosswordLibraryManager(this);
+        Log.d(LOG_TAG, "opening crossword: " + crossword.getSaveDir());
         clm.openCrossword(crossword.getSaveDir());
     }
 
     private void tutorialToast() {
         // Toast to give hint as to what to do here
         Toast tutorial = Toast.makeText(this,getResources().getString(R.string.tutorial_toast_grid_maker), Toast.LENGTH_LONG);
-        toastShowCentred(tutorial);
+//        toastShowCentred(tutorial); // Causes crash in Android 11
 
     }
 
@@ -194,7 +195,7 @@ public class GridMaker extends AppCompatActivity {
 
     /****************************************** Auto Grid Generation *************************************/
     @Override
-         protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Automatically called when activity is resumed post photo taking.
         autoGenerateGrid();
     }

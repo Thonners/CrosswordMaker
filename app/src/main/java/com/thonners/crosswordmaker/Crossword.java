@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -823,9 +824,8 @@ public class Crossword {
         try {
             Log.d(LOG_TAG, "Writing crossword file...");
             FileWriter fileWriter = new FileWriter(crosswordFile);
-
             for (int i = 0 ; i < saveArray.length ; i++) {
-            Log.d(LOG_TAG, "value at index i = " + i + " = " + saveArray[i]);
+                Log.d(LOG_TAG, "value at index i = " + i + " = " + saveArray[i]);
                 fileWriter.write(saveArray[i] + "\n");
             }
             fileWriter.close();
@@ -840,9 +840,14 @@ public class Crossword {
         // Format File name
         fileName = date + "-" + title.replaceAll(" ","_").replaceAll("-","__"); //.toLowerCase() ; // Delete this if it works
         // Create the save files/directories
-
-        // Directory
-        File docsDirectory = new File(Environment.getExternalStorageDirectory() + "/.CrosswordToolkit");
+        File docsDirectory ;
+        // Android 11 changes how this all works...
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Log.i(LOG_TAG,"Android version 10+ detected. Using local storage for crossword files");
+            docsDirectory = context.getFilesDir();
+        } else {
+            docsDirectory = new File(Environment.getExternalStorageDirectory() + "/.CrosswordToolkit");
+        }
         if (!(docsDirectory.exists() && docsDirectory.isDirectory())) {
             docsDirectory.mkdirs();
         }
@@ -850,11 +855,11 @@ public class Crossword {
         if (!docsDirectory.mkdir()) {
             Log.e(LOG_TAG, "Error creating documents directory! In big trouble here...");
         }
-        saveDir = new File(docsDirectory, fileName) ;
+        saveDir = new File(docsDirectory, fileName);
 
-        Log.d(LOG_TAG,"saveDir = " + saveDir.getPath());
-        if(!saveDir.exists()) {
-            Log.d(LOG_TAG,"saveDir doesn't exist, so creating it...");
+        Log.d(LOG_TAG, "saveDir = " + saveDir.getPath());
+        if (!saveDir.exists()) {
+            Log.d(LOG_TAG, "saveDir doesn't exist, so creating it...");
             if (!saveDir.mkdirs()) {
                 Log.e(LOG_TAG, "Main directory not created");
             }
@@ -864,41 +869,41 @@ public class Crossword {
 
         // Main Crossword file
         crosswordFile = new File(saveDir, SAVE_CROSSWORD_FILE_NAME);
-        if(!crosswordFile.exists()) {
+        if (!crosswordFile.exists()) {
             try {
                 if (!crosswordFile.createNewFile()) {
                     Log.e(LOG_TAG, "Crossword file not created");
                 }
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Crossword file not created. Exception message: ");
-                Log.e(LOG_TAG,e.getMessage());
+                Log.e(LOG_TAG, e.getMessage());
 
             }
         }
 
         // Clue Image path
-        clueImageFile = new File(saveDir,SAVE_CLUE_IMAGE_FILE_NAME) ;
-        if(!clueImageFile.exists()) {
+        clueImageFile = new File(saveDir, SAVE_CLUE_IMAGE_FILE_NAME);
+        if (!clueImageFile.exists()) {
             try {
                 if (!clueImageFile.createNewFile()) {
                     Log.e(LOG_TAG, "Clue image file not created");
                 }
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Clue image file not created. Exception message: ");
-                Log.e(LOG_TAG,e.getMessage());
+                Log.e(LOG_TAG, e.getMessage());
 
             }
         }
         // Crossword Image path
-        crosswordImageFile = new File(saveDir,SAVE_CROSSWORD_IMAGE_FILE_NAME) ;
-        if(!crosswordImageFile.exists()) {
+        crosswordImageFile = new File(saveDir, SAVE_CROSSWORD_IMAGE_FILE_NAME);
+        if (!crosswordImageFile.exists()) {
             try {
                 if (!crosswordImageFile.createNewFile()) {
                     Log.e(LOG_TAG, "Crossword image file not created");
                 }
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Crossword image file not created. Exception message: ");
-                Log.e(LOG_TAG,e.getMessage());
+                Log.e(LOG_TAG, e.getMessage());
 
             }
         }

@@ -602,6 +602,7 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
         return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA) ;
     }
     public static boolean sdcardIsAvailable(Activity activity) {
+        // TODO: Check storage permissions for Android 11+ differently...
         // Check to see if SD Card is available - This is required to save crosswords
         Boolean isSDPresent = android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED);
         if(isSDPresent)
