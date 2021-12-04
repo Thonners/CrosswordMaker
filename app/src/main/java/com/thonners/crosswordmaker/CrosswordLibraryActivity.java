@@ -41,7 +41,7 @@ public class CrosswordLibraryActivity extends AppCompatActivity {
 
         libraryManager = new CrosswordLibraryManager(this);
 
-        int i = 0;
+        int i = 1;
         for (CrosswordLibraryManager.SavedCrossword savedCrossword : libraryManager.getSavedCrosswords()) {
             addCrosswordToLayout(i, savedCrossword);
             i++;
@@ -113,10 +113,9 @@ public class CrosswordLibraryActivity extends AppCompatActivity {
 
     }
     private void crosswordSelected(View view) {
-        int i = view.getId() ;  // get index of save file
-
+        int i = view.getId() - 1;  // get index of save file
+        // View index starts at 1, but file index at 0, so need to -1
         Log.d(LOG_TAG, "Crossword selected: " + libraryManager.getSavedCrosswords().get(i).getTitle());
-
         libraryManager.openCrossword(libraryManager.getSavedCrosswords().get(i).getCrosswordDir());
     }
 
