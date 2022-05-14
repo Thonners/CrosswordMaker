@@ -244,7 +244,7 @@ public class ServerConnection {
         private final String LOG_TAG = "DataTransfer" ;
         private final int TIMEOUT = 10000 ; // Set timeout to 10s.
         private final int serverPort = 28496 ;
-        private final String serverURL = "thonners.ddns.net" ;
+        private final String serverURL = "www.mathonwythomas.com" ;
 
         private Connection returnConnection ;
         private DataTransferListener listener ;
