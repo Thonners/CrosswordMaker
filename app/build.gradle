@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 32
 
     // We use Apache packages for downloading the dictionary definitions
     useLibrary 'org.apache.http.legacy'
@@ -9,7 +9,7 @@ android {
     defaultConfig {
         applicationId "com.thonners.crosswordmaker"
         minSdkVersion 17
-        targetSdkVersion 30
+        targetSdkVersion 32
         versionCode 13
         versionName "1.12"
     }
