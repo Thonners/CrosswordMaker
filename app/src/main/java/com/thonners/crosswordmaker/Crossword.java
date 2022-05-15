@@ -1,26 +1,16 @@
 package com.thonners.crosswordmaker;
 
-import android.Manifest;
-import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.graphics.Point;
-import android.hardware.display.DisplayManager;
 import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.WindowManager;
 import android.widget.GridLayout;
-import android.widget.RelativeLayout;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -28,9 +18,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -105,7 +93,7 @@ public class Crossword {
     private String clueImagePath ;
 
     private FileOutputStream fileOutputStream ;
-    private File saveDir ;
+    private File saveDir , photoSaveDir;
     private File crosswordFile ;
     private File clueImageFile ;
     private File crosswordImageFile ;
@@ -636,8 +624,8 @@ public class Crossword {
         saveArray[SAVED_ARRAY_INDEX_DATE] = date ;
         saveArray[SAVED_ARRAY_INDEX_ROW_COUNT] = "" + rowCount ;
         saveArray[SAVED_ARRAY_INDEX_CELL_WIDTH] = "" + cellWidth ;
-        saveArray[SAVED_ARRAY_INDEX_CROSSWORD_IMAGE] = "" + saveDir.getAbsolutePath()  + "/" + SAVE_CROSSWORD_FILE_NAME;
-        saveArray[SAVED_ARRAY_INDEX_CLUE_IMAGE] = "" + saveDir.getAbsolutePath() + "/" + SAVE_CLUE_IMAGE_FILE_NAME;
+        saveArray[SAVED_ARRAY_INDEX_CROSSWORD_IMAGE] = crosswordFile.getAbsolutePath();
+        saveArray[SAVED_ARRAY_INDEX_CLUE_IMAGE] = clueImageFile.getAbsolutePath();
 
         // Loop through cells and save contents to the array.
         int index = SAVE_ARRAY_START_INDEX; // For iterating over, and saving current cell to index.
@@ -825,7 +813,7 @@ public class Crossword {
             Log.d(LOG_TAG, "Writing crossword file...");
             FileWriter fileWriter = new FileWriter(crosswordFile);
             for (int i = 0 ; i < saveArray.length ; i++) {
-                Log.d(LOG_TAG, "value at index i = " + i + " = " + saveArray[i]);
+//                Log.d(LOG_TAG, "value at index i = " + i + " = " + saveArray[i]);
                 fileWriter.write(saveArray[i] + "\n");
             }
             fileWriter.close();
@@ -840,13 +828,15 @@ public class Crossword {
         // Format File name
         fileName = date + "-" + title.replaceAll(" ","_").replaceAll("-","__"); //.toLowerCase() ; // Delete this if it works
         // Create the save files/directories
-        File docsDirectory ;
+        File docsDirectory, photosDirectory ;
         // Android 11 changes how this all works...
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             Log.i(LOG_TAG,"Android version 10+ detected. Using local storage for crossword files");
             docsDirectory = context.getFilesDir();
+            photosDirectory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         } else {
             docsDirectory = new File(Environment.getExternalStorageDirectory() + "/.CrosswordToolkit");
+            photosDirectory = docsDirectory;
         }
         if (!(docsDirectory.exists() && docsDirectory.isDirectory())) {
             docsDirectory.mkdirs();
@@ -856,6 +846,7 @@ public class Crossword {
             Log.e(LOG_TAG, "Error creating documents directory! In big trouble here...");
         }
         saveDir = new File(docsDirectory, fileName);
+        photoSaveDir = new File(photosDirectory, fileName);
 
         Log.d(LOG_TAG, "saveDir = " + saveDir.getPath());
         if (!saveDir.exists()) {
@@ -881,21 +872,33 @@ public class Crossword {
             }
         }
 
+        Log.d(LOG_TAG, "photoSaveDir = " + photoSaveDir.getPath());
+        if (!photoSaveDir.exists()) {
+            Log.d(LOG_TAG, "photoSaveDir doesn't exist, so creating it...");
+            if (!photoSaveDir.mkdirs()) {
+                Log.e(LOG_TAG, "Main Photo directory not created");
+            }
+        } else {
+            Log.d(LOG_TAG, "photoSaveDir already exists.");
+        }
         // Clue Image path
-        clueImageFile = new File(saveDir, SAVE_CLUE_IMAGE_FILE_NAME);
+        clueImageFile = new File(photoSaveDir, SAVE_CLUE_IMAGE_FILE_NAME);
         if (!clueImageFile.exists()) {
             try {
+                Log.d(LOG_TAG, "Trying to create image file...");
                 if (!clueImageFile.createNewFile()) {
                     Log.e(LOG_TAG, "Clue image file not created");
                 }
+                Log.d(LOG_TAG, "Image file created :)");
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Clue image file not created. Exception message: ");
                 Log.e(LOG_TAG, e.getMessage());
 
             }
         }
+        Log.i(LOG_TAG,"Photo file path:" + clueImageFile.getAbsolutePath());
         // Crossword Image path
-        crosswordImageFile = new File(saveDir, SAVE_CROSSWORD_IMAGE_FILE_NAME);
+        crosswordImageFile = new File(photoSaveDir, SAVE_CROSSWORD_IMAGE_FILE_NAME);
         if (!crosswordImageFile.exists()) {
             try {
                 if (!crosswordImageFile.createNewFile()) {

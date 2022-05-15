@@ -3,6 +3,7 @@ package com.thonners.crosswordmaker;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,7 +15,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-//import android.app.Fragment;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -62,6 +62,7 @@ public class CluePageFragment extends Fragment {
 
 
     public static CluePageFragment newInstance(String filePath) {
+        Log.d(LOG_TAG,"Initial filePath for clue image: " + filePath);
         CluePageFragment fragment = new CluePageFragment();
         Bundle args = new Bundle();
         String imageFilePath = filePath;
@@ -96,6 +97,7 @@ public class CluePageFragment extends Fragment {
 
     private void initialise(View view) {
 
+        Log.d(LOG_TAG,"Initialising...");
         takeCluePhotoButton = view.findViewById(R.id.take_picture_clues_button) ;
         clueImageViewTouch = view.findViewById(R.id.image_view_clues) ;
         clueImageViewTouch.setOnLongClickListener(new View.OnLongClickListener() {
@@ -171,7 +173,6 @@ public class CluePageFragment extends Fragment {
         clueImageViewTouch.setZoom(2.0f);
         clueImageViewTouch.setZoom(1.0f);
     }
-
     private void removePhotoButton() {
         //Remove button from view
         if (takeCluePhotoButton != null) {
@@ -199,19 +200,29 @@ public class CluePageFragment extends Fragment {
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) == PERMISSION_GRANTED) {
             Log.d(LOG_TAG,"Camera permissions granted. Starting the takePictureIntent");
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+            if (takePictureIntent.resolveActivity(getContext().getPackageManager()) == null) Log.d(LOG_TAG," resolveImageIntent == null");
+            if (getActivity().getPackageManager() == null) Log.d(LOG_TAG," getPackageManager == null");
+            if (getContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) Log.d(LOG_TAG," camera feature == null");
 
+            try {
                 // Check file exists
                 if (clueImageFile != null) {
                     Log.d(LOG_TAG, "clueImage != null");
                     //Give intent the save path
-                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(getActivity(),
-                                        getActivity().getPackageName() + ".provider",clueImageFile));
+                    Uri photoURI = FileProvider.getUriForFile(getContext(),
+                            getActivity().getPackageName() + ".provider" ,      // This provider name is set in the manifest & must match, else there will be permissions errors
+                            clueImageFile);
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
 
                     Log.d(LOG_TAG, "taking the picture");
                     //Take the picture
                     startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                 }
+            } catch (ActivityNotFoundException e) {
+                // display error state to the user
+                Log.d(LOG_TAG," Caught activity not found exception");
+            } catch (Exception ex) {
+                Log.e(LOG_TAG,"Caught exception when trying to make camera intent: " + ex.getMessage());
             }
         } else {
             Log.d(LOG_TAG,"Requesting Camera permission.");
