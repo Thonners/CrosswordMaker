@@ -10,8 +10,8 @@ android {
         applicationId "com.thonners.crosswordmaker"
         minSdkVersion 17
         targetSdkVersion 32
-        versionCode 13
-        versionName "1.12"
+        versionCode 15
+        versionName "2.0"
     }
 
     compileOptions {
