@@ -2,7 +2,7 @@ package com.thonners.crosswordmaker;
 
 import android.content.Context;
 import android.os.Build;
-import android.support.v7.widget.CardView;
+import androidx.cardview.widget.CardView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;

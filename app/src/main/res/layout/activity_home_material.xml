@@ -8,7 +8,7 @@
     android:layout_height="match_parent">
 
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/home_card_toolkit"
         android:layout_gravity="center"
@@ -50,9 +50,9 @@
                 android:layout_alignParentRight="true"
                 android:src="@drawable/ic_tools"/>
         </RelativeLayout>
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/home_card_new"
         android:layout_gravity="center"
@@ -95,10 +95,10 @@
                 android:layout_alignParentRight="true"
                 android:src="@drawable/home_new"/>
         </RelativeLayout>
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/home_card_recent"
         android:layout_gravity="center"
@@ -142,7 +142,7 @@
                 android:textColor="@color/text_default"
                 android:layout_below="@+id/home_recent_title"
                 android:textStyle="normal"/>
-            <android.support.v7.widget.CardView
+            <androidx.cardview.widget.CardView
                 xmlns:card_view="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/home_card_recent_1"
                 android:layout_gravity="center"
@@ -174,8 +174,8 @@
                         android:textColor="@color/text_default"
                         android:textStyle="normal"/>
                 </RelativeLayout>
-            </android.support.v7.widget.CardView>
-            <android.support.v7.widget.CardView
+            </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
                 xmlns:card_view="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/home_card_recent_2"
                 android:layout_gravity="center"
@@ -207,8 +207,8 @@
                         android:textColor="@color/text_default"
                         android:textStyle="normal"/>
                 </RelativeLayout>
-            </android.support.v7.widget.CardView>
-            <android.support.v7.widget.CardView
+            </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
                 xmlns:card_view="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/home_card_recent_3"
                 android:layout_gravity="center"
@@ -240,13 +240,13 @@
                         android:textColor="@color/text_default"
                         android:textStyle="normal"/>
                 </RelativeLayout>
-            </android.support.v7.widget.CardView>
+            </androidx.cardview.widget.CardView>
 
         </RelativeLayout>
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/home_card_library"
         android:layout_gravity="center"
@@ -288,9 +288,9 @@
                 android:layout_alignParentRight="true"
                 android:src="@drawable/home_new"/>
         </RelativeLayout>
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/home_card_settings"
         android:layout_gravity="center"
@@ -331,7 +331,7 @@
                 android:layout_alignParentRight="true"
                 android:src="@drawable/settings"/>
         </RelativeLayout>
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
 
 

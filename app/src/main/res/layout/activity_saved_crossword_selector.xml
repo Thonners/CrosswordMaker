@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context="com.thonners.crosswordmaker.CrosswordLibraryActivity" >
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
             android:id="@+id/saved_file_selection_prompt"
         android:layout_height="@dimen/home_card_default_height"
         android:layout_width="fill_parent"
@@ -22,7 +22,7 @@
             android:textSize="@dimen/home_card_text_size_main"
             android:textStyle="bold"
             android:layout_gravity="center"/>
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
     <ScrollView
         android:layout_width="fill_parent"

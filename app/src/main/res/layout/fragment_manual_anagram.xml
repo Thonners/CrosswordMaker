@@ -62,7 +62,7 @@
             android:layout_below="@+id/manual_anagram_input_layout"
             android:layout_above="@+id/manual_anagram_known_letters_layout">
         </RelativeLayout>
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/manual_anagram_fab"
         android:layout_width="@dimen/fab_radius"
         android:layout_height="@dimen/fab_radius"
