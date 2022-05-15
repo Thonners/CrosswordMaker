@@ -5,6 +5,7 @@
       <map>
         <entry key="app/src/main/res/layout/activity_crossword.xml" value="0.25729166666666664" />
         <entry key="app/src/main/res/layout/activity_home_material.xml" value="0.35260416666666666" />
+        <entry key="app/src/main/res/layout/fragment_clues.xml" value="0.653125" />
       </map>
     </option>
   </component>
