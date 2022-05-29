@@ -47,6 +47,11 @@ public class Crossword {
     public static final String SAVE_CLUE_IMAGE_FILE_NAME = "clue.jpg";
     public static final String SAVE_CROSSWORD_IMAGE_FILE_NAME = "image_crossword.jpg";
 
+    private static final String SAVE_RIGHT_HYPHEN_CODE = "~" ;
+    private static final String SAVE_BOTTOM_HYPHEN_CODE = "_" ;
+    private static final String SAVE_RIGHT_WORD_SPLIT_CODE = "|" ;
+    private static final String SAVE_BOTTOM_WORD_SPLIT_CODE = "/" ;
+
     public static final int SAVED_ARRAY_INDEX_TITLE = 0 ;
     public static final int SAVED_ARRAY_INDEX_DATE = 1 ;
     public static final int SAVED_ARRAY_INDEX_ROW_COUNT = 2 ;
@@ -264,7 +269,18 @@ public class Crossword {
                     cells[i][j].toggleBlackCell();
                 } else {
 //                    Log.d(LOG_TAG,"Setting value to: " + tempString);
-                    cells[i][j].setText(tempString);
+                    int stringLength = tempString.length() ;
+                    if (tempString.contains(SAVE_RIGHT_HYPHEN_CODE)) {
+                        cells[i][j].addHyphen(Cell.CellSide.RIGHT);
+                        cells[i][j+1].addHyphen(Cell.CellSide.LEFT);
+                        stringLength-- ;
+                    }
+                    if (tempString.contains(SAVE_BOTTOM_HYPHEN_CODE)) {
+                        cells[i][j].addHyphen(Cell.CellSide.BOTTOM);
+                        cells[i+1][j].addHyphen(Cell.CellSide.TOP);
+                        stringLength-- ;
+                    }
+                    if (stringLength > 0) cells[i][j].setText(tempString.substring(0,1));
                 }
                 index++;
             }
@@ -687,6 +703,10 @@ public class Crossword {
             for (int j = 0; j < rowCount; j++) {
                 if (!cells[i][j].isBlackCell()) {
                     saveArray[index] = cells[i][j].getText().toString() ;   // Save whatever text is in the box to the saveArray. Will be empty if box is empty.
+                    if (cells[i][j].hyphens[Cell.CellSide.RIGHT.ordinal()]) saveArray[index] += SAVE_RIGHT_HYPHEN_CODE ;
+                    if (cells[i][j].hyphens[Cell.CellSide.BOTTOM.ordinal()]) saveArray[index] += SAVE_BOTTOM_HYPHEN_CODE ;
+                    if (cells[i][j].wordSplits[Cell.CellSide.RIGHT.ordinal()]) saveArray[index] += SAVE_RIGHT_WORD_SPLIT_CODE ;
+                    if (cells[i][j].wordSplits[Cell.CellSide.BOTTOM.ordinal()]) saveArray[index] += SAVE_BOTTOM_WORD_SPLIT_CODE ;
                 } else {
                     saveArray[index] = "-" ;
                 }

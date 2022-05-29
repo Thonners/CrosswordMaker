@@ -29,8 +29,8 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
     private Clue activeClue = null  ; // Set the active clue so that cell focus can move as input is done
     private CellView cellView = null ;
 
-    private boolean[] hyphens = new boolean[4] ;
-    private boolean[] wordSplits = new boolean[4] ;
+    public boolean[] hyphens = new boolean[4] ;
+    public boolean[] wordSplits = new boolean[4] ;
 
     public enum CellSide {
         LEFT,
