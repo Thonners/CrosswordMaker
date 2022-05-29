@@ -91,6 +91,9 @@ public class Crossword {
     private String [] crosswordStringArray ;    // Place to save progress
     private String crosswordImagePath ;
     private String clueImagePath ;
+    private boolean addHyphenActive = false ;
+    private boolean addWordSplitActive = false ;
+    private Cell activeCell = null ;
 
     private FileOutputStream fileOutputStream ;
     private File saveDir , photoSaveDir;
@@ -466,6 +469,57 @@ public class Crossword {
     }
     public CellView getCellView(int row, int column) {
         return cellViews[row][column];
+    }
+
+    public boolean isAddHyphenActive() {
+        return addHyphenActive;
+    }
+
+    public void setAddHyphenActive(boolean addHyphenActive) {
+        this.addHyphenActive = addHyphenActive;
+        if (addHyphenActive) {
+            this.addWordSplitActive = false;
+            clearCellHighlights();
+        }
+    }
+
+    public boolean isAddWordSplitActive() {
+        return addWordSplitActive;
+    }
+
+    public void setAddWordSplitActive(boolean addWordSplitActive) {
+        this.addWordSplitActive = addWordSplitActive;
+        if (addWordSplitActive) {
+            this.addHyphenActive = false;
+            clearCellHighlights();
+        }
+    }
+
+    public void cellClickedWhenHyphenActive(Cell cellClicked) {
+        if (activeCell == null) {
+            activeCell = cellClicked;
+            activeCell.setFocusedMajor();
+            getCell(activeCell.getRow() + 1, activeCell.getColumn()).setFocusedMinor();
+            getCell(activeCell.getRow(), activeCell.getColumn() + 1).setFocusedMinor();
+        } else {
+            int aCol = activeCell.getColumn();
+            int aRow = activeCell.getRow();
+            int cCol = cellClicked.getColumn();
+            int cRow = cellClicked.getRow();
+            if (aCol == cCol && aRow + 1 == cRow) {
+                activeCell.addHyphen(Cell.CellSide.BOTTOM);
+                cellClicked.addHyphen(Cell.CellSide.TOP);
+            } else if (aCol  + 1 == cCol && aRow == cRow) {
+                activeCell.addHyphen(Cell.CellSide.RIGHT);
+                cellClicked.addHyphen(Cell.CellSide.LEFT);
+            } else {
+                Log.d(LOG_TAG,"Invalid cell clicked, so doing nothing");
+            }
+            activeCell = null;
+            addHyphenActive = false ;
+            addWordSplitActive = false ;
+            clearCellHighlights();
+        }
     }
 
     public void clearCellHighlights() {

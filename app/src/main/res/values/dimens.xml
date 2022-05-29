@@ -40,6 +40,9 @@
 
     <dimen name="cell_size">15dp</dimen>
     <dimen name="cell_size_zoomed_in">30dp</dimen>
+    <dimen name="cell_hyphen_length">4dp</dimen>
+    <dimen name="cell_hyphen_thickness">2dp</dimen>
+    <dimen name="cell_word_split_thickness">3dp</dimen>
 
     <dimen name="clue_image_padding">16dp</dimen>
     <dimen name="grid_padding">1dp</dimen>

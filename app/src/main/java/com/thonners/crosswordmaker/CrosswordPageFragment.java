@@ -14,6 +14,8 @@ import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.io.File;
 import java.util.ArrayList;
 
@@ -42,6 +44,9 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
 
     private Crossword crossword ;
     private String[] crosswordStringArray;
+
+    private boolean addHyphenActive = false ;
+    private boolean addWordSplitActive = false ;
 
     private int tabPosition ;
 
@@ -99,6 +104,13 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
         populateCluesChecklists(acrossCluesChecklist, crossword.getHClues());
         // Populate the vertical clues checklist
         populateCluesChecklists(downCluesChecklist, crossword.getVClues());
+
+        // Add click listeners for the hyphen/word split FABs
+        view.findViewById(R.id.add_word_split).setOnClickListener(this);
+        view.findViewById(R.id.add_hyphen).setOnClickListener(this);
+
+//        // Add click listener to the cell views, in case we're in add hyphen or add word split mode...
+//        crossword.setClickListenerForAllCells(this);
 
         return view ;
 
@@ -229,6 +241,27 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
         if( view instanceof ClueChecklistEntryTextView) {
             Clue clue = ((ClueChecklistEntryTextView) view).getClue();
             clue.highlightClue(clue.getStartCell());
+        } else if (view instanceof FloatingActionButton){
+            switch (view.getId()) {
+                case R.id.add_word_split:
+                    addWordSplit((FloatingActionButton) view);
+                    break;
+                case R.id.add_hyphen:
+                    addHyphen(view);
+                    break;
+            }
+        } else if (view instanceof CellView) {
+            Log.d(LOG_TAG,"Cell view clicked");
+            if (this.addHyphenActive || this.addWordSplitActive) {
+                Log.d(LOG_TAG,"Adding something active");
+
+            }
+        }else if (view instanceof HorizontalScrollViewNoFocus) {
+            Log.d(LOG_TAG,"HorizontalScrollViewNoFocus view clicked");
+            if (this.addHyphenActive || this.addWordSplitActive) {
+                Log.d(LOG_TAG,"Adding something active");
+
+            }
         }
     }
     /**
@@ -246,5 +279,15 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
         } else {
             return false ;
         }
+    }
+
+    private void addWordSplit(FloatingActionButton wordSplitFAB) {
+        Log.d(LOG_TAG,"Add work split clicked");
+        crossword.setAddWordSplitActive(true);
+    }
+
+    private void addHyphen(View hyphenFAB) {
+        Log.d(LOG_TAG, "Add hyphen clicked");
+        crossword.setAddHyphenActive(true);
     }
 }

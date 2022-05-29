@@ -1,9 +1,10 @@
 package com.thonners.crosswordmaker;
 
 import android.content.Context;
+import android.util.Log;
 import android.util.TypedValue;
+import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -14,6 +15,8 @@ import java.io.Serializable;
  */
 public class CellView extends RelativeLayout implements Serializable {
 
+    private static final String LOG_TAG = "CellView";
+
     private Cell cell ;
     private int clueNumber ;
     private TextView clueNumberDisplay = null;
@@ -22,7 +25,7 @@ public class CellView extends RelativeLayout implements Serializable {
 
     public CellView(Context context, Crossword crossword, int r, int c) {
         super(context);
-        cell = new Cell(getContext(), crossword, r, c) ;
+        cell = new Cell(getContext(), crossword, r, c, this) ;
         
         initialiseLayoutParams();
         
@@ -73,4 +76,43 @@ public class CellView extends RelativeLayout implements Serializable {
     public Cell getCell() {
         return this.cell ;
     }
+
+    public void addHyphen(Cell.CellSide side) {
+        Log.d(LOG_TAG,"Adding hyphen to " + side + " of cellView: ");
+        int cellWidth = this.cell.getWidth() ;
+        int hyphenLength = getResources().getDimensionPixelOffset(R.dimen.cell_hyphen_length) ; //cellWidth / (int) getResources().getDimension(R.dimen.cell_hyphen_length_fraction);
+        int hyphenWidth = getResources().getDimensionPixelOffset(R.dimen.cell_hyphen_thickness) ;
+        View trailingHyphen = new View(getContext()) ;
+        trailingHyphen.setBackgroundColor(getResources().getColor(R.color.black));
+        RelativeLayout.LayoutParams trailingHyphenLP = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        switch (side) {
+            case TOP:
+                trailingHyphenLP.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                trailingHyphenLP.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                trailingHyphenLP.height = hyphenLength ;
+                trailingHyphenLP.width = hyphenWidth ;
+                break;
+            case BOTTOM:
+                trailingHyphenLP.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                trailingHyphenLP.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                trailingHyphenLP.height = hyphenLength ;
+                trailingHyphenLP.width = hyphenWidth ;
+                break;
+            case LEFT:
+                trailingHyphenLP.addRule(RelativeLayout.CENTER_VERTICAL);
+                trailingHyphenLP.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+                trailingHyphenLP.height = hyphenWidth ;
+                trailingHyphenLP.width = hyphenLength ;
+                break;
+            case RIGHT:
+                trailingHyphenLP.addRule(RelativeLayout.CENTER_VERTICAL);
+                trailingHyphenLP.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                trailingHyphenLP.height = hyphenWidth ;
+                trailingHyphenLP.width = hyphenLength ;
+                break;
+        }
+        this.addView(trailingHyphen, trailingHyphenLP);
+        Log.d(LOG_TAG,"Added hyphen to " + side + " of cellView: ");
+    }
+
 }
