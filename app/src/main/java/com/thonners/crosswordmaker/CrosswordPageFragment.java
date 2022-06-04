@@ -282,7 +282,7 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
     }
 
     private void addWordSplit(FloatingActionButton wordSplitFAB) {
-        Log.d(LOG_TAG,"Add work split clicked");
+        Log.d(LOG_TAG,"Add word split clicked");
         crossword.setAddWordSplitActive(true);
     }
 

@@ -78,8 +78,7 @@ public class CellView extends RelativeLayout implements Serializable {
     }
 
     public void addHyphen(Cell.CellSide side) {
-        Log.d(LOG_TAG,"Adding hyphen to " + side + " of cellView: ");
-        int cellWidth = this.cell.getWidth() ;
+        Log.d(LOG_TAG,"Adding hyphen to " + side + " of cellView: " + cell.getCellName());
         int hyphenLength = getResources().getDimensionPixelOffset(R.dimen.cell_hyphen_length) ; //cellWidth / (int) getResources().getDimension(R.dimen.cell_hyphen_length_fraction);
         int hyphenWidth = getResources().getDimensionPixelOffset(R.dimen.cell_hyphen_thickness) ;
         View trailingHyphen = new View(getContext()) ;
@@ -112,7 +111,46 @@ public class CellView extends RelativeLayout implements Serializable {
                 break;
         }
         this.addView(trailingHyphen, trailingHyphenLP);
-        Log.d(LOG_TAG,"Added hyphen to " + side + " of cellView: ");
+        Log.d(LOG_TAG,"Added hyphen to " + side + " of cellView: " + cell.getCellName());
+    }
+
+    public void addWordSplit(Cell.CellSide side, int cellWidth) {
+        Log.d(LOG_TAG,"Adding word split to " + side + " of cellView: " + cell.getCellName());
+
+        int dividerThickness = getResources().getDimensionPixelOffset(R.dimen.cell_word_split_thickness) ;
+        int cellSize = cellWidth;
+        View trailingWordSplit = new View(getContext()) ;
+        trailingWordSplit.setBackgroundColor(getResources().getColor(R.color.black));
+        RelativeLayout.LayoutParams trailingWordSplitLP = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        switch (side) {
+            case TOP:
+                trailingWordSplitLP.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                trailingWordSplitLP.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+                trailingWordSplitLP.height = dividerThickness ;
+                trailingWordSplitLP.width = cellSize ;
+                break;
+            case BOTTOM:
+                trailingWordSplitLP.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                trailingWordSplitLP.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                trailingWordSplitLP.height = dividerThickness ;
+                trailingWordSplitLP.width = cellSize ;
+                break;
+            case LEFT:
+                trailingWordSplitLP.addRule(RelativeLayout.CENTER_VERTICAL);
+                trailingWordSplitLP.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+                trailingWordSplitLP.height = cellSize ;
+                trailingWordSplitLP.width = dividerThickness ;
+                break;
+            case RIGHT:
+                trailingWordSplitLP.addRule(RelativeLayout.CENTER_VERTICAL);
+                trailingWordSplitLP.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                trailingWordSplitLP.height = cellSize ;
+                trailingWordSplitLP.width = dividerThickness ;
+                break;
+        }
+        this.addView(trailingWordSplit, trailingWordSplitLP);
+        trailingWordSplit.bringToFront();
+        Log.d(LOG_TAG,"Added Word|Split to " + side + " of cellView: " + cell.getCellName() + ", Width = " + trailingWordSplitLP.width + ", Height = " + trailingWordSplitLP.height);
     }
 
 }

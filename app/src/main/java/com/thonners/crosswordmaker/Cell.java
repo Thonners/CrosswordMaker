@@ -143,7 +143,6 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
         // If in crossword filling mode, and cell clicked, change clue orientation
         Log.d(LOG_TAG, " Cell click repeated, swapping clue highlight orientation");
         swapClueHighlightOrientation();
-
     }
 
     // For highlighting active cell & clue during normal operation
@@ -154,11 +153,9 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
 
             crossword.clearCellHighlights();
 
-            if (crossword.isAddHyphenActive()) {
-                Log.d(LOG_TAG, "Setting hyphen active ");
-                crossword.cellClickedWhenHyphenActive(this);
-            } else if (crossword.isAddWordSplitActive()) {
-                Log.d(LOG_TAG, "Adding word split active ");
+            if (crossword.isAddHyphenActive() || crossword.isAddWordSplitActive()) {
+                Log.d(LOG_TAG, "Setting hyphen / word split active ");
+                crossword.cellClickedWhenHyphenWordSplitActive(this);
             } else {
 
                 Log.d(LOG_TAG, "Cell " + cellName + " has focus");
@@ -311,5 +308,11 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
     public void addHyphen(CellSide side) {
         cellView.addHyphen(side);
         hyphens[side.ordinal()] = true;
+        wordSplits[side.ordinal()] = false;
+    }
+    public void addWordSplit(CellSide side, int cellWidth) {
+        cellView.addWordSplit(side, cellWidth);
+        wordSplits[side.ordinal()] = true;
+        hyphens[side.ordinal()] = false;
     }
 }

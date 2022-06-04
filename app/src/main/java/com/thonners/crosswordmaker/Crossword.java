@@ -280,6 +280,16 @@ public class Crossword {
                         cells[i+1][j].addHyphen(Cell.CellSide.TOP);
                         stringLength-- ;
                     }
+                    if (tempString.contains(SAVE_RIGHT_WORD_SPLIT_CODE)) {
+                        cells[i][j].addWordSplit(Cell.CellSide.RIGHT, cellWidth);
+                        cells[i][j+1].addWordSplit(Cell.CellSide.LEFT, cellWidth);
+                        stringLength-- ;
+                    }
+                    if (tempString.contains(SAVE_BOTTOM_WORD_SPLIT_CODE)) {
+                        cells[i][j].addWordSplit(Cell.CellSide.BOTTOM, cellWidth);
+                        cells[i+1][j].addWordSplit(Cell.CellSide.TOP, cellWidth);
+                        stringLength-- ;
+                    }
                     if (stringLength > 0) cells[i][j].setText(tempString.substring(0,1));
                 }
                 index++;
@@ -494,7 +504,7 @@ public class Crossword {
     public void setAddHyphenActive(boolean addHyphenActive) {
         this.addHyphenActive = addHyphenActive;
         if (addHyphenActive) {
-            this.addWordSplitActive = false;
+            setAddWordSplitActive(false);
             clearCellHighlights();
         }
     }
@@ -506,12 +516,12 @@ public class Crossword {
     public void setAddWordSplitActive(boolean addWordSplitActive) {
         this.addWordSplitActive = addWordSplitActive;
         if (addWordSplitActive) {
-            this.addHyphenActive = false;
+            setAddHyphenActive(false);
             clearCellHighlights();
         }
     }
 
-    public void cellClickedWhenHyphenActive(Cell cellClicked) {
+    public void cellClickedWhenHyphenWordSplitActive(Cell cellClicked) {
         if (activeCell == null) {
             activeCell = cellClicked;
             activeCell.setFocusedMajor();
@@ -523,11 +533,21 @@ public class Crossword {
             int cCol = cellClicked.getColumn();
             int cRow = cellClicked.getRow();
             if (aCol == cCol && aRow + 1 == cRow) {
-                activeCell.addHyphen(Cell.CellSide.BOTTOM);
-                cellClicked.addHyphen(Cell.CellSide.TOP);
+                if (addHyphenActive) {
+                    activeCell.addHyphen(Cell.CellSide.BOTTOM);
+                    cellClicked.addHyphen(Cell.CellSide.TOP);
+                } else {
+                    activeCell.addWordSplit(Cell.CellSide.BOTTOM, cellWidth);
+                    cellClicked.addWordSplit(Cell.CellSide.TOP, cellWidth);
+                }
             } else if (aCol  + 1 == cCol && aRow == cRow) {
-                activeCell.addHyphen(Cell.CellSide.RIGHT);
-                cellClicked.addHyphen(Cell.CellSide.LEFT);
+                if (addHyphenActive) {
+                    activeCell.addHyphen(Cell.CellSide.RIGHT);
+                    cellClicked.addHyphen(Cell.CellSide.LEFT);
+                } else {
+                    activeCell.addWordSplit(Cell.CellSide.RIGHT, cellWidth);
+                    cellClicked.addWordSplit(Cell.CellSide.LEFT, cellWidth);
+                }
             } else {
                 Log.d(LOG_TAG,"Invalid cell clicked, so doing nothing");
             }
