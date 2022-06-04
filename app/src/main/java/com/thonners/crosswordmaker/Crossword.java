@@ -111,6 +111,11 @@ public class Crossword {
     private GridLayout grid;
     private CrosswordGrid   crosswordGrid ;
 
+    private WordSplitHyphenDeactivatedListener listener ;
+
+    public interface WordSplitHyphenDeactivatedListener {
+        public void wordSplitHyphenDeactivated() ;
+    }
 
     //---------------------------------------------- Constructors --------------------------------------------------
 
@@ -497,6 +502,10 @@ public class Crossword {
         return cellViews[row][column];
     }
 
+    public void setWordSplitHyphenListener(WordSplitHyphenDeactivatedListener listener) {
+        this.listener = listener ;
+    }
+
     public boolean isAddHyphenActive() {
         return addHyphenActive;
     }
@@ -555,7 +564,9 @@ public class Crossword {
             addHyphenActive = false ;
             addWordSplitActive = false ;
             clearCellHighlights();
+            listener.wordSplitHyphenDeactivated();
         }
+        // TODO: Catch back button press and clear the active status
     }
 
     public void clearCellHighlights() {
