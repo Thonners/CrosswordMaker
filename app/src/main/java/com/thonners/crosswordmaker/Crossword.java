@@ -532,6 +532,46 @@ public class Crossword {
 
     public void cellClickedWhenHyphenWordSplitActive(Cell cellClicked) {
         if (activeCell == null) {
+            int thisRow = cellClicked.getRow();
+            int thisCol = cellClicked.getColumn();
+            int nextRow = thisRow + 1;
+            int nextCol = thisCol + 1;
+            if (getCell(thisRow, nextCol).isBlackCell()) {
+                // Then the only option for the word-break is between this row and the next one
+                Log.d(LOG_TAG,"Failing fast as only vertical word break an option");
+                if (addHyphenActive) {
+                    cellClicked.addHyphen(Cell.CellSide.BOTTOM);
+                    getCell(nextRow,thisCol).addHyphen(Cell.CellSide.TOP);
+                } else {
+                    cellClicked.addWordSplit(Cell.CellSide.BOTTOM, cellWidth);
+                    getCell(nextRow,thisCol).addWordSplit(Cell.CellSide.TOP, cellWidth);
+                }
+                // Job done
+                activeCell = null;
+                addHyphenActive = false ;
+                addWordSplitActive = false ;
+                clearCellHighlights();
+                listener.wordSplitHyphenDeactivated();
+                return ;
+            }
+            if (getCell(nextRow, thisCol).isBlackCell()) {
+                // Then the only option for the word-break is between this col and the next one
+                Log.d(LOG_TAG,"Failing fast as only horizontal word break an option");
+                if (addHyphenActive) {
+                    cellClicked.addHyphen(Cell.CellSide.RIGHT);
+                    getCell(thisRow,nextCol).addHyphen(Cell.CellSide.LEFT);
+                } else {
+                    cellClicked.addWordSplit(Cell.CellSide.RIGHT, cellWidth);
+                    getCell(thisRow,nextCol).addWordSplit(Cell.CellSide.LEFT, cellWidth);
+                }
+                // Job done
+                activeCell = null;
+                addHyphenActive = false ;
+                addWordSplitActive = false ;
+                clearCellHighlights();
+                listener.wordSplitHyphenDeactivated();
+                return ;
+            }
             activeCell = cellClicked;
             activeCell.setFocusedMajor();
             getCell(activeCell.getRow() + 1, activeCell.getColumn()).setFocusedMinor();
@@ -566,8 +606,19 @@ public class Crossword {
             clearCellHighlights();
             listener.wordSplitHyphenDeactivated();
         }
+        // TODO: Remove repetition of code from fail-fast options if only one direction of word split possible
         // TODO: Catch back button press and clear the active status
     }
+
+//    private void addVerticalWordBreak(Cell finalLetterFirstWord) {
+//        if (addHyphenActive) {
+//            activeCell.addHyphen(Cell.CellSide.BOTTOM);
+//            cellClicked.addHyphen(Cell.CellSide.TOP);
+//        } else {
+//            activeCell.addWordSplit(Cell.CellSide.BOTTOM, cellWidth);
+//            cellClicked.addWordSplit(Cell.CellSide.TOP, cellWidth);
+//        }
+//    }
 
     public void clearCellHighlights() {
         // Set all (non black) cells back to white backgrounds
