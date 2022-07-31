@@ -536,46 +536,22 @@ public class Crossword {
             int thisCol = cellClicked.getColumn();
             int nextRow = thisRow + 1;
             int nextCol = thisCol + 1;
-            if (getCell(thisRow, nextCol).isBlackCell()) {
+            if (nextCol >= rowCount || getCell(thisRow, nextCol).isBlackCell()) {
                 // Then the only option for the word-break is between this row and the next one
                 Log.d(LOG_TAG,"Failing fast as only vertical word break an option");
-                if (addHyphenActive) {
-                    cellClicked.addHyphen(Cell.CellSide.BOTTOM);
-                    getCell(nextRow,thisCol).addHyphen(Cell.CellSide.TOP);
-                } else {
-                    cellClicked.addWordSplit(Cell.CellSide.BOTTOM, cellWidth);
-                    getCell(nextRow,thisCol).addWordSplit(Cell.CellSide.TOP, cellWidth);
-                }
-                // Job done
-                activeCell = null;
-                addHyphenActive = false ;
-                addWordSplitActive = false ;
-                clearCellHighlights();
-                listener.wordSplitHyphenDeactivated();
+                addWordBreak(cellClicked,getCell(nextRow,thisCol));
                 return ;
             }
-            if (getCell(nextRow, thisCol).isBlackCell()) {
+            if (nextRow >= rowCount || getCell(nextRow, thisCol).isBlackCell()) {
                 // Then the only option for the word-break is between this col and the next one
                 Log.d(LOG_TAG,"Failing fast as only horizontal word break an option");
-                if (addHyphenActive) {
-                    cellClicked.addHyphen(Cell.CellSide.RIGHT);
-                    getCell(thisRow,nextCol).addHyphen(Cell.CellSide.LEFT);
-                } else {
-                    cellClicked.addWordSplit(Cell.CellSide.RIGHT, cellWidth);
-                    getCell(thisRow,nextCol).addWordSplit(Cell.CellSide.LEFT, cellWidth);
-                }
-                // Job done
-                activeCell = null;
-                addHyphenActive = false ;
-                addWordSplitActive = false ;
-                clearCellHighlights();
-                listener.wordSplitHyphenDeactivated();
+                addWordBreak(cellClicked,getCell(thisRow,nextCol));
                 return ;
             }
             activeCell = cellClicked;
             activeCell.setFocusedMajor();
-            getCell(activeCell.getRow() + 1, activeCell.getColumn()).setFocusedMinor();
-            getCell(activeCell.getRow(), activeCell.getColumn() + 1).setFocusedMinor();
+            getCell(nextRow, thisCol).setFocusedMinor();
+            getCell(thisRow, nextCol).setFocusedMinor();
         } else {
             int aCol = activeCell.getColumn();
             int aRow = activeCell.getRow();
@@ -610,15 +586,29 @@ public class Crossword {
         // TODO: Catch back button press and clear the active status
     }
 
-//    private void addVerticalWordBreak(Cell finalLetterFirstWord) {
-//        if (addHyphenActive) {
-//            activeCell.addHyphen(Cell.CellSide.BOTTOM);
-//            cellClicked.addHyphen(Cell.CellSide.TOP);
-//        } else {
-//            activeCell.addWordSplit(Cell.CellSide.BOTTOM, cellWidth);
-//            cellClicked.addWordSplit(Cell.CellSide.TOP, cellWidth);
-//        }
-//    }
+    private void addWordBreak(Cell finalLetterFirstWord, Cell firstLetterNextWord) {
+        boolean isVertical = finalLetterFirstWord.getColumn() == firstLetterNextWord.getColumn() ;
+        Cell.CellSide finalLetterCellSide, firstLetterCellSide;
+        if (isVertical) {
+            finalLetterCellSide = Cell.CellSide.BOTTOM ;
+            firstLetterCellSide = Cell.CellSide.TOP ;
+        } else {
+            finalLetterCellSide = Cell.CellSide.RIGHT ;
+            firstLetterCellSide = Cell.CellSide.LEFT ;
+        }
+        if (addHyphenActive) {
+            finalLetterFirstWord.addHyphen(finalLetterCellSide);
+            firstLetterNextWord.addHyphen(firstLetterCellSide);
+        } else {
+            finalLetterFirstWord.addWordSplit(finalLetterCellSide, cellWidth);
+            firstLetterNextWord.addWordSplit(firstLetterCellSide, cellWidth);
+        }
+        activeCell = null;
+        addHyphenActive = false ;
+        addWordSplitActive = false ;
+        clearCellHighlights();
+        listener.wordSplitHyphenDeactivated();
+    }
 
     public void clearCellHighlights() {
         // Set all (non black) cells back to white backgrounds
