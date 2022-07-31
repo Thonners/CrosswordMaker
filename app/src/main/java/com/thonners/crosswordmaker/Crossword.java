@@ -531,9 +531,9 @@ public class Crossword {
     }
 
     public void cellClickedWhenHyphenWordSplitActive(Cell cellClicked) {
+        int thisRow = cellClicked.getRow();
+        int thisCol = cellClicked.getColumn();
         if (activeCell == null) {
-            int thisRow = cellClicked.getRow();
-            int thisCol = cellClicked.getColumn();
             int nextRow = thisRow + 1;
             int nextCol = thisCol + 1;
             if (nextCol >= rowCount || getCell(thisRow, nextCol).isBlackCell()) {
@@ -555,24 +555,10 @@ public class Crossword {
         } else {
             int aCol = activeCell.getColumn();
             int aRow = activeCell.getRow();
-            int cCol = cellClicked.getColumn();
-            int cRow = cellClicked.getRow();
-            if (aCol == cCol && aRow + 1 == cRow) {
-                if (addHyphenActive) {
-                    activeCell.addHyphen(Cell.CellSide.BOTTOM);
-                    cellClicked.addHyphen(Cell.CellSide.TOP);
-                } else {
-                    activeCell.addWordSplit(Cell.CellSide.BOTTOM, cellWidth);
-                    cellClicked.addWordSplit(Cell.CellSide.TOP, cellWidth);
-                }
-            } else if (aCol  + 1 == cCol && aRow == cRow) {
-                if (addHyphenActive) {
-                    activeCell.addHyphen(Cell.CellSide.RIGHT);
-                    cellClicked.addHyphen(Cell.CellSide.LEFT);
-                } else {
-                    activeCell.addWordSplit(Cell.CellSide.RIGHT, cellWidth);
-                    cellClicked.addWordSplit(Cell.CellSide.LEFT, cellWidth);
-                }
+            if (aCol == thisCol && aRow + 1 == thisRow) {
+                addWordBreak(getCell(aRow,aCol), getCell(thisRow,thisCol));
+            } else if (aCol  + 1 == thisCol && aRow == thisRow) {
+                addWordBreak(getCell(aRow,aCol), getCell(thisRow,thisCol));
             } else {
                 Log.d(LOG_TAG,"Invalid cell clicked, so doing nothing");
             }
@@ -582,8 +568,6 @@ public class Crossword {
             clearCellHighlights();
             listener.wordSplitHyphenDeactivated();
         }
-        // TODO: Remove repetition of code from fail-fast options if only one direction of word split possible
-        // TODO: Catch back button press and clear the active status
     }
 
     private void addWordBreak(Cell finalLetterFirstWord, Cell firstLetterNextWord) {
