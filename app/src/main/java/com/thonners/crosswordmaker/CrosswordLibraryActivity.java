@@ -196,7 +196,6 @@ public class CrosswordLibraryActivity extends AppCompatActivity {
         if (editCrosswordIndex < 0) {
             Log.d(LOG_TAG, "editCrosswordIndex < 0 - not doing anything (why is this method being called???!?!?!");
         } else {
-            // TODO: Launch edit activity
             Log.d(LOG_TAG, "Opening edit task for: " + libraryManager.getSavedCrosswords().get(editCrosswordIndex).getTitle());
             libraryManager.openEditCrossword(libraryManager.getSavedCrosswords().get(editCrosswordIndex).getCrosswordDir());
 
