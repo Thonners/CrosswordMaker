@@ -9,6 +9,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.Serializable;
+import java.util.HashMap;
 
 /**
  * Created by mat on 28/12/14.
@@ -20,6 +21,7 @@ public class CellView extends RelativeLayout implements Serializable {
     private Cell cell ;
     private int clueNumber ;
     private TextView clueNumberDisplay = null;
+    private HashMap<Cell.CellSide, View> wordSplitViews = new HashMap<>();
     private RelativeLayout.LayoutParams cellLP = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT) ;
     private RelativeLayout.LayoutParams cellNoLP = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT) ;
 
@@ -79,6 +81,7 @@ public class CellView extends RelativeLayout implements Serializable {
 
     public void addHyphen(Cell.CellSide side) {
         Log.d(LOG_TAG,"Adding hyphen to " + side + " of cellView: " + cell.getCellName());
+        removeWordSplitOrHyphen(side);
         int hyphenLength = getResources().getDimensionPixelOffset(R.dimen.cell_hyphen_length) ; //cellWidth / (int) getResources().getDimension(R.dimen.cell_hyphen_length_fraction);
         int hyphenWidth = getResources().getDimensionPixelOffset(R.dimen.cell_hyphen_thickness) ;
         View trailingHyphen = new View(getContext()) ;
@@ -111,12 +114,13 @@ public class CellView extends RelativeLayout implements Serializable {
                 break;
         }
         this.addView(trailingHyphen, trailingHyphenLP);
+        wordSplitViews.put(side,trailingHyphen);
         Log.d(LOG_TAG,"Added hyphen to " + side + " of cellView: " + cell.getCellName());
     }
 
     public void addWordSplit(Cell.CellSide side, int cellWidth) {
         Log.d(LOG_TAG,"Adding word split to " + side + " of cellView: " + cell.getCellName());
-
+        removeWordSplitOrHyphen(side);
         int dividerThickness = getResources().getDimensionPixelOffset(R.dimen.cell_word_split_thickness) ;
         int cellSize = cellWidth;
         View trailingWordSplit = new View(getContext()) ;
@@ -150,7 +154,14 @@ public class CellView extends RelativeLayout implements Serializable {
         }
         this.addView(trailingWordSplit, trailingWordSplitLP);
         trailingWordSplit.bringToFront();
+        wordSplitViews.put(side,trailingWordSplit);
         Log.d(LOG_TAG,"Added Word|Split to " + side + " of cellView: " + cell.getCellName() + ", Width = " + trailingWordSplitLP.width + ", Height = " + trailingWordSplitLP.height);
     }
 
+    public void removeWordSplitOrHyphen(Cell.CellSide side) {
+        if (wordSplitViews.containsKey(side)) {
+            Log.d(LOG_TAG,"Removing previous word separator from " + side + " side of cell");
+            this.removeView(wordSplitViews.get(side));
+        }
+    }
 }
