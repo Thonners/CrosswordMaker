@@ -303,13 +303,25 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
     }
 
     public void addHyphen(CellSide side) {
-        cellView.addHyphen(side);
-        hyphens[side.ordinal()] = true;
+        if (hyphens[side.ordinal()]) {
+            // If it's already active, remove it this time
+            cellView.removeWordSplitOrHyphen(side);
+            hyphens[side.ordinal()] = false;
+        } else {
+            cellView.addHyphen(side);
+            hyphens[side.ordinal()] = true;
+        }
         wordSplits[side.ordinal()] = false;
     }
     public void addWordSplit(CellSide side, int cellWidth) {
-        cellView.addWordSplit(side, cellWidth);
-        wordSplits[side.ordinal()] = true;
+        if (wordSplits[side.ordinal()]) {
+            // If it's already active, remove it this time
+            cellView.removeWordSplitOrHyphen(side);
+            wordSplits[side.ordinal()] = false;
+        } else {
+            cellView.addWordSplit(side, cellWidth);
+            wordSplits[side.ordinal()] = true;
+        }
         hyphens[side.ordinal()] = false;
     }
 }
