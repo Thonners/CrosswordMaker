@@ -158,6 +158,8 @@
     <!-- Crossword Page Fragment -->
     <string name="across"><u>Across:</u></string>
     <string name="down"><u>Down:</u></string>
+    <string name="add_word_split_tooltip">Add word-split</string>
+    <string name="add_hyphen_tooltip">Add a hyphen</string>
 
     <!-- Victory dialog -->
     <string name="victory_title">Congratulations\!</string>

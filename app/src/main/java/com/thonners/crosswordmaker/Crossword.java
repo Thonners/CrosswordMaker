@@ -47,6 +47,11 @@ public class Crossword {
     public static final String SAVE_CLUE_IMAGE_FILE_NAME = "clue.jpg";
     public static final String SAVE_CROSSWORD_IMAGE_FILE_NAME = "image_crossword.jpg";
 
+    private static final String SAVE_RIGHT_HYPHEN_CODE = "~" ;
+    private static final String SAVE_BOTTOM_HYPHEN_CODE = "_" ;
+    private static final String SAVE_RIGHT_WORD_SPLIT_CODE = "|" ;
+    private static final String SAVE_BOTTOM_WORD_SPLIT_CODE = "/" ;
+
     public static final int SAVED_ARRAY_INDEX_TITLE = 0 ;
     public static final int SAVED_ARRAY_INDEX_DATE = 1 ;
     public static final int SAVED_ARRAY_INDEX_ROW_COUNT = 2 ;
@@ -91,6 +96,9 @@ public class Crossword {
     private String [] crosswordStringArray ;    // Place to save progress
     private String crosswordImagePath ;
     private String clueImagePath ;
+    private boolean addHyphenActive = false ;
+    private boolean addWordSplitActive = false ;
+    private Cell activeCell = null ;
 
     private FileOutputStream fileOutputStream ;
     private File saveDir , photoSaveDir;
@@ -103,6 +111,11 @@ public class Crossword {
     private GridLayout grid;
     private CrosswordGrid   crosswordGrid ;
 
+    private WordSplitHyphenDeactivatedListener listener ;
+
+    public interface WordSplitHyphenDeactivatedListener {
+        public void wordSplitHyphenDeactivated() ;
+    }
 
     //---------------------------------------------- Constructors --------------------------------------------------
 
@@ -261,7 +274,28 @@ public class Crossword {
                     cells[i][j].toggleBlackCell();
                 } else {
 //                    Log.d(LOG_TAG,"Setting value to: " + tempString);
-                    cells[i][j].setText(tempString);
+                    int stringLength = tempString.length() ;
+                    if (tempString.contains(SAVE_RIGHT_HYPHEN_CODE)) {
+                        cells[i][j].addHyphen(Cell.CellSide.RIGHT);
+                        cells[i][j+1].addHyphen(Cell.CellSide.LEFT);
+                        stringLength-- ;
+                    }
+                    if (tempString.contains(SAVE_BOTTOM_HYPHEN_CODE)) {
+                        cells[i][j].addHyphen(Cell.CellSide.BOTTOM);
+                        cells[i+1][j].addHyphen(Cell.CellSide.TOP);
+                        stringLength-- ;
+                    }
+                    if (tempString.contains(SAVE_RIGHT_WORD_SPLIT_CODE)) {
+                        cells[i][j].addWordSplit(Cell.CellSide.RIGHT, cellWidth);
+                        cells[i][j+1].addWordSplit(Cell.CellSide.LEFT, cellWidth);
+                        stringLength-- ;
+                    }
+                    if (tempString.contains(SAVE_BOTTOM_WORD_SPLIT_CODE)) {
+                        cells[i][j].addWordSplit(Cell.CellSide.BOTTOM, cellWidth);
+                        cells[i+1][j].addWordSplit(Cell.CellSide.TOP, cellWidth);
+                        stringLength-- ;
+                    }
+                    if (stringLength > 0) cells[i][j].setText(tempString.substring(0,1));
                 }
                 index++;
             }
@@ -468,6 +502,98 @@ public class Crossword {
         return cellViews[row][column];
     }
 
+    public void setWordSplitHyphenListener(WordSplitHyphenDeactivatedListener listener) {
+        this.listener = listener ;
+    }
+
+    public boolean isAddHyphenActive() {
+        return addHyphenActive;
+    }
+
+    public void setAddHyphenActive(boolean addHyphenActive) {
+        this.addHyphenActive = addHyphenActive;
+        if (addHyphenActive) {
+            setAddWordSplitActive(false);
+            clearCellHighlights();
+        }
+    }
+
+    public boolean isAddWordSplitActive() {
+        return addWordSplitActive;
+    }
+
+    public void setAddWordSplitActive(boolean addWordSplitActive) {
+        this.addWordSplitActive = addWordSplitActive;
+        if (addWordSplitActive) {
+            setAddHyphenActive(false);
+            clearCellHighlights();
+        }
+    }
+
+    public void cellClickedWhenHyphenWordSplitActive(Cell cellClicked) {
+        int thisRow = cellClicked.getRow();
+        int thisCol = cellClicked.getColumn();
+        if (activeCell == null) {
+            int nextRow = thisRow + 1;
+            int nextCol = thisCol + 1;
+            if (nextCol >= rowCount || getCell(thisRow, nextCol).isBlackCell()) {
+                // Then the only option for the word-break is between this row and the next one
+                Log.d(LOG_TAG,"Failing fast as only vertical word break an option");
+                addWordBreak(cellClicked,getCell(nextRow,thisCol));
+                return ;
+            }
+            if (nextRow >= rowCount || getCell(nextRow, thisCol).isBlackCell()) {
+                // Then the only option for the word-break is between this col and the next one
+                Log.d(LOG_TAG,"Failing fast as only horizontal word break an option");
+                addWordBreak(cellClicked,getCell(thisRow,nextCol));
+                return ;
+            }
+            activeCell = cellClicked;
+            activeCell.setFocusedMajor();
+            getCell(nextRow, thisCol).setFocusedMinor();
+            getCell(thisRow, nextCol).setFocusedMinor();
+        } else {
+            int aCol = activeCell.getColumn();
+            int aRow = activeCell.getRow();
+            if (aCol == thisCol && aRow + 1 == thisRow) {
+                addWordBreak(getCell(aRow,aCol), getCell(thisRow,thisCol));
+            } else if (aCol  + 1 == thisCol && aRow == thisRow) {
+                addWordBreak(getCell(aRow,aCol), getCell(thisRow,thisCol));
+            } else {
+                Log.d(LOG_TAG,"Invalid cell clicked, so doing nothing");
+            }
+            activeCell = null;
+            addHyphenActive = false ;
+            addWordSplitActive = false ;
+            clearCellHighlights();
+            listener.wordSplitHyphenDeactivated();
+        }
+    }
+
+    private void addWordBreak(Cell finalLetterFirstWord, Cell firstLetterNextWord) {
+        boolean isVertical = finalLetterFirstWord.getColumn() == firstLetterNextWord.getColumn() ;
+        Cell.CellSide finalLetterCellSide, firstLetterCellSide;
+        if (isVertical) {
+            finalLetterCellSide = Cell.CellSide.BOTTOM ;
+            firstLetterCellSide = Cell.CellSide.TOP ;
+        } else {
+            finalLetterCellSide = Cell.CellSide.RIGHT ;
+            firstLetterCellSide = Cell.CellSide.LEFT ;
+        }
+        if (addHyphenActive) {
+            finalLetterFirstWord.addHyphen(finalLetterCellSide);
+            firstLetterNextWord.addHyphen(firstLetterCellSide);
+        } else {
+            finalLetterFirstWord.addWordSplit(finalLetterCellSide, cellWidth);
+            firstLetterNextWord.addWordSplit(firstLetterCellSide, cellWidth);
+        }
+        activeCell = null;
+        addHyphenActive = false ;
+        addWordSplitActive = false ;
+        clearCellHighlights();
+        listener.wordSplitHyphenDeactivated();
+    }
+
     public void clearCellHighlights() {
         // Set all (non black) cells back to white backgrounds
         for (int i = 0; i < rowCount; i++) {
@@ -633,6 +759,10 @@ public class Crossword {
             for (int j = 0; j < rowCount; j++) {
                 if (!cells[i][j].isBlackCell()) {
                     saveArray[index] = cells[i][j].getText().toString() ;   // Save whatever text is in the box to the saveArray. Will be empty if box is empty.
+                    if (cells[i][j].hyphens[Cell.CellSide.RIGHT.ordinal()]) saveArray[index] += SAVE_RIGHT_HYPHEN_CODE ;
+                    if (cells[i][j].hyphens[Cell.CellSide.BOTTOM.ordinal()]) saveArray[index] += SAVE_BOTTOM_HYPHEN_CODE ;
+                    if (cells[i][j].wordSplits[Cell.CellSide.RIGHT.ordinal()]) saveArray[index] += SAVE_RIGHT_WORD_SPLIT_CODE ;
+                    if (cells[i][j].wordSplits[Cell.CellSide.BOTTOM.ordinal()]) saveArray[index] += SAVE_BOTTOM_WORD_SPLIT_CODE ;
                 } else {
                     saveArray[index] = "-" ;
                 }

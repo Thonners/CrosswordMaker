@@ -1,6 +1,5 @@
 package com.thonners.crosswordmaker;
 
-import android.app.Activity;
 import android.content.Context;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -28,6 +27,17 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
     private Clue hClue = null ;  // Horizontal clue to which cell belongs - initialise as null, and set later if required.
     private Clue vClue = null  ; // Vertical clue to which cell belongs
     private Clue activeClue = null  ; // Set the active clue so that cell focus can move as input is done
+    private CellView cellView = null ;
+
+    public boolean[] hyphens = new boolean[4] ;
+    public boolean[] wordSplits = new boolean[4] ;
+
+    public enum CellSide {
+        LEFT,
+        RIGHT,
+        TOP,
+        BOTTOM;
+    }
 
     private int maxLength = 1 ; // Max number of letters in the editText
     private InputFilter[] whiteCellInputFilter = {new InputFilter.AllCaps(), new InputFilter.LengthFilter(maxLength), new InputFilter() {
@@ -51,10 +61,11 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
 
     // Constructor:
     // For creating the initial grid, all cells start life as white cells
-    public Cell(Context context, Crossword crossword, int r, int c) {
+    public Cell(Context context, Crossword crossword, int r, int c, CellView cellView) {
         super(context);
         setCrossword(crossword);
 
+        this.cellView = cellView ;
         setRow(r) ;
         setColumn(c);
         setCellName(row,column);
@@ -102,7 +113,10 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
         this.setBackground(getResources().getDrawable(R.drawable.cell_focus_main));
     }
     public void setFocusedMinor() {
-        this.setBackground(getResources().getDrawable(R.drawable.cell_focus_minor));
+        // Make sure it's not a black cell, as this can get called when doing hyphens/word splits
+        if (!isBlackCell()) {
+            this.setBackground(getResources().getDrawable(R.drawable.cell_focus_minor));
+        }
     }
 
     public void toggleBlackCell() {
@@ -129,7 +143,6 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
         // If in crossword filling mode, and cell clicked, change clue orientation
         Log.d(LOG_TAG, " Cell click repeated, swapping clue highlight orientation");
         swapClueHighlightOrientation();
-
     }
 
     // For highlighting active cell & clue during normal operation
@@ -137,20 +150,28 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
     public void onFocusChange(View view, boolean hasFocus){
         // To change cell highlight if cell has focus
         if (hasFocus) {
-            Log.d(LOG_TAG, "Cell " + cellName + " has focus");
 
             crossword.clearCellHighlights();
 
-            if (activeClue != null) {
-                activeClue.highlightClue(this);
+            if (crossword.isAddHyphenActive() || crossword.isAddWordSplitActive()) {
+                Log.d(LOG_TAG, "Setting hyphen / word split active ");
+                crossword.cellClickedWhenHyphenWordSplitActive(this);
             } else {
-                // Default to selecting horizontal clue if cell belongs to both a horizontal and vertical clue but isn't active
-                if (hClue != null) {
-                    hClue.highlightClue(this);
-                } else if (vClue != null) {
-                    vClue.highlightClue(this);
+
+                Log.d(LOG_TAG, "Cell " + cellName + " has focus");
+
+
+                if (activeClue != null) {
+                    activeClue.highlightClue(this);
                 } else {
-                    Log.d(LOG_TAG, "Cell seems not to belong to a clue. Is the grid valid?");
+                    // Default to selecting horizontal clue if cell belongs to both a horizontal and vertical clue but isn't active
+                    if (hClue != null) {
+                        hClue.highlightClue(this);
+                    } else if (vClue != null) {
+                        vClue.highlightClue(this);
+                    } else {
+                        Log.d(LOG_TAG, "Cell seems not to belong to a clue. Is the grid valid?");
+                    }
                 }
             }
 
@@ -181,11 +202,8 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
 
     }
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // TODO Auto-generated method stub
-
     }
     public void afterTextChanged(Editable s) {
-                // TODO Auto-generated method stub
     }
 
     public void setGridMakingPhase(Boolean isGridMakingPhase){
@@ -282,5 +300,28 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
      */
     public boolean isEmpty() {
         return this.getText().toString().isEmpty() ;
+    }
+
+    public void addHyphen(CellSide side) {
+        if (hyphens[side.ordinal()]) {
+            // If it's already active, remove it this time
+            cellView.removeWordSplitOrHyphen(side);
+            hyphens[side.ordinal()] = false;
+        } else {
+            cellView.addHyphen(side);
+            hyphens[side.ordinal()] = true;
+        }
+        wordSplits[side.ordinal()] = false;
+    }
+    public void addWordSplit(CellSide side, int cellWidth) {
+        if (wordSplits[side.ordinal()]) {
+            // If it's already active, remove it this time
+            cellView.removeWordSplitOrHyphen(side);
+            wordSplits[side.ordinal()] = false;
+        } else {
+            cellView.addWordSplit(side, cellWidth);
+            wordSplits[side.ordinal()] = true;
+        }
+        hyphens[side.ordinal()] = false;
     }
 }

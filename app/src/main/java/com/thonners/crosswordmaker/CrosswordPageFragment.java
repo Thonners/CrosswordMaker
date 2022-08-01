@@ -10,9 +10,14 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -26,7 +31,7 @@ import java.util.ArrayList;
  * Use the {@link CrosswordPageFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CrosswordPageFragment extends Fragment implements  View.OnClickListener, View.OnLongClickListener{
+public class CrosswordPageFragment extends Fragment implements  View.OnClickListener, View.OnLongClickListener, Crossword.WordSplitHyphenDeactivatedListener{
 
     private static final String ARG_TAB_POSITION = "tabPosition" ;
     private static final String ARG_STRING_ARRAY = "crosswordStringArray" ;
@@ -39,9 +44,14 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
     private ScrollView verticalScrollView ;
     private GridLayout acrossCluesChecklist ;
     private GridLayout downCluesChecklist ;
+    private FloatingActionButton wordSplitFAB ;
+    private FloatingActionButton hyphenFAB ;
 
     private Crossword crossword ;
     private String[] crosswordStringArray;
+
+    private boolean addHyphenActive = false ;
+    private boolean addWordSplitActive = false ;
 
     private int tabPosition ;
 
@@ -81,11 +91,13 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_crossword_page, container, false);
         // Get instances of the views
-        crosswordGrid = (CrosswordGrid) view.findViewById(R.id.crossword_grid);
-        horizontalScrollViewNoFocus = (HorizontalScrollViewNoFocus) view.findViewById(R.id.horizontal_scroll_view_crossword);
-        verticalScrollView = (ScrollView) view.findViewById(R.id.vertical_scroll_view_crossword);
-        acrossCluesChecklist = (GridLayout) view.findViewById(R.id.clues_checklist_across_layout);
-        downCluesChecklist = (GridLayout) view.findViewById(R.id.clues_checklist_down_layout);
+        crosswordGrid = view.findViewById(R.id.crossword_grid);
+        horizontalScrollViewNoFocus = view.findViewById(R.id.horizontal_scroll_view_crossword);
+        verticalScrollView = view.findViewById(R.id.vertical_scroll_view_crossword);
+        acrossCluesChecklist = view.findViewById(R.id.clues_checklist_across_layout);
+        downCluesChecklist = view.findViewById(R.id.clues_checklist_down_layout);
+        wordSplitFAB = view.findViewById(R.id.add_word_split);
+        hyphenFAB = view.findViewById(R.id.add_hyphen);
 
         // Pass scroll view instances to the crosswordGrid
         crosswordGrid.setHorizontalScrollView(horizontalScrollViewNoFocus);
@@ -99,6 +111,15 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
         populateCluesChecklists(acrossCluesChecklist, crossword.getHClues());
         // Populate the vertical clues checklist
         populateCluesChecklists(downCluesChecklist, crossword.getVClues());
+
+        // Add click listeners for the hyphen/word split FABs
+        view.findViewById(R.id.add_word_split).setOnClickListener(this);
+        view.findViewById(R.id.add_hyphen).setOnClickListener(this);
+        // Reduce their prominence
+        resetFABs();
+
+//        // Add click listener to the cell views, in case we're in add hyphen or add word split mode...
+//        crossword.setClickListenerForAllCells(this);
 
         return view ;
 
@@ -134,6 +155,7 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
     private void createCrossword() {
         // Create the crossword
         crossword = new Crossword(getActivity(), crosswordGrid,crosswordStringArray,false);
+        crossword.setWordSplitHyphenListener(this);
     }
 
     public void zoomCrossword(){
@@ -229,6 +251,21 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
         if( view instanceof ClueChecklistEntryTextView) {
             Clue clue = ((ClueChecklistEntryTextView) view).getClue();
             clue.highlightClue(clue.getStartCell());
+        } else if (view instanceof FloatingActionButton){
+            if (view.equals(wordSplitFAB)) addWordSplit();
+            if (view.equals(hyphenFAB)) addHyphen();
+        } else if (view instanceof CellView) {
+            Log.d(LOG_TAG,"Cell view clicked");
+            if (this.addHyphenActive || this.addWordSplitActive) {
+                Log.d(LOG_TAG,"Adding something active");
+
+            }
+        }else if (view instanceof HorizontalScrollViewNoFocus) {
+            Log.d(LOG_TAG,"HorizontalScrollViewNoFocus view clicked");
+            if (this.addHyphenActive || this.addWordSplitActive) {
+                Log.d(LOG_TAG,"Adding something active");
+
+            }
         }
     }
     /**
@@ -246,5 +283,73 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
         } else {
             return false ;
         }
+    }
+
+    private void addWordSplit() {
+        Log.d(LOG_TAG,"Add word split clicked");
+        if (crossword.isAddWordSplitActive()) {
+            // Then deactivate it
+            crossword.setAddWordSplitActive(false);
+            setFABNormal(wordSplitFAB);
+            setFABNormal(hyphenFAB);
+        } else {
+            setFABActive(wordSplitFAB);
+            setFABDeactive(hyphenFAB);
+            crossword.setAddWordSplitActive(true);
+        }
+    }
+
+    private void addHyphen() {
+        Log.d(LOG_TAG, "Add hyphen clicked");
+        if (crossword.isAddHyphenActive()) {
+            // Then deactivate it
+            crossword.setAddHyphenActive(false);
+            setFABNormal(wordSplitFAB);
+            setFABNormal(hyphenFAB);
+        } else {
+            setFABActive(hyphenFAB);
+            setFABDeactive(wordSplitFAB);
+            crossword.setAddHyphenActive(true);
+        }
+    }
+
+    private void setFABActive(FloatingActionButton fabView) {
+        fabView.animate()
+                .scaleX((float) 1.3)
+                .scaleY((float) 1.3)
+                .alpha(1)
+                .setDuration(200)
+                .setInterpolator(new AccelerateDecelerateInterpolator());
+
+    }
+
+    private void setFABDeactive(FloatingActionButton fabView) {
+        fabView.animate()
+                .scaleX((float) 0.5)
+                .scaleY((float) 0.5)
+                .alpha((float) 0.25)
+                .setDuration(200)
+                .setInterpolator(new AccelerateDecelerateInterpolator());
+
+    }
+
+    private void setFABNormal(FloatingActionButton fabView) {
+        fabView.animate()
+                .scaleX((float) 1.0)
+                .scaleY((float) 1.0)
+                .alpha((float) 0.5)
+                .setDuration(200)
+                .setInterpolator(new AccelerateDecelerateInterpolator());
+
+    }
+
+    @Override
+    public void wordSplitHyphenDeactivated() {
+        resetFABs();
+    }
+
+    private void resetFABs() {
+        setFABNormal(hyphenFAB);
+        setFABNormal(wordSplitFAB);
     }
 }

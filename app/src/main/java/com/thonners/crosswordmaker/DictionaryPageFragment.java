@@ -109,12 +109,12 @@ public class DictionaryPageFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // TODO: Use whatever replaced onActivityResult now that it's been deprecated
         // When search returns to activity, clear search box?
         inputBox.selectAll();
     }
 
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         public void searchDictionary(String searchTerm);
     }
 
