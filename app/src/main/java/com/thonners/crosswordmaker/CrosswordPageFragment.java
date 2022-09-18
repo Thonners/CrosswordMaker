@@ -32,7 +32,7 @@ import java.util.ArrayList;
  * Use the {@link CrosswordPageFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CrosswordPageFragment extends Fragment implements  View.OnClickListener, View.OnLongClickListener, Crossword.WordSplitHyphenDeactivatedListener{
+public class CrosswordPageFragment extends Fragment implements  View.OnClickListener, View.OnLongClickListener, Crossword.WordSplitHyphenDeactivatedListener, Clue.ClueInteractionListener{
 
     private static final String ARG_TAB_POSITION = "tabPosition" ;
     private static final String ARG_STRING_ARRAY = "crosswordStringArray" ;
@@ -45,6 +45,7 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
     private ScrollView verticalScrollView ;
     private GridLayout acrossCluesChecklist ;
     private GridLayout downCluesChecklist ;
+    private LinearLayout hangmanLayout ;
     private FloatingActionButton wordSplitFAB ;
     private FloatingActionButton hyphenFAB ;
 
@@ -99,6 +100,7 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
         downCluesChecklist = view.findViewById(R.id.clues_checklist_down_layout);
         wordSplitFAB = view.findViewById(R.id.add_word_split);
         hyphenFAB = view.findViewById(R.id.add_hyphen);
+        hangmanLayout = view.findViewById(R.id.hangman_letters_layout);
 
         // Pass scroll view instances to the crosswordGrid
         crosswordGrid.setHorizontalScrollView(horizontalScrollViewNoFocus);
@@ -157,6 +159,7 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
         // Create the crossword
         crossword = new Crossword(getActivity(), crosswordGrid,crosswordStringArray,false);
         crossword.setWordSplitHyphenListener(this);
+        crossword.setClueHangmanListener(this);
     }
 
     public void zoomCrossword(){
@@ -283,6 +286,23 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
             return true ;
         } else {
             return false ;
+        }
+    }
+
+    /**
+     * @param letters Array of Strings for each letter in the clue
+     */
+    public void updateHangman(char[] letters) {
+        Log.d(LOG_TAG,"Updating hangman..." + String.valueOf(letters));
+        this.hangmanLayout.removeAllViews();
+        if (letters.length == 0) {
+            Log.d(LOG_TAG,"letters.length = 0");
+            return;
+        }
+        for (int i = 0; i < letters.length; i++) {
+            ManualAnagramKnownLetterCardView tv = new ManualAnagramKnownLetterCardView(getContext());
+            tv.setLetter(letters[i] + "");
+            this.hangmanLayout.addView(tv);
         }
     }
 

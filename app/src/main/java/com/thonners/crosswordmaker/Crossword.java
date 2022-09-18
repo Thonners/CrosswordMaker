@@ -507,6 +507,11 @@ public class Crossword {
         this.listener = listener ;
     }
 
+    public void setClueHangmanListener(Clue.ClueInteractionListener clueHangmanListener) {
+        for (Clue clue : this.hClues) clue.setClueHangmanListener(clueHangmanListener);
+        for (Clue clue : this.vClues) clue.setClueHangmanListener(clueHangmanListener);
+    }
+
     public boolean isAddHyphenActive() {
         return addHyphenActive;
     }

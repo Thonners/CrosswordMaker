@@ -1,7 +1,9 @@
 package com.thonners.crosswordmaker;
 
 import android.content.Context;
+import android.util.Log;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /** Class to hold all the details of a clue
@@ -16,10 +18,10 @@ public class Clue {
 
     private static final String LOG_TAG = "Clue" ;
 
-    private String orientation;
-    private Cell startCell ;
+    private final String orientation;
+    private final Cell startCell ;
     private int length ;
-    private ArrayList<Cell> clueCells = new ArrayList<Cell>();
+    private final ArrayList<Cell> clueCells = new ArrayList<>();
     private int clueID;
     private int clueDisplayNumber ;
 
@@ -27,12 +29,21 @@ public class Clue {
     private boolean isCompleted = false ;
 
     private ClueChecklistEntryTextView checklistEntryTextView = null;
+    private ClueInteractionListener listener = null;
+
+    public interface ClueInteractionListener {
+        void updateHangman(char[] letters);
+    }
 
     //public Clue (String clueOrientation , Cell startCell, OnClueInteractionListener crosswordPageFragment) {
     public Clue (String clueOrientation , Cell startCell) {
         this.orientation = clueOrientation;
         this.startCell = startCell ;
         this.isHighlighted = false ;
+    }
+
+    public void setClueHangmanListener(ClueInteractionListener listener) {
+        this.listener = listener ;
     }
 
     public void setLength(int l) {
@@ -48,8 +59,7 @@ public class Clue {
     }
 
     /**
-     * Method to set the display number, i.e. the number of the clue in its across / down capacity
-     * @param clueDisplayNumber
+     * @param clueDisplayNumber The number with which to identify the clue (e.g. this should be '4' for the '4 Down' clue)
      */
     public void setClueDisplayNumber(int clueDisplayNumber) {
         this.clueDisplayNumber = clueDisplayNumber ;
@@ -81,16 +91,27 @@ public class Clue {
      * @param focusCell The cell in the clue that is to have the major focus - i.e. the active cell
      */
     public void highlightClue(Cell focusCell) {
+        // Use this array to store the values of the letters in the clue
+        char[] letters = new char[this.clueCells.size()];
+        int cellNumber = 0;
         // Highlight the cells in the clue
         setIsHighlighted();
-        for (Cell cell : clueCells ) {
+        Cell cell = null;
+        for (int i = 0 ; i < letters.length ; i++) {
+            cell = clueCells.get(i);
             cell.setActiveClue(this);
             if (cell.equals(focusCell)) {
                 cell.setFocusedMajor();
             } else {
                 cell.setFocusedMinor();
             }
+            String letter = cell.getText().toString() ;
+            if (!letter.isEmpty()) {
+                Array.setChar(letters, i, letter.charAt(0));
+            }
         }
+        Log.d(LOG_TAG,"Letters in this clue: " + String.valueOf(letters) + ", length should be: " + this.length);
+        this.listener.updateHangman(letters);
     }
 
     private void setIsHighlighted() {
@@ -141,11 +162,7 @@ public class Clue {
         }
 
         // If still completed, cross it off the list
-        if (isCompleted) {
-            checklistEntryTextView.setChecked(true) ;
-        } else {
-            checklistEntryTextView.setChecked(false) ;
-        }
+        checklistEntryTextView.setChecked(isCompleted) ;
     }
     public String getCells() {
         String cellList = "";
