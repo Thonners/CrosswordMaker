@@ -16,6 +16,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -252,13 +253,13 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
             Clue clue = ((ClueChecklistEntryTextView) view).getClue();
             clue.highlightClue(clue.getStartCell());
         } else if (view instanceof FloatingActionButton){
+            Toast.makeText(getContext(),R.string.word_split_instructions_1,Toast.LENGTH_LONG).show();
             if (view.equals(wordSplitFAB)) addWordSplit();
             if (view.equals(hyphenFAB)) addHyphen();
         } else if (view instanceof CellView) {
             Log.d(LOG_TAG,"Cell view clicked");
             if (this.addHyphenActive || this.addWordSplitActive) {
                 Log.d(LOG_TAG,"Adding something active");
-
             }
         }else if (view instanceof HorizontalScrollViewNoFocus) {
             Log.d(LOG_TAG,"HorizontalScrollViewNoFocus view clicked");

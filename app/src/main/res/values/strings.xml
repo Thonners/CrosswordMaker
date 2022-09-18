@@ -160,6 +160,8 @@
     <string name="down"><u>Down:</u></string>
     <string name="add_word_split_tooltip">Add word-split</string>
     <string name="add_hyphen_tooltip">Add a hyphen</string>
+    <string name="word_split_instructions_1">Touch the cell of the final letter before the word-break</string>
+    <string name="word_split_instructions_2">Touch the cell of the first letter after the word-break</string>
 
     <!-- Victory dialog -->
     <string name="victory_title">Congratulations\!</string>

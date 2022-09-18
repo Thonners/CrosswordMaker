@@ -11,6 +11,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.GridLayout;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -552,6 +553,8 @@ public class Crossword {
             activeCell.setFocusedMajor();
             getCell(nextRow, thisCol).setFocusedMinor();
             getCell(thisRow, nextCol).setFocusedMinor();
+            // Show the instructions if we can't work out which clue to add the hyphen/word-split to automatically
+            Toast.makeText(this.context,R.string.word_split_instructions_2,Toast.LENGTH_LONG).show();
         } else {
             int aCol = activeCell.getColumn();
             int aRow = activeCell.getRow();
