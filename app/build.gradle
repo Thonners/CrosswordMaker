@@ -1,7 +1,6 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 32
 
     // We use Apache packages for downloading the dictionary definitions
     useLibrary 'org.apache.http.legacy'
@@ -9,7 +8,8 @@ android {
     defaultConfig {
         applicationId "com.thonners.crosswordmaker"
         minSdkVersion 17
-        targetSdkVersion 32
+        compileSdk 34
+        targetSdkVersion 34
         versionCode 16
         versionName "2.1"
     }
@@ -32,10 +32,10 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
-    implementation 'com.google.android.material:material:1.6.0'
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+    implementation 'com.google.android.material:material:1.11.0'
     implementation 'io.github.kobakei:ratethisapp:1.1.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 }
