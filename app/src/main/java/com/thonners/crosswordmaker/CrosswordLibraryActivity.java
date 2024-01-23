@@ -2,8 +2,10 @@ package com.thonners.crosswordmaker;
 
 import android.os.Build;
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,19 +17,19 @@ import android.widget.Toast;
  * CrosswordLibraryActivity Activity
  * Shows a list of all the crosswords saved by the user on their device.
  * Shows completion % of the crossword, calculated as number of filled spaces over total number of white spaces
- *
+ * <p>
  * Created by Thonners on 06/05/15.
  */
 
 public class CrosswordLibraryActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = "CrosswordLibActivity" ;
+    private static final String LOG_TAG = "CrosswordLibActivity";
 
-    CrosswordLibraryManager libraryManager ;
-    RelativeLayout mainLayout ;
-    RelativeLayout layout ;
+    CrosswordLibraryManager libraryManager;
+    RelativeLayout mainLayout;
+    RelativeLayout layout;
     CardView editButton;
-    int editCrosswordIndex = -1 ;
+    int editCrosswordIndex = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +38,7 @@ public class CrosswordLibraryActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mainLayout = (RelativeLayout) findViewById(R.id.saved_crossword_main_layout);
-        layout = (RelativeLayout) findViewById(R.id.saved_crosswords_r_layout)  ;
+        layout = (RelativeLayout) findViewById(R.id.saved_crosswords_r_layout);
         createEditButton();
 
         libraryManager = new CrosswordLibraryManager(this);
@@ -78,7 +80,7 @@ public class CrosswordLibraryActivity extends AppCompatActivity {
             case R.id.action_settings:
                 // Open some settings menu
                 HomeActivity.openSettings(this);
-                break ;
+                break;
 
         }
         return super.onOptionsItemSelected(item);
@@ -86,7 +88,7 @@ public class CrosswordLibraryActivity extends AppCompatActivity {
 
     private void addCrosswordToLayout(int index, CrosswordLibraryManager.SavedCrossword savedCrossword) {
 
-        Card card = new Card(getApplicationContext(),savedCrossword.getTitle(),savedCrossword.getDisplayDate(),savedCrossword.getDisplayPercentageComplete()) ;
+        Card card = new Card(getApplicationContext(), savedCrossword.getTitle(), savedCrossword.getDisplayDate(), savedCrossword.getDisplayPercentageComplete());
         card.setId(index);
         card.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,8 +104,8 @@ public class CrosswordLibraryActivity extends AppCompatActivity {
                 return true;
             }
         });
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT );
-        if(index == 1) {
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        if (index == 1) {
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         } else {
             layoutParams.addRule(RelativeLayout.BELOW, index - 1);
@@ -112,6 +114,7 @@ public class CrosswordLibraryActivity extends AppCompatActivity {
         layout.addView(card);
 
     }
+
     private void crosswordSelected(View view) {
         int i = view.getId() - 1;  // get index of save file
         // View index starts at 1, but file index at 0, so need to -1
@@ -121,52 +124,53 @@ public class CrosswordLibraryActivity extends AppCompatActivity {
 
     private void toggleCardSelection(View view) {
         // Method to toggle whether card is highlighted (i.e. raised) after long click
-        Card card = (Card) view ;
+        Card card = (Card) view;
         card.toggleCardSelected();
 
         if (card.getCardSelected()) {
             // Get index of selected card
-            editCrosswordIndex = view.getId() ;
+            editCrosswordIndex = view.getId();
             Log.d(LOG_TAG, "editCardIndex = " + view.getId());
 
             selectCard(card);
         } else {
             // Set index to <0 to imply that no card is selected
-            editCrosswordIndex = -1 ;
+            editCrosswordIndex = -1;
             Log.d(LOG_TAG, "editCardIndex = -1");
 
             deselectCard(card);
 
         }
 
-    toggleEditDeleteButtons();
+        toggleEditDeleteButtons();
 
     }
 
     private void selectCard(Card card) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                // Lower all views (in case another was selected)
-                for (int i = 0; i < layout.getChildCount(); i++) {
-                    View v = layout.getChildAt(i);
-                    if (v instanceof Card) {
-                        v.setElevation(getResources().getDimension(R.dimen.z_card_default));
-                        ((Card) v).setCardDeselected();
-                    }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // Lower all views (in case another was selected)
+            for (int i = 0; i < layout.getChildCount(); i++) {
+                View v = layout.getChildAt(i);
+                if (v instanceof Card) {
+                    v.setElevation(getResources().getDimension(R.dimen.z_card_default));
+                    ((Card) v).setCardDeselected();
                 }
-                // Set selected view to raised elevation
-                card.setElevation(getResources().getDimension(R.dimen.z_library_card_highlighted));
-                card.toggleCardSelected();  // Put it back to selected as it's turned off by the for loop above
-            } else {
-                card.setBackgroundColor(getResources().getColor(R.color.light_grey));
             }
+            // Set selected view to raised elevation
+            card.setElevation(getResources().getDimension(R.dimen.z_library_card_highlighted));
+            card.toggleCardSelected();  // Put it back to selected as it's turned off by the for loop above
+        } else {
+            card.setBackgroundColor(getResources().getColor(R.color.light_grey));
+        }
     }
+
     private void deselectCard(Card card) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                // Lower selected view as it's already raised
-                card.setElevation(getResources().getDimension(R.dimen.z_card_default));
-            } else {
-                card.setBackgroundColor(getResources().getColor(R.color.white));
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // Lower selected view as it's already raised
+            card.setElevation(getResources().getDimension(R.dimen.z_card_default));
+        } else {
+            card.setBackgroundColor(getResources().getColor(R.color.white));
+        }
 
     }
 
@@ -203,7 +207,7 @@ public class CrosswordLibraryActivity extends AppCompatActivity {
     }
 
     private void showEditTutorialToast() {
-        Toast.makeText(this,getResources().getString(R.string.edit_delete_tutorial),Toast.LENGTH_LONG).show();
+        Toast.makeText(this, getResources().getString(R.string.edit_delete_tutorial), Toast.LENGTH_LONG).show();
     }
 
 }

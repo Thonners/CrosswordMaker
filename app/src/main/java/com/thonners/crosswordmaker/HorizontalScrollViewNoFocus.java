@@ -10,30 +10,32 @@ import android.widget.HorizontalScrollView;
 import java.util.ArrayList;
 
 /**
- *  Horizontal Scroll View, but with override to ignore child focus changes,
- *  which cause unwanted scrolling behaviour.
- *
+ * Horizontal Scroll View, but with override to ignore child focus changes,
+ * which cause unwanted scrolling behaviour.
+ * <p>
  * Created by Thonners on 11/10/15.
  */
 public class HorizontalScrollViewNoFocus extends HorizontalScrollView {
 
     private static String LOG_TAG = "HorizontalScrollViewNoFocus";
 
-    public HorizontalScrollViewNoFocus(Context context){
+    public HorizontalScrollViewNoFocus(Context context) {
         super(context);
     }
-    public HorizontalScrollViewNoFocus(Context context, AttributeSet attrs){
+
+    public HorizontalScrollViewNoFocus(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
-    public HorizontalScrollViewNoFocus(Context context, AttributeSet attrs, int defStyle){
-        super(context, attrs,defStyle);
+
+    public HorizontalScrollViewNoFocus(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
     }
 
     @Override
-    protected boolean onRequestFocusInDescendants(int direction, Rect previouslyFocusedRect){
+    protected boolean onRequestFocusInDescendants(int direction, Rect previouslyFocusedRect) {
         Log.d(LOG_TAG, "direction = " + direction);
         //Log.d(LOG_TAG,"previouslyFocusedRect = " + previouslyFocusedRect.toString());
-        return true ;
+        return true;
     }
 
     @Override

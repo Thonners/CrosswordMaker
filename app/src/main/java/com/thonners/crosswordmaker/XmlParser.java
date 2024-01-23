@@ -15,7 +15,7 @@ import java.util.ArrayList;
  * XMLParser
  * Parse the XML returned by the Merriam Webster dictionary
  * Format it into word, word-type and definition
- *
+ * <p>
  * Created by Thonners on 26/07/15.
  */
 
@@ -23,15 +23,15 @@ public class XmlParser {
 
     private static final String LOG_TAG = "xmlParser";
 
-    private static final String CHARSET = "UTF-8" ; // Change this string if necessary. Used to be CHARSET = StandardCharsets.UTF_8 ;
+    private static final String CHARSET = "UTF-8"; // Change this string if necessary. Used to be CHARSET = StandardCharsets.UTF_8 ;
 
-    private static final String XML_TAG_ENTRY_LIST = "entry_list" ; //Hopefully it will ignore the 'version="1.0"' also in the entry tag. Contains the entire feed
-    private static final String XML_TAG_ENTRY = "entry" ;           //Hopefully it will ignore the ' id=X' also in the entry tag
-    private static final String XML_TAG_WORD = "ew" ;               // Word to be defined
-    private static final String XML_TAG_DEFINITION_ZONE = "def" ;   // Tag containing the definition
-    private static final String XML_TAG_DEFINITION_NUMBER = "sn" ;  // Tag which precedes the definition in the XML.
-    private static final String XML_TAG_DEFINITION = "dt" ;         // Tag containing the definition
-    private static final String XML_TAG_WORD_TYPE = "fl" ;          // Tag denoting verb, noun, etc.
+    private static final String XML_TAG_ENTRY_LIST = "entry_list"; //Hopefully it will ignore the 'version="1.0"' also in the entry tag. Contains the entire feed
+    private static final String XML_TAG_ENTRY = "entry";           //Hopefully it will ignore the ' id=X' also in the entry tag
+    private static final String XML_TAG_WORD = "ew";               // Word to be defined
+    private static final String XML_TAG_DEFINITION_ZONE = "def";   // Tag containing the definition
+    private static final String XML_TAG_DEFINITION_NUMBER = "sn";  // Tag which precedes the definition in the XML.
+    private static final String XML_TAG_DEFINITION = "dt";         // Tag containing the definition
+    private static final String XML_TAG_WORD_TYPE = "fl";          // Tag denoting verb, noun, etc.
 
     // We don't use namespaces
     private static final String ns = null;
@@ -44,6 +44,7 @@ public class XmlParser {
 
     /**
      * Converts the input String to an InputStream, then calls {@link #parse(InputStream)}
+     *
      * @param input The raw XML to be parsed
      */
     public ArrayList<Entry> parse(String input) throws XmlPullParserException, IOException {
@@ -54,8 +55,9 @@ public class XmlParser {
     /**
      * Converts rawXML, as downloaded/received from the MerriamWebster dictionary and turns it into
      * a list of {@link Entry}s.
-     *
+     * <p>
      * This method just sets up the {@link XmlPullParser}, then calls {@link #readFeed(XmlPullParser)}.
+     *
      * @param in The InputStream of raw XML received from the MW dictionary.
      * @return An ArrayList of {@link Entry}s, extracted from the input rawXML.
      * @throws XmlPullParserException
@@ -75,10 +77,10 @@ public class XmlParser {
 
     /**
      * Method to read the XML feed, and to turn it into a list of {@link Entry}s.
-     *
+     * <p>
      * Loops through all objects in the parser, ignoring the {@link XmlPullParser#START_TAG}, and
      * finishing at the {@link XmlPullParser#END_TAG}.
-     *
+     * <p>
      * The useful results are read by {@link #readEntry(XmlPullParser)}. Other entries are {@link #skip(XmlPullParser)}'ed
      *
      * @param parser The parser instance containing the rawXML downloaded from MW.
@@ -109,7 +111,7 @@ public class XmlParser {
 
     /**
      * Wrapper method to read an 'entry', where the entry is the complete definition as received.
-     *
+     * <p>
      * For each type of XML tag read, this method then calls the appropriate method, from
      * {@link #readWord(XmlPullParser)}, {@link #readWordType(XmlPullParser)}, or {@link #readDefinitions(XmlPullParser)},
      * and adds the result to the appropriate part of the entry.
@@ -119,8 +121,8 @@ public class XmlParser {
      * @throws XmlPullParserException
      * @throws IOException
      */
-    private Entry readEntry(XmlPullParser parser)  throws XmlPullParserException, IOException {
-        Log.d(LOG_TAG,"Entry found, reading entry...");
+    private Entry readEntry(XmlPullParser parser) throws XmlPullParserException, IOException {
+        Log.d(LOG_TAG, "Entry found, reading entry...");
 
         parser.require(XmlPullParser.START_TAG, ns, XML_TAG_ENTRY);
         String word = null;
@@ -172,15 +174,15 @@ public class XmlParser {
         parser.require(XmlPullParser.START_TAG, ns, XML_TAG_WORD_TYPE);
         String wordType = readText(parser);
         parser.require(XmlPullParser.END_TAG, ns, XML_TAG_WORD_TYPE);
-        Log.d(LOG_TAG,"WordType for entry found: " + wordType);
-        return wordType ;
+        Log.d(LOG_TAG, "WordType for entry found: " + wordType);
+        return wordType;
     }
 
     /**
      * Method to extract the definition(s) from the raw XML.
-     *
+     * <p>
      * For each separate definition, a new entry in the ArrayList is created.
-     *
+     * <p>
      * Complexity is added by the nested tags around certain words in a definition received from MW.
      * e.g. Links to other words, etc. which are used on the website but not by this app.
      * The method deals with these extra tags by keeping a count of how 'deep' the current XML object
@@ -191,7 +193,7 @@ public class XmlParser {
      * @throws IOException
      * @throws XmlPullParserException
      */
-    private ArrayList<String> readDefinitions(XmlPullParser parser)  throws IOException, XmlPullParserException {
+    private ArrayList<String> readDefinitions(XmlPullParser parser) throws IOException, XmlPullParserException {
         // Extract all the definitions from the various numbered definitions
         ArrayList<String> definitions = new ArrayList<String>();
         String definitionNumber = "";
@@ -199,18 +201,18 @@ public class XmlParser {
         parser.require(XmlPullParser.START_TAG, ns, XML_TAG_DEFINITION_ZONE);
 
         // Track how 'deep' into the definition zone's nested tags we are.
-        int depth = 1 ;
+        int depth = 1;
         while (depth != 0) {
             switch (parser.next()) {
                 case XmlPullParser.END_TAG:
                     depth--;
-                    Log.d(LOG_TAG,"End tag found for: " + parser.getName() + ". Depth now = " + depth);
+                    Log.d(LOG_TAG, "End tag found for: " + parser.getName() + ". Depth now = " + depth);
                     break;
                 case XmlPullParser.START_TAG:
                     depth++;
-                    Log.d(LOG_TAG,"Start tag found for: " + parser.getName() + ". Depth now = " + depth);
+                    Log.d(LOG_TAG, "Start tag found for: " + parser.getName() + ". Depth now = " + depth);
                     if (parser.getName().matches(XML_TAG_DEFINITION_NUMBER)) {
-                        definitionNumber = "" ;
+                        definitionNumber = "";
                         int defNoDepth = 1;
                         while (defNoDepth != 0) {
                             switch (parser.next()) {
@@ -231,11 +233,11 @@ public class XmlParser {
                                     break;
                             }
                         }
-                            Log.d(LOG_TAG,"Definition number tag found: " + definitionNumber);
+                        Log.d(LOG_TAG, "Definition number tag found: " + definitionNumber);
                     } else if (parser.getName().matches(XML_TAG_DEFINITION)) {
                         parser.next();
-                        String definition = parser.getText() ;
-                        int defDepth = 1 ;
+                        String definition = parser.getText();
+                        int defDepth = 1;
                         while (defDepth != 0) {
                             switch (parser.next()) {
                                 case XmlPullParser.END_TAG:
@@ -243,15 +245,15 @@ public class XmlParser {
                                     Log.d(LOG_TAG, "Within definition tags, end tag found for: " + parser.getName() + ". defDepth now = " + defDepth);
                                     if (parser.getName().matches(XML_TAG_DEFINITION)) {
                                         // Reduce depth by 1 here as the closing <dt> tag will not be picked up by the main loop as when this inner while loop ends, parser.next() will be called.
-                                        depth-- ;
+                                        depth--;
                                     }
                                     break;
                                 case XmlPullParser.START_TAG:
                                     defDepth++;
                                     Log.d(LOG_TAG, "Within definition tags, start tag found for: " + parser.getName() + ". defDepth now = " + defDepth);
-                                    break ;
+                                    break;
                                 case XmlPullParser.TEXT:
-                                    Log.d(LOG_TAG,"Some definition text: " + parser.getText());
+                                    Log.d(LOG_TAG, "Some definition text: " + parser.getText());
                                     definition = definition + parser.getText();
                                     break;
                             }
@@ -260,20 +262,21 @@ public class XmlParser {
                             definition = definition.substring(1);   // Remove the ':' from the front of the definition string if it exists, so a space can be put in
                         }
                         if (!definitionNumber.matches("") && !definitionNumber.matches("null")) {
-                            definition = definitionNumber + ": " + definition ;
+                            definition = definitionNumber + ": " + definition;
                         }
-                        Log.d(LOG_TAG,"Definition found: " + definition);
+                        Log.d(LOG_TAG, "Definition found: " + definition);
                         definitions.add(definition);
                     }
                     break;
             }
         }
 
-        return definitions ;
+        return definitions;
     }
 
     /**
      * Method to actually pull the text out from between a set of XML tags.
+     *
      * @param parser The parser instance containing the rawXML downloaded from MW.
      * @return The String from between the tags
      * @throws IOException
@@ -290,6 +293,7 @@ public class XmlParser {
 
     /**
      * Method to skip to the next entry in the parser.
+     *
      * @param parser The parser instance containing the rawXML downloaded from MW.
      * @throws XmlPullParserException
      * @throws IOException
@@ -316,19 +320,20 @@ public class XmlParser {
      * and the definition.
      */
     public static class Entry {
-        public String word ;
-        public String wordType ;   // Noun, verb, etc.
+        public String word;
+        public String wordType;   // Noun, verb, etc.
         public ArrayList<String> definitions = new ArrayList<>();
 
         /**
          * Constructor
-         * @param word The word defined by the definition
-         * @param wordType The type of word being defined.
+         *
+         * @param word        The word defined by the definition
+         * @param wordType    The type of word being defined.
          * @param definitions An ArrayList of all the definitions for this word.
          */
-        public Entry(String word, String wordType, ArrayList<String> definitions){
-            this.word = word ;
-            this.wordType = wordType ;
+        public Entry(String word, String wordType, ArrayList<String> definitions) {
+            this.word = word;
+            this.wordType = wordType;
             this.definitions = definitions;
         }
 
@@ -336,21 +341,21 @@ public class XmlParser {
          * @return The word to which this entry refers.
          */
         public String getWord() {
-            return word ;
+            return word;
         }
 
         /**
          * @return The type of word being defined by this entry. E.g. verb, noun, adjective, etc.
          */
         public String getWordType() {
-            return wordType ;
+            return wordType;
         }
 
         /**
          * @return An ArrayList of all the definitions for this word.
          */
         public ArrayList<String> getDefinitions() {
-            return definitions ;
+            return definitions;
         }
     }
 }

@@ -2,7 +2,9 @@ package com.thonners.crosswordmaker;
 
 import android.content.Context;
 import android.graphics.Typeface;
+
 import androidx.cardview.widget.CardView;
+
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -16,17 +18,17 @@ public class Card extends CardView {
     private Context context;
     private RelativeLayout layout;
     private int padding;
-    private boolean cardSelected = false ;
+    private boolean cardSelected = false;
 
-    private static final int DICTIONARY_WORD_NOT_FOUND  = -1 ;
-    private static final int DICTIONARY_WORD            = 0;
-    private static final int DICTIONARY_WORD_TYPE       = 1;
-    private static final int DICTIONARY_DEFINITION      = 2;
-    private static final int DICTIONARY_SUGGESTION      = 3;
-    private static final int ANAGRAM_ANSWER             = 4;
-    private static final int CROSSWORD_TITLE            = 5;
-    private static final int CROSSWORD_DATE             = 6;
-    private static final int CROSSWORD_PERCENTAGE       = 7;
+    private static final int DICTIONARY_WORD_NOT_FOUND = -1;
+    private static final int DICTIONARY_WORD = 0;
+    private static final int DICTIONARY_WORD_TYPE = 1;
+    private static final int DICTIONARY_DEFINITION = 2;
+    private static final int DICTIONARY_SUGGESTION = 3;
+    private static final int ANAGRAM_ANSWER = 4;
+    private static final int CROSSWORD_TITLE = 5;
+    private static final int CROSSWORD_DATE = 6;
+    private static final int CROSSWORD_PERCENTAGE = 7;
 
     TextView suggestionTextView;
 
@@ -34,7 +36,7 @@ public class Card extends CardView {
     // Home page Cards
 
     // Saved crossword
-    public Card (Context context, String crosswordTitle, String crosswordDate, String crosswordPercentage) {
+    public Card(Context context, String crosswordTitle, String crosswordDate, String crosswordPercentage) {
         super(context);
         initialise(context);
 
@@ -48,13 +50,13 @@ public class Card extends CardView {
         // Create layout parameters
         // Title
         titleTV.setId(1000);
-        RelativeLayout.LayoutParams titleLP = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams titleLP = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         titleLP.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         // Date
-        RelativeLayout.LayoutParams dateLP = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams dateLP = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         dateLP.addRule(RelativeLayout.BELOW, titleTV.getId());
         // Percentage
-        RelativeLayout.LayoutParams percentageLP = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams percentageLP = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         percentageLP.addRule(RelativeLayout.BELOW, titleTV.getId());
         percentageLP.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 
@@ -63,6 +65,7 @@ public class Card extends CardView {
         layout.addView(dateTV, dateLP);
         layout.addView(percentageTV, percentageLP);
     }
+
     // Dictionary Results
     public Card(Context context, XmlParser.Entry dictionaryEntry) {
         super(context);
@@ -70,6 +73,7 @@ public class Card extends CardView {
 
         this.addView(createTextView(DICTIONARY_WORD, dictionaryEntry.getWord()));
     }
+
     // Dictionary Suggestions
     public Card(Context context, String suggestion) {
         super(context);
@@ -94,7 +98,7 @@ public class Card extends CardView {
         layout = new RelativeLayout(context);
         layout.setPadding(padding, padding, padding, padding);
         // Provide feedback when button pressed. Pretty rubbish atm. Could be improved.
-        TypedValue outValue  = new TypedValue();
+        TypedValue outValue = new TypedValue();
         context.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
         layout.setBackgroundResource(outValue.resourceId);
 
@@ -107,7 +111,7 @@ public class Card extends CardView {
         tv.setTextColor(getResources().getColor(R.color.text_default));
 
         // Get settings for each word type
-        switch(displayType){
+        switch (displayType) {
             case DICTIONARY_WORD:  // Bold
                 tv.setTypeface(null, Typeface.BOLD);
                 tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.getResources().getDimension(R.dimen.dictionary_word));
@@ -149,30 +153,34 @@ public class Card extends CardView {
         // Set text
         tv.setText(textToDisplay);
 
-        return tv ;
+        return tv;
     }
 
-    public String getSuggestionText(){
+    public String getSuggestionText() {
         if (suggestionTextView != null) {
             return suggestionTextView.getText().toString();
         } else {
             return null;
         }
     }
+
     public RelativeLayout getRelativeLayout() {
         return layout;
     }
+
     public boolean getCardSelected() {
-        return cardSelected ;
+        return cardSelected;
     }
+
     public void toggleCardSelected() {
         if (cardSelected) {
-            cardSelected = false ;
+            cardSelected = false;
         } else {
-            cardSelected = true ;
+            cardSelected = true;
         }
     }
+
     public void setCardDeselected() {
-        cardSelected = false ;
+        cardSelected = false;
     }
 }

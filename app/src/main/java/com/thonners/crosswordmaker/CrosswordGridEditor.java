@@ -4,7 +4,9 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -19,14 +21,14 @@ public class CrosswordGridEditor extends AppCompatActivity {
 
     private static final String LOG_TAG = "CrosswordEditorActivity";
 
-    private RelativeLayout mainLayout ;
-    private FooterButton deleteButton ;
-    private FloatingActionButton saveFab ;
+    private RelativeLayout mainLayout;
+    private FooterButton deleteButton;
+    private FloatingActionButton saveFab;
 
-    private GridLayout crosswordGrid ;
-    private Crossword crossword ;
+    private GridLayout crosswordGrid;
+    private Crossword crossword;
     private String[] originalCrosswordStringArray;
-    private String[] newCrossworyStringArray ;
+    private String[] newCrossworyStringArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,26 +85,27 @@ public class CrosswordGridEditor extends AppCompatActivity {
 
     private void createCrossword() {
         // Create the crossword
-        crossword = new Crossword(this, crosswordGrid, originalCrosswordStringArray,true);
+        crossword = new Crossword(this, crosswordGrid, originalCrosswordStringArray, true);
     }
 
 
     private void showWarningToast() {
-        Toast.makeText(this,getResources().getString(R.string.edit_warning_toast),Toast.LENGTH_LONG).show();
+        Toast.makeText(this, getResources().getString(R.string.edit_warning_toast), Toast.LENGTH_LONG).show();
     }
+
     private void showDeleteDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         // Set the dialog title
-        builder.setTitle(R.string.delete_dialog_title) ;        // Set the action buttons
+        builder.setTitle(R.string.delete_dialog_title);        // Set the action buttons
         builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick (DialogInterface dialog,int id){
+                    public void onClick(DialogInterface dialog, int id) {
                         // User clicked Delete, so delete crossword
                         deleteCrossword();
                     }
                 }
 
-        ) ;
+        );
         builder.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
@@ -119,7 +122,7 @@ public class CrosswordGridEditor extends AppCompatActivity {
         Log.d(LOG_TAG, "Save clicked, so saving crossword now...");
         saveCrosswordGrid();
 
-        Log.d(LOG_TAG,"Crossword saved, opening new activity...");
+        Log.d(LOG_TAG, "Crossword saved, opening new activity...");
         CrosswordLibraryManager crosswordLibraryManager = new CrosswordLibraryManager(this);
         crosswordLibraryManager.openCrossword(crossword.getSaveDir());
     }
@@ -127,33 +130,35 @@ public class CrosswordGridEditor extends AppCompatActivity {
     private void saveCrosswordGrid() {
         // Save the new grid to the crossword
         // Save admin details to newCrosswordStringArray
-        for (int i=0 ; i < Crossword.SAVE_ARRAY_START_INDEX ; i++) {
-            Log.d(LOG_TAG,"Setting value at index position " + i + " of newCrosswordSA to: " + originalCrosswordStringArray[i]);
-            newCrossworyStringArray[i] = originalCrosswordStringArray[i] ;
+        for (int i = 0; i < Crossword.SAVE_ARRAY_START_INDEX; i++) {
+            Log.d(LOG_TAG, "Setting value at index position " + i + " of newCrosswordSA to: " + originalCrosswordStringArray[i]);
+            newCrossworyStringArray[i] = originalCrosswordStringArray[i];
         }
 
         getNewGrid();
 
         // Loop through original and new grids and find where they differ to the original
-        for (int i=Crossword.SAVE_ARRAY_START_INDEX ; i < originalCrosswordStringArray.length ; i++) {
+        for (int i = Crossword.SAVE_ARRAY_START_INDEX; i < originalCrosswordStringArray.length; i++) {
             if (!newCrossworyStringArray[i].matches("-")) {
                 // If new array isn't a black cell, carryover value from old array, unless it used to be a black cell, in which case set it blank
-                String oldValue = originalCrosswordStringArray[i] ;
+                String oldValue = originalCrosswordStringArray[i];
                 if (oldValue.matches("-")) {
-                    newCrossworyStringArray[i] = "" ;
+                    newCrossworyStringArray[i] = "";
                 } else {
-                    newCrossworyStringArray[i] = originalCrosswordStringArray[i] ;
+                    newCrossworyStringArray[i] = originalCrosswordStringArray[i];
                 }
             }
-            Log.d(LOG_TAG, "Setting value at index: " + i  + " to " + newCrossworyStringArray[i]);
+            Log.d(LOG_TAG, "Setting value at index: " + i + " to " + newCrossworyStringArray[i]);
         }
-        Log.d(LOG_TAG,"Setting new string array in crossword");
+        Log.d(LOG_TAG, "Setting new string array in crossword");
         crossword.setSaveArray(newCrossworyStringArray);
         crossword.saveCrossword();
     }
+
     private void getNewGrid() {
-        newCrossworyStringArray = crossword.getSaveArray() ;
+        newCrossworyStringArray = crossword.getSaveArray();
     }
+
     private void deleteCrossword() {
         new CrosswordLibraryManager(this).deleteSavedCrossword(crossword.getSaveDir());
         //crossword.deleteCrossword();

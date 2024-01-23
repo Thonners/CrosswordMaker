@@ -1,11 +1,12 @@
 package com.thonners.crosswordmaker;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
 
 /**
  * Simple Activity to display the SettingsFragment.
- *
+ * <p>
  * All admin is done by the Fragment, and this is just a wrapper.
  *
  * @author M Thomas
@@ -19,6 +20,6 @@ public class SettingsActivity extends AppCompatActivity {
         // Make the fragment the main content
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())
-                .commit() ;
+                .commit();
     }
 }

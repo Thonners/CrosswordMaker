@@ -8,39 +8,40 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.util.Log ;
+import android.util.Log;
 
 
 /**
  * Class to deal with locating the text views for each letter
+ *
  * @author M Thomas
  * @since 18/08/16
  */
 public class ManualAnagramTextView extends TextView {
 
-    private static final String LOG_TAG = "ManualAnagramTextView" ;
+    private static final String LOG_TAG = "ManualAnagramTextView";
 
     // Constant dimensions (probably should move to dimens?)
-    private final int DEFAULT_WIDTH = 15 ;
-    private final int MAX_LETTERS_PER_CIRCLE = 6 ;
-    private int letterSpacingRadius = 0 ;
+    private final int DEFAULT_WIDTH = 15;
+    private final int MAX_LETTERS_PER_CIRCLE = 6;
+    private int letterSpacingRadius = 0;
 
-    private int letterNo ;      // Letter number, base 0 (i.e. final letter will be letterCount - 1)
-    private int letterCount ;   // Net letter number
+    private int letterNo;      // Letter number, base 0 (i.e. final letter will be letterCount - 1)
+    private int letterCount;   // Net letter number
     private int parentViewID;
-    private RelativeLayout parentView ;
-    private int anchorViewID ;
-    private int leftMargin ;
-    private int bottomMargin ;
+    private RelativeLayout parentView;
+    private int anchorViewID;
+    private int leftMargin;
+    private int bottomMargin;
     private boolean letterKnown = false;   // Whether the position of the letter is already known
-    private String letter ;
+    private String letter;
 
     public ManualAnagramTextView(Context context) {
         super(context);
     }
 
     public ManualAnagramTextView(Context context, AttributeSet attrs) {
-        super(context,attrs);
+        super(context, attrs);
     }
 
     public ManualAnagramTextView(Context context, AttributeSet attrs, int defStyle) {
@@ -49,11 +50,12 @@ public class ManualAnagramTextView extends TextView {
 
     /**
      * Main constructor.
-     * @param context       Application context
-     * @param letterChar    Character, i.e. letter, to assign to this view.
-     * @param letterCount   The total number of letters in the anagram. Used to determine spacing of letters in results.
-     * @param parentView    The view this textView is to be added to.
-     * @param anchorViewID  The resource ID of the anchor view - as this will be positioned relative to that.
+     *
+     * @param context      Application context
+     * @param letterChar   Character, i.e. letter, to assign to this view.
+     * @param letterCount  The total number of letters in the anagram. Used to determine spacing of letters in results.
+     * @param parentView   The view this textView is to be added to.
+     * @param anchorViewID The resource ID of the anchor view - as this will be positioned relative to that.
      */
     public ManualAnagramTextView(Context context, char letterChar, int letterCount, RelativeLayout parentView, int anchorViewID) {
         super(context);
@@ -81,9 +83,9 @@ public class ManualAnagramTextView extends TextView {
 
     public void draw(int anchorViewID) {
         // Set the anchor ID
-        this.anchorViewID = anchorViewID ;
+        this.anchorViewID = anchorViewID;
         // Initialise
-        calculateMargins() ;
+        calculateMargins();
 
         // Set position
         setPosition();
@@ -91,7 +93,7 @@ public class ManualAnagramTextView extends TextView {
     }
 
     public void setLetterNo(int letterNo) {
-        this.letterNo = letterNo ;
+        this.letterNo = letterNo;
     }
 
     /**
@@ -120,7 +122,7 @@ public class ManualAnagramTextView extends TextView {
     /**
      * Method to calculate the margins to be applied to this text view, when positioned in the results layout.
      * The margins determine this view's position.
-     *
+     * <p>
      * The calculation derives the margins by working out the x/y coordinates of points around a circle.
      * The circle's radius is calculated in the constructor to ensure sensible spacing of the letters.
      * This view's letterNumber is used to determine how far around the circle this particular view
@@ -129,13 +131,13 @@ public class ManualAnagramTextView extends TextView {
      */
     private void calculateMargins() {
         // Don't think these are needed, since it's always the bottom left corner being reference (both anchor and this view)
-        double midpointOffsetX = this.getTextSize() / 2 ; // To be added to the offset to move the spacing from the bottom corner to the mid point of the view (Assuming it is the same size)
-        double midpointOffsetY = this.getTextSize() / 2 ;
+        double midpointOffsetX = this.getTextSize() / 2; // To be added to the offset to move the spacing from the bottom corner to the mid point of the view (Assuming it is the same size)
+        double midpointOffsetY = this.getTextSize() / 2;
 
         // Calculate angle between each letter. LetterCount must be greater than 2 else a /0 error will occur. TODO: Put this check in the calling function which creates this instance.
-        double dTheta = 2 * Math.PI / (letterCount) ;
+        double dTheta = 2 * Math.PI / (letterCount);
         // Calculate theta (angle from dead above anchorView
-        double theta = (letterNo - 1) * dTheta ;
+        double theta = (letterNo - 1) * dTheta;
         // Get margins from angle and radius
         leftMargin = (int) ((Math.sin(theta) * letterSpacingRadius) - midpointOffsetX);
         bottomMargin = (int) ((Math.cos(theta) * letterSpacingRadius) - midpointOffsetY);
@@ -152,10 +154,11 @@ public class ManualAnagramTextView extends TextView {
      * Method to set whether this textView's letter is known.
      * If letter is known, make text faded to remove it from user's focus in results view.
      * If letter is not known, return it to normal appearance.
+     *
      * @param isKnown Whether the position in the answer of the letter this text view is for is known by the user.
      */
     public void setLetterKnown(boolean isKnown) {
-        letterKnown = isKnown ;
+        letterKnown = isKnown;
         if (letterKnown) {
             this.setAlpha(0.3f);
             //this.setTextColor(getResources().getColor(R.color.light_grey));
@@ -166,13 +169,14 @@ public class ManualAnagramTextView extends TextView {
     }
 
     public void setIsActive() {
-        setIsActive(true) ;
+        setIsActive(true);
     }
 
     /**
      * Method to provide visual feedback to user that the letter is active - i.e. that pressing a
      * known letter card next will assign this letter to that card. If no longer active, reset the
      * appearance of the card.
+     *
      * @param isActive Whether this card is active or not.
      */
     public void setIsActive(boolean isActive) {
@@ -184,7 +188,7 @@ public class ManualAnagramTextView extends TextView {
     }
 
     public String getLetter() {
-        return letter ;
+        return letter;
     }
 
     public int getLetterNo() {
@@ -192,6 +196,6 @@ public class ManualAnagramTextView extends TextView {
     }
 
     public boolean isKnown() {
-        return letterKnown ;
+        return letterKnown;
     }
 }

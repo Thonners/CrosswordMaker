@@ -6,7 +6,9 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+
 import androidx.appcompat.app.AlertDialog;
+
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
@@ -28,7 +30,7 @@ import java.util.HashMap;
 
 /**
  * Class to hold all the necessary details for a crossword.
- *
+ * <p>
  * Manages
  *
  * @author M Thomas
@@ -41,81 +43,81 @@ public class Crossword {
     public static final String CROSSWORD_EXTRA_DATE = "com.thonners.crosswordmaker.crossword_date";
     public static final String CROSSWORD_EXTRA_NO_ROWS = "com.thonners.crosswordmaker.crossword_no_rows";
 
-    private static final String LOG_TAG = "Crossword" ;
+    private static final String LOG_TAG = "Crossword";
 
     public static final String SAVE_DATE_FORMAT = "yyyyMMdd";
     public static final String SAVE_CROSSWORD_FILE_NAME = "crossword";
     public static final String SAVE_CLUE_IMAGE_FILE_NAME = "clue.jpg";
     public static final String SAVE_CROSSWORD_IMAGE_FILE_NAME = "image_crossword.jpg";
 
-    private static final String SAVE_RIGHT_HYPHEN_CODE = "~" ;
-    private static final String SAVE_BOTTOM_HYPHEN_CODE = "_" ;
-    private static final String SAVE_RIGHT_WORD_SPLIT_CODE = "|" ;
-    private static final String SAVE_BOTTOM_WORD_SPLIT_CODE = "/" ;
+    private static final String SAVE_RIGHT_HYPHEN_CODE = "~";
+    private static final String SAVE_BOTTOM_HYPHEN_CODE = "_";
+    private static final String SAVE_RIGHT_WORD_SPLIT_CODE = "|";
+    private static final String SAVE_BOTTOM_WORD_SPLIT_CODE = "/";
 
-    public static final int SAVED_ARRAY_INDEX_TITLE = 0 ;
-    public static final int SAVED_ARRAY_INDEX_DATE = 1 ;
-    public static final int SAVED_ARRAY_INDEX_ROW_COUNT = 2 ;
-    public static final int SAVED_ARRAY_INDEX_CELL_WIDTH = 3 ;
-    public static final int SAVED_ARRAY_INDEX_CROSSWORD_IMAGE = 4 ; // Not required
-    public static final int SAVED_ARRAY_INDEX_CLUE_IMAGE = 5 ;  // Not required
-    public static final int SAVE_ARRAY_START_INDEX = 6 ;       // Update this if format of saveArray changes, i.e. if more fields are added before the grid is saved.
+    public static final int SAVED_ARRAY_INDEX_TITLE = 0;
+    public static final int SAVED_ARRAY_INDEX_DATE = 1;
+    public static final int SAVED_ARRAY_INDEX_ROW_COUNT = 2;
+    public static final int SAVED_ARRAY_INDEX_CELL_WIDTH = 3;
+    public static final int SAVED_ARRAY_INDEX_CROSSWORD_IMAGE = 4; // Not required
+    public static final int SAVED_ARRAY_INDEX_CLUE_IMAGE = 5;  // Not required
+    public static final int SAVE_ARRAY_START_INDEX = 6;       // Update this if format of saveArray changes, i.e. if more fields are added before the grid is saved.
 
     private Context context;
 
     public String title = "Default title";   // Add the displayDate to the default title?
-    public String date ;    // Save displayDate format (yyyyMMdd)          //= getFormattedDate() ;       // Default displayDate
+    public String date;    // Save displayDate format (yyyyMMdd)          //= getFormattedDate() ;       // Default displayDate
 
     public int rowCount;
 
-    private int screenWidth ;
-    private int screenHeight ;
-    private int cellWidth ;
-    private int borderWidth = 1 ;   // This is the width of the border around the cells. (Needs to be accounted for in cell width calculation else final column is too thin
-    private int gridPadding ;
+    private int screenWidth;
+    private int screenHeight;
+    private int cellWidth;
+    private int borderWidth = 1;   // This is the width of the border around the cells. (Needs to be accounted for in cell width calculation else final column is too thin
+    private int gridPadding;
 
-    private float fontSize ;
+    private float fontSize;
 
-    private boolean editMode = false ;
-    private boolean isZoomedIn = false ;
+    private boolean editMode = false;
+    private boolean isZoomedIn = false;
 
-    private ArrayList<Clue> hClues = new ArrayList<Clue>() ;     // Storage for all the horizontal clues
-    private ArrayList<Clue> vClues = new ArrayList<Clue>() ;     // Storage for all the vertical clues
+    private ArrayList<Clue> hClues = new ArrayList<Clue>();     // Storage for all the horizontal clues
+    private ArrayList<Clue> vClues = new ArrayList<Clue>();     // Storage for all the vertical clues
     private int totalClueCount = 0;
-    private int hClueCount = 0 ;
-    private int vClueCount = 0 ;
+    private int hClueCount = 0;
+    private int vClueCount = 0;
     public int horizontalClueIndex = -1;    // Start at -1, first clue found will bump this up to 0
     public int verticalClueIndex = -1;
 
-    private Cell focusedCell ;
-    private Clue highlightedClue ;
+    private Cell focusedCell;
+    private Clue highlightedClue;
 
     public boolean[][] blackCells;
 
     private Cell[][] cells;
     private CellView[][] cellViews;
-    private String [] crosswordStringArray ;    // Place to save progress
-    private String crosswordImagePath ;
-    private String clueImagePath ;
-    private boolean addHyphenActive = false ;
-    private boolean addWordSplitActive = false ;
-    private Cell activeCell = null ;
+    private String[] crosswordStringArray;    // Place to save progress
+    private String crosswordImagePath;
+    private String clueImagePath;
+    private boolean addHyphenActive = false;
+    private boolean addWordSplitActive = false;
+    private Cell activeCell = null;
 
-    private FileOutputStream fileOutputStream ;
-    private File saveDir , photoSaveDir;
-    private File crosswordFile ;
-    private File clueImageFile ;
-    private File crosswordImageFile ;
-    private String fileName ;
-    private String savePath ;
+    private FileOutputStream fileOutputStream;
+    private File saveDir, photoSaveDir;
+    private File crosswordFile;
+    private File clueImageFile;
+    private File crosswordImageFile;
+    private String fileName;
+    private String savePath;
 
     private GridLayout grid;
-    private CrosswordGrid   crosswordGrid ;
+    private CrosswordGrid crosswordGrid;
 
-    private WordSplitHyphenDeactivatedListener listener ;
+    private WordSplitHyphenDeactivatedListener listener;
 
     public interface WordSplitHyphenDeactivatedListener {
-        public void wordSplitHyphenDeactivated() ;
+        public void wordSplitHyphenDeactivated();
     }
 
     //---------------------------------------------- Constructors --------------------------------------------------
@@ -125,21 +127,22 @@ public class Crossword {
         rowCount = rows;
         grid = gridLayout;
         this.title = title;
-        this.date = date ;
+        this.date = date;
 
         getScreenDetails();
-        calculateCellWidth() ;
+        calculateCellWidth();
         createGrid();
         createCells();
 
         initialiseSaveFiles();
 
     }
+
     public Crossword(Context context, GridLayout gridLayout, String[] savedCrossword, boolean editMode) {
         // Constructor for a saved crossword
-        this.context = context ;
+        this.context = context;
         this.grid = gridLayout;
-        this.crosswordStringArray = savedCrossword ;
+        this.crosswordStringArray = savedCrossword;
         this.title = crosswordStringArray[SAVED_ARRAY_INDEX_TITLE];
         this.date = crosswordStringArray[SAVED_ARRAY_INDEX_DATE];
         this.rowCount = Integer.parseInt(crosswordStringArray[SAVED_ARRAY_INDEX_ROW_COUNT]);
@@ -150,7 +153,7 @@ public class Crossword {
         createGrid();
         createCells();
         if (editMode) {
-            toggleBlackCells() ;
+            toggleBlackCells();
         } else {
             fillCells();
             freezeGrid();
@@ -160,15 +163,17 @@ public class Crossword {
         initialiseSaveFiles();
 
     }
+
     public Crossword(Context context, GridLayout gridLayout, String[] savedCrossword) {
         // Default constructor for saved crossword - don't use edit mode.
         this(context, gridLayout, savedCrossword, false);
     }
+
     public Crossword(Context context, CrosswordGrid crosswordGrid, String[] savedCrossword, boolean editMode) {
         // Constructor for a saved crossword
-        this.context = context ;
+        this.context = context;
         this.crosswordGrid = crosswordGrid;
-        this.crosswordStringArray = savedCrossword ;
+        this.crosswordStringArray = savedCrossword;
         this.title = crosswordStringArray[SAVED_ARRAY_INDEX_TITLE];
         this.date = crosswordStringArray[SAVED_ARRAY_INDEX_DATE];
         this.rowCount = Integer.parseInt(crosswordStringArray[SAVED_ARRAY_INDEX_ROW_COUNT]);
@@ -181,7 +186,7 @@ public class Crossword {
         crosswordGrid.setCrossword(this);
         createCellsRL();
         if (editMode) {
-            toggleBlackCells() ;
+            toggleBlackCells();
         } else {
             fillCells();
             freezeGrid();
@@ -191,14 +196,16 @@ public class Crossword {
         initialiseSaveFiles();
 
     }
+
     // --------------------------------------- Crossword Creation - private methods --------------------------------
     private void createGrid() {
-      //  grid.setFocusable(true);
-      //  grid.setFocusableInTouchMode(true);
+        //  grid.setFocusable(true);
+        //  grid.setFocusableInTouchMode(true);
         grid.setRowCount(rowCount);
         grid.setColumnCount(rowCount);
         grid.setBackground(context.getResources().getDrawable(R.drawable.cell_white));
     }
+
     private void createCells() {
         //Generate all the cells in the crossword grid
 
@@ -231,6 +238,7 @@ public class Crossword {
             }
         }
     }
+
     private void createCellsRL() {
         //Generate all the cells in the crossword grid
 
@@ -260,50 +268,52 @@ public class Crossword {
             }
         }
     }
+
     private void fillCells() {
-      // Fill a grid with pre-existing CellViews
+        // Fill a grid with pre-existing CellViews
         Log.d(LOG_TAG, "Rebuilding grid from saveArray...");
-      // TODO: Make each row in a separate parallel thread
+        // TODO: Make each row in a separate parallel thread
         int index = SAVE_ARRAY_START_INDEX;
-        String tempString ;
+        String tempString;
         for (int i = 0; i < rowCount; i++) {
             for (int j = 0; j < rowCount; j++) {
-                tempString = crosswordStringArray[index] ;
+                tempString = crosswordStringArray[index];
 //                Log.d(LOG_TAG,"For cell " + cells[i][j].getCellName() + ", read value: " + tempString);
                 if (tempString.matches("-")) {
 //                    Log.d(LOG_TAG,"Value matched '-', so toggling black cell.");
                     cells[i][j].toggleBlackCell();
                 } else {
 //                    Log.d(LOG_TAG,"Setting value to: " + tempString);
-                    int stringLength = tempString.length() ;
+                    int stringLength = tempString.length();
                     if (tempString.contains(SAVE_RIGHT_HYPHEN_CODE)) {
                         cells[i][j].addHyphen(Cell.CellSide.RIGHT);
-                        cells[i][j+1].addHyphen(Cell.CellSide.LEFT);
-                        stringLength-- ;
+                        cells[i][j + 1].addHyphen(Cell.CellSide.LEFT);
+                        stringLength--;
                     }
                     if (tempString.contains(SAVE_BOTTOM_HYPHEN_CODE)) {
                         cells[i][j].addHyphen(Cell.CellSide.BOTTOM);
-                        cells[i+1][j].addHyphen(Cell.CellSide.TOP);
-                        stringLength-- ;
+                        cells[i + 1][j].addHyphen(Cell.CellSide.TOP);
+                        stringLength--;
                     }
                     if (tempString.contains(SAVE_RIGHT_WORD_SPLIT_CODE)) {
                         cells[i][j].addWordSplit(Cell.CellSide.RIGHT, cellWidth);
-                        cells[i][j+1].addWordSplit(Cell.CellSide.LEFT, cellWidth);
-                        stringLength-- ;
+                        cells[i][j + 1].addWordSplit(Cell.CellSide.LEFT, cellWidth);
+                        stringLength--;
                     }
                     if (tempString.contains(SAVE_BOTTOM_WORD_SPLIT_CODE)) {
                         cells[i][j].addWordSplit(Cell.CellSide.BOTTOM, cellWidth);
-                        cells[i+1][j].addWordSplit(Cell.CellSide.TOP, cellWidth);
-                        stringLength-- ;
+                        cells[i + 1][j].addWordSplit(Cell.CellSide.TOP, cellWidth);
+                        stringLength--;
                     }
-                    if (stringLength > 0) cells[i][j].setText(tempString.substring(0,1));
+                    if (stringLength > 0) cells[i][j].setText(tempString.substring(0, 1));
                 }
                 index++;
             }
         }
     }
-    private void toggleBlackCells(){
-      // Fill a grid with pre-existing CellViews
+
+    private void toggleBlackCells() {
+        // Fill a grid with pre-existing CellViews
         Log.d(LOG_TAG, "Rebuilding grid from saveArray in editMode...");
         int index = SAVE_ARRAY_START_INDEX;
         for (int i = 0; i < rowCount; i++) {
@@ -320,33 +330,38 @@ public class Crossword {
         // Locate clues by cycling through grid and finding all clues and their numbered square
         // TODO: make horizontal and vertical clue finding happen on different threads
 
-        for (int row = 0 ; row < rowCount ; row++) {
+        for (int row = 0; row < rowCount; row++) {
             findHorizontalClues(row);
         }
-        for (int col = 0 ; col < rowCount ; col++) {
+        for (int col = 0; col < rowCount; col++) {
             findVerticalClues(col);
         }
         // Print cells in first clue to check for duplicates. Check size > 0 to prevent it crashing due to IndexOutOfBounds Exception
-        if (hClues.size() > 0 ){ Log.d(LOG_TAG, "First Horizontal Clue Contains cells " + hClues.get(0).getCells()); }
-        if (vClues.size() > 0 ){ Log.d(LOG_TAG, "First Vertical Clue Contains cells " + vClues.get(0).getCells()); }
+        if (hClues.size() > 0) {
+            Log.d(LOG_TAG, "First Horizontal Clue Contains cells " + hClues.get(0).getCells());
+        }
+        if (vClues.size() > 0) {
+            Log.d(LOG_TAG, "First Vertical Clue Contains cells " + vClues.get(0).getCells());
+        }
 
         Log.d(LOG_TAG, "");
         Log.d(LOG_TAG, "Getting clue numbers...");
         Log.d(LOG_TAG, "");
         getClueNumbers();
     }
+
     private void findHorizontalClues(int row) {
         // Method to find all clues in row
 
-        boolean nextWhiteCellNewClue = true ;
-        for (int col = 0 ; col < rowCount ; col++) {  // only go as far as rowCount-1 because there cannot be a horizontal clue in the final column.
+        boolean nextWhiteCellNewClue = true;
+        for (int col = 0; col < rowCount; col++) {  // only go as far as rowCount-1 because there cannot be a horizontal clue in the final column.
 
             // Test to see if next cell is a new clue - if next cell is
-            if (col < rowCount -1 && nextWhiteCellNewClue && !cells[row][col].isBlackCell() && !cells[row][col + 1].isBlackCell() ){
+            if (col < rowCount - 1 && nextWhiteCellNewClue && !cells[row][col].isBlackCell() && !cells[row][col + 1].isBlackCell()) {
                 hClueCount++;
                 totalClueCount++;
-                horizontalClueIndex++ ;
-                nextWhiteCellNewClue = false ;
+                horizontalClueIndex++;
+                nextWhiteCellNewClue = false;
                 Clue newClue = new Clue(Clue.HORIZONTAL_CLUE, cells[row][col]);
                 hClues.add(newClue);                                            // Add clue to collection of clues
                 hClues.get(horizontalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
@@ -355,38 +370,39 @@ public class Crossword {
 //                Log.d("Clues", "New clue found at: r = " + row + " & c = " + col) ;
 //                Log.d("Clues", "horizontalClueIndex = " + horizontalClueIndex + " & hClues.length = " + hClues.size()) ;
 
-            } else if (! nextWhiteCellNewClue && ! cells[row][col].isBlackCell()) {
-            // If white cell, augment clue count. If not, reset nextWhiteCellNewClue
-                int clueLength = col - hClues.get(horizontalClueIndex).getStartCell().getColumn() + 1 ;
+            } else if (!nextWhiteCellNewClue && !cells[row][col].isBlackCell()) {
+                // If white cell, augment clue count. If not, reset nextWhiteCellNewClue
+                int clueLength = col - hClues.get(horizontalClueIndex).getStartCell().getColumn() + 1;
                 hClues.get(horizontalClueIndex).setLength(clueLength);
                 hClues.get(horizontalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
                 cells[row][col].setHClue(hClues.get(horizontalClueIndex));          // Tell the cell which clue it belongs to
 
- //               Log.d("Clues", "increasing clue length to " + clueLength) ;
- //               Log.d("Clues", "horizontalClueIndex = " + horizontalClueIndex + " & hClues.length = " + hClues.size()) ;
+                //               Log.d("Clues", "increasing clue length to " + clueLength) ;
+                //               Log.d("Clues", "horizontalClueIndex = " + horizontalClueIndex + " & hClues.length = " + hClues.size()) ;
             }
 
             // If a black cell is found, reset nextWhiteCellNewClue flag
             if (cells[row][col].isBlackCell()) {
-                nextWhiteCellNewClue = true ;
+                nextWhiteCellNewClue = true;
             }
 
 
         }
     }
+
     private void findVerticalClues(int col) {
         // Method to find all clues in col
 
-        boolean nextWhiteCellNewClue = true ;
-        for (int row = 0 ; row < rowCount ; row++) {
+        boolean nextWhiteCellNewClue = true;
+        for (int row = 0; row < rowCount; row++) {
 
             // only go as far as rowCount-1 because there cannot be a horizontal clue starting in the final column.
             // Test to see if next cell is a new clue - if next cell is, add to clue collections
-            if (row < rowCount -1 && nextWhiteCellNewClue && !cells[row][col].isBlackCell() && !cells[row + 1][col].isBlackCell() ){
+            if (row < rowCount - 1 && nextWhiteCellNewClue && !cells[row][col].isBlackCell() && !cells[row + 1][col].isBlackCell()) {
                 vClueCount++;
                 totalClueCount++;
-                verticalClueIndex++ ;
-                nextWhiteCellNewClue = false ;
+                verticalClueIndex++;
+                nextWhiteCellNewClue = false;
                 Clue newClue = new Clue(Clue.VERTICAL_CLUE, cells[row][col]);
                 vClues.add(newClue);                                            // Add clue to collection of clues
                 vClues.get(verticalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
@@ -395,30 +411,31 @@ public class Crossword {
 //                Log.d("Clues", "New clue found at: r = " + row + " & c = " + col) ;
 //                Log.d("Clues", "verticalClueIndex = " + verticalClueIndex + " & vClues.length = " + vClues.size()) ;
 
-            } else if (! nextWhiteCellNewClue && ! cells[row][col].isBlackCell()) {
-            // If white cell, augment clue count. If not, reset nextWhiteCellNewClue
-                int clueLength = col - vClues.get(verticalClueIndex).getStartCell().getColumn() + 1 ;
+            } else if (!nextWhiteCellNewClue && !cells[row][col].isBlackCell()) {
+                // If white cell, augment clue count. If not, reset nextWhiteCellNewClue
+                int clueLength = col - vClues.get(verticalClueIndex).getStartCell().getColumn() + 1;
                 vClues.get(verticalClueIndex).setLength(clueLength);
                 vClues.get(verticalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
                 cells[row][col].setVClue(vClues.get(verticalClueIndex));          // Tell the cell which clue it belongs to
 
-    //            Log.d("Clues", "increasing clue length to " + clueLength) ;
-    //            Log.d("Clues", "verticalClueIndex = " + verticalClueIndex + " & vClues.length = " + vClues.size()) ;
+                //            Log.d("Clues", "increasing clue length to " + clueLength) ;
+                //            Log.d("Clues", "verticalClueIndex = " + verticalClueIndex + " & vClues.length = " + vClues.size()) ;
             }
 
             // If a black cell is found, reset nextWhiteCellNewClue flag
             if (cells[row][col].isBlackCell()) {
-                nextWhiteCellNewClue = true ;
+                nextWhiteCellNewClue = true;
             }
         }
     }
+
     private void calculateCellWidth() {
         // Use screen width to calculate cell size.
         // Make cell size (screenWidth / (rowCount + 1)). This allows half a cellWidth on each side to keep the borders nice
-        cellWidth = (int) screenWidth / (rowCount + 1) - (borderWidth * 2) ;
-        gridPadding = (int) cellWidth / 2 ;
+        cellWidth = (int) screenWidth / (rowCount + 1) - (borderWidth * 2);
+        gridPadding = (int) cellWidth / 2;
 
-        Log.d("Sizes","cellWidth = " + cellWidth);
+        Log.d("Sizes", "cellWidth = " + cellWidth);
     }
 
     /**
@@ -431,6 +448,7 @@ public class Crossword {
     /**
      * Method to sort the passed ArrayList of clues so that they will be in order according to their
      * display number
+     *
      * @param clues The ArrayList of clues to be sorted
      */
     private ArrayList<Clue> sortClues(ArrayList<Clue> clues) {
@@ -438,73 +456,78 @@ public class Crossword {
 
         // Load the clue numbers into the array
         for (Clue clue : clues) {
-            clueSet.put(clue.getClueDisplayNumber(), clue) ;
+            clueSet.put(clue.getClueDisplayNumber(), clue);
         }
 
         // Sort the clue numbers
-        Integer[] sortedClueNos = clueSet.keySet().toArray(new Integer[0]) ;
+        Integer[] sortedClueNos = clueSet.keySet().toArray(new Integer[0]);
         Arrays.sort(sortedClueNos);
 
         // Add clues to a new ArrayList in the right order
-        ArrayList<Clue> newClueList = new ArrayList<>() ;
-        for (int i = 0 ; i < sortedClueNos.length ; i++) {
-            newClueList.add(clueSet.get(sortedClueNos[i])) ;
+        ArrayList<Clue> newClueList = new ArrayList<>();
+        for (int i = 0; i < sortedClueNos.length; i++) {
+            newClueList.add(clueSet.get(sortedClueNos[i]));
         }
 
-        return newClueList ;
+        return newClueList;
     }
 
     // ---------------------------------------------------- Public get/set methods ------------------------------------------
     public void setTitle(String newTitle) {
-        if(newTitle.length() > 0 ) {
+        if (newTitle.length() > 0) {
             this.title = newTitle;
         }
-        return ;
+        return;
     }
+
     public void setDate(String inputDate) {
         // String inputDate to be provided from HomeActivity intent, which should put it into yyyyMMdd.
-        this.date = inputDate ;
+        this.date = inputDate;
     }
+
     public String getDisplayDate() {
         // Method to use for saving the display displayDate. Not sure this is required
         SimpleDateFormat sdf = new SimpleDateFormat(SAVE_DATE_FORMAT);      // Save Formatted displayDate
         DateFormat localeDateFormat = android.text.format.DateFormat.getDateFormat(context);    // Locale displayDate format
-        Date dateProper ;
+        Date dateProper;
 
         try {
-            dateProper = sdf.parse(date) ;
+            dateProper = sdf.parse(date);
         } catch (Exception e) {
             Log.e(LOG_TAG, "Couldn't parse Crossword.displayDate (should be in save format) into something useful. This is coming from HomeActivity via intents so check the routing!");
             return context.getResources().getString(R.string.error_crossword_date); // Return the error message to be displayed.
         }
 
-        return localeDateFormat.format(dateProper) ;
+        return localeDateFormat.format(dateProper);
     }
+
     public static String getDisplayDate(Context context1, String savedDate) {
         // Method to use for saving the display displayDate. Not sure this is required
         SimpleDateFormat sdf = new SimpleDateFormat(SAVE_DATE_FORMAT);      // Save Formatted displayDate
         DateFormat localeDateFormat = android.text.format.DateFormat.getDateFormat(context1);    // Locale displayDate format
-        Date dateProper ;
+        Date dateProper;
 
         try {
-            dateProper = sdf.parse(savedDate) ;
+            dateProper = sdf.parse(savedDate);
         } catch (Exception e) {
             Log.e(LOG_TAG, "Couldn't parse Crossword.displayDate (should be in save format) into something useful. This is coming from HomeActivity via intents so check the routing!");
             return context1.getResources().getString(R.string.error_crossword_date); // Return the error message to be displayed.
         }
 
-        return localeDateFormat.format(dateProper) ;
+        return localeDateFormat.format(dateProper);
 
     }
+
     public Cell getCell(int row, int column) {
         return cells[row][column];
     }
+
     public CellView getCellView(int row, int column) {
         return cellViews[row][column];
     }
 
     public void setWordSplitHyphenListener(WordSplitHyphenDeactivatedListener listener) {
-        this.listener = listener ;
+        this.listener = listener;
     }
 
     public void setClueHangmanListener(Clue.ClueInteractionListener clueHangmanListener) {
@@ -544,49 +567,49 @@ public class Crossword {
             int nextCol = thisCol + 1;
             if (nextCol >= rowCount || getCell(thisRow, nextCol).isBlackCell()) {
                 // Then the only option for the word-break is between this row and the next one
-                Log.d(LOG_TAG,"Failing fast as only vertical word break an option");
-                addWordBreak(cellClicked,getCell(nextRow,thisCol));
-                return ;
+                Log.d(LOG_TAG, "Failing fast as only vertical word break an option");
+                addWordBreak(cellClicked, getCell(nextRow, thisCol));
+                return;
             }
             if (nextRow >= rowCount || getCell(nextRow, thisCol).isBlackCell()) {
                 // Then the only option for the word-break is between this col and the next one
-                Log.d(LOG_TAG,"Failing fast as only horizontal word break an option");
-                addWordBreak(cellClicked,getCell(thisRow,nextCol));
-                return ;
+                Log.d(LOG_TAG, "Failing fast as only horizontal word break an option");
+                addWordBreak(cellClicked, getCell(thisRow, nextCol));
+                return;
             }
             activeCell = cellClicked;
             activeCell.setFocusedMajor();
             getCell(nextRow, thisCol).setFocusedMinor();
             getCell(thisRow, nextCol).setFocusedMinor();
             // Show the instructions if we can't work out which clue to add the hyphen/word-split to automatically
-            Toast.makeText(this.context,R.string.word_split_instructions_2,Toast.LENGTH_LONG).show();
+            Toast.makeText(this.context, R.string.word_split_instructions_2, Toast.LENGTH_LONG).show();
         } else {
             int aCol = activeCell.getColumn();
             int aRow = activeCell.getRow();
             if (aCol == thisCol && aRow + 1 == thisRow) {
-                addWordBreak(getCell(aRow,aCol), getCell(thisRow,thisCol));
-            } else if (aCol  + 1 == thisCol && aRow == thisRow) {
-                addWordBreak(getCell(aRow,aCol), getCell(thisRow,thisCol));
+                addWordBreak(getCell(aRow, aCol), getCell(thisRow, thisCol));
+            } else if (aCol + 1 == thisCol && aRow == thisRow) {
+                addWordBreak(getCell(aRow, aCol), getCell(thisRow, thisCol));
             } else {
-                Log.d(LOG_TAG,"Invalid cell clicked, so doing nothing");
+                Log.d(LOG_TAG, "Invalid cell clicked, so doing nothing");
             }
             activeCell = null;
-            addHyphenActive = false ;
-            addWordSplitActive = false ;
+            addHyphenActive = false;
+            addWordSplitActive = false;
             clearCellHighlights();
             listener.wordSplitHyphenDeactivated();
         }
     }
 
     private void addWordBreak(Cell finalLetterFirstWord, Cell firstLetterNextWord) {
-        boolean isVertical = finalLetterFirstWord.getColumn() == firstLetterNextWord.getColumn() ;
+        boolean isVertical = finalLetterFirstWord.getColumn() == firstLetterNextWord.getColumn();
         Cell.CellSide finalLetterCellSide, firstLetterCellSide;
         if (isVertical) {
-            finalLetterCellSide = Cell.CellSide.BOTTOM ;
-            firstLetterCellSide = Cell.CellSide.TOP ;
+            finalLetterCellSide = Cell.CellSide.BOTTOM;
+            firstLetterCellSide = Cell.CellSide.TOP;
         } else {
-            finalLetterCellSide = Cell.CellSide.RIGHT ;
-            firstLetterCellSide = Cell.CellSide.LEFT ;
+            finalLetterCellSide = Cell.CellSide.RIGHT;
+            firstLetterCellSide = Cell.CellSide.LEFT;
         }
         if (addHyphenActive) {
             finalLetterFirstWord.addHyphen(finalLetterCellSide);
@@ -596,8 +619,8 @@ public class Crossword {
             firstLetterNextWord.addWordSplit(firstLetterCellSide, cellWidth);
         }
         activeCell = null;
-        addHyphenActive = false ;
-        addWordSplitActive = false ;
+        addHyphenActive = false;
+        addWordSplitActive = false;
         clearCellHighlights();
         listener.wordSplitHyphenDeactivated();
     }
@@ -612,6 +635,7 @@ public class Crossword {
             }
         }
     }
+
     public void freezeGrid() {
         // Locks the grid so that black cells stay black and white cells stay white
         for (int i = 0; i < rowCount; i++) {
@@ -631,12 +655,13 @@ public class Crossword {
         int oppositeCol = (rowCount - 1) - inputCell.getColumn();
 
         if (oppositeCol == inputCell.getColumn() && oppositeRow == inputCell.getRow()) {
-            Log.d(LOG_TAG,"Not toggling opposite cell as in this instance it is the same cell!") ;
+            Log.d(LOG_TAG, "Not toggling opposite cell as in this instance it is the same cell!");
         } else {
- //           Log.d(LOG_TAG, "Toggling blackCell opposite: " + inputCell.getCellName() + ", i.e. toggling: " + cells[oppositeRow][oppositeCol].getCellName());
+            //           Log.d(LOG_TAG, "Toggling blackCell opposite: " + inputCell.getCellName() + ", i.e. toggling: " + cells[oppositeRow][oppositeCol].getCellName());
             cells[oppositeRow][oppositeCol].toggleBlackCell();
         }
     }
+
     private void getClueNumbers() {
         ArrayList<Cell> startCells = new ArrayList<>();
         ArrayList<Integer[]> startCellCoordsGeneral = new ArrayList<>();
@@ -645,30 +670,30 @@ public class Crossword {
         Integer[] lastCellCoords = {rowCount, rowCount};          // Initialise coords as last cell so that it will definitely be corrected on the first run through
         Integer[] nextClueStartCellCoords = lastCellCoords;
         int displayClueNo = 1;
-        int clueID = 0 ;
+        int clueID = 0;
 
 
-        for (Clue clue : hClues){
-            if (! startCells.contains(clue.getStartCell())){
+        for (Clue clue : hClues) {
+            if (!startCells.contains(clue.getStartCell())) {
                 startCells.add(clue.getStartCell());
-                Integer[] coords = {clue.getStartCell().getRow(), clue.getStartCell().getColumn()} ;
+                Integer[] coords = {clue.getStartCell().getRow(), clue.getStartCell().getColumn()};
                 startCellCoordsGeneral.add(coords);
                 clue.setClueID(clueID);
-                clueID++ ;
+                clueID++;
             }
         }
-        for (Clue clue : vClues){
-            if (! startCells.contains(clue.getStartCell())){
+        for (Clue clue : vClues) {
+            if (!startCells.contains(clue.getStartCell())) {
                 startCells.add(clue.getStartCell());
-                Integer[] coords = {clue.getStartCell().getRow(), clue.getStartCell().getColumn()} ;
+                Integer[] coords = {clue.getStartCell().getRow(), clue.getStartCell().getColumn()};
                 startCellCoordsGeneral.add(coords);
                 clue.setClueID(clueID);
-                clueID++ ;
+                clueID++;
             }
         }
 
         // Loop through all coords and sort them into order. Once the next startCell is found, remove it from the general list.
-        while (startCellCoordsGeneral.size() > 0 ) {
+        while (startCellCoordsGeneral.size() > 0) {
             for (Integer[] coords : startCellCoordsGeneral) {
                 // Make nextClueStartCell equal to that under investigation if its row is less than that of another
                 if (coords[0] < nextClueStartCellCoords[0]) {
@@ -682,7 +707,7 @@ public class Crossword {
 
             // Check that it isn't the last time through
             if (nextClueStartCellCoords != lastCellCoords) {
- //               Log.d(LOG_TAG, "Next Clue Start Cell Coords = (" + nextClueStartCellCoords[0] + "," + nextClueStartCellCoords[1] + ").");
+                //               Log.d(LOG_TAG, "Next Clue Start Cell Coords = (" + nextClueStartCellCoords[0] + "," + nextClueStartCellCoords[1] + ").");
                 startCellCoordsOrdered.add(nextClueStartCellCoords);
                 startCellCoordsGeneral.remove(nextClueStartCellCoords);
 
@@ -691,7 +716,7 @@ public class Crossword {
             }
         }
 
-        for (Integer[] coords : startCellCoordsOrdered ) {
+        for (Integer[] coords : startCellCoordsOrdered) {
             // Loop through and assign each clue its number
             // i.e. cellViews[row][col].setClueNumber(displayClueNo);
             cellViews[coords[0]][coords[1]].setClueNumber(displayClueNo);
@@ -699,16 +724,16 @@ public class Crossword {
             // find the relevant clue and assign the clue number to it
             // check h clues
             for (Clue clue : hClues) {
-                if (clue.getStartCell().getRow() == coords[0] && clue.getStartCell().getColumn() == coords[1] ) {
+                if (clue.getStartCell().getRow() == coords[0] && clue.getStartCell().getColumn() == coords[1]) {
                     clue.setClueDisplayNumber(displayClueNo);
-                    Log.d(LOG_TAG, "Matched coords for across clue number: "+ displayClueNo) ;
+                    Log.d(LOG_TAG, "Matched coords for across clue number: " + displayClueNo);
                 }
             }
             // check v clues
             for (Clue clue : vClues) {
-                if (clue.getStartCell().getRow() == coords[0] && clue.getStartCell().getColumn() == coords[1] ) {
+                if (clue.getStartCell().getRow() == coords[0] && clue.getStartCell().getColumn() == coords[1]) {
                     clue.setClueDisplayNumber(displayClueNo);
-                    Log.d(LOG_TAG, "Matched coords for down clue number: "+ displayClueNo) ;
+                    Log.d(LOG_TAG, "Matched coords for down clue number: " + displayClueNo);
                 }
             }
 
@@ -719,25 +744,31 @@ public class Crossword {
     public int getScreenWidth() {
         return screenWidth;
     }
+
     public File getCrosswordPictureFile() {
-        return crosswordImageFile ;
+        return crosswordImageFile;
     }
+
     public File getSaveDir() {
-        return saveDir ;
+        return saveDir;
     }
+
     public File getCrosswordFile() {
-        return crosswordFile ;
+        return crosswordFile;
     }
+
     public File getCluePictureFile() {
-        return clueImageFile ;
+        return clueImageFile;
     }
+
     public String getActivityTitle() {
-        return getDisplayDate()+ ": " + title ;
+        return getDisplayDate() + ": " + title;
     }
 
     public void setSaveArray(String[] newStringArray) {
         saveCrossword(newStringArray);
     }
+
     public String[] getSaveArray() {
         // Create String array to save and pass around with intents
         // Format:  array[0]    = Crossword name
@@ -754,29 +785,33 @@ public class Crossword {
         String[] saveArray = new String[saveArraySize];
 
         // Initialise array
-        saveArray[SAVED_ARRAY_INDEX_TITLE] = this.title ;
-        saveArray[SAVED_ARRAY_INDEX_DATE] = date ;
-        saveArray[SAVED_ARRAY_INDEX_ROW_COUNT] = "" + rowCount ;
-        saveArray[SAVED_ARRAY_INDEX_CELL_WIDTH] = "" + cellWidth ;
+        saveArray[SAVED_ARRAY_INDEX_TITLE] = this.title;
+        saveArray[SAVED_ARRAY_INDEX_DATE] = date;
+        saveArray[SAVED_ARRAY_INDEX_ROW_COUNT] = "" + rowCount;
+        saveArray[SAVED_ARRAY_INDEX_CELL_WIDTH] = "" + cellWidth;
         saveArray[SAVED_ARRAY_INDEX_CROSSWORD_IMAGE] = crosswordFile.getAbsolutePath();
         saveArray[SAVED_ARRAY_INDEX_CLUE_IMAGE] = clueImageFile.getAbsolutePath();
 
         // Loop through cells and save contents to the array.
         int index = SAVE_ARRAY_START_INDEX; // For iterating over, and saving current cell to index.
-         for (int i = 0; i < rowCount; i++) {
+        for (int i = 0; i < rowCount; i++) {
             for (int j = 0; j < rowCount; j++) {
                 if (!cells[i][j].isBlackCell()) {
-                    saveArray[index] = cells[i][j].getText().toString() ;   // Save whatever text is in the box to the saveArray. Will be empty if box is empty.
-                    if (cells[i][j].hyphens[Cell.CellSide.RIGHT.ordinal()]) saveArray[index] += SAVE_RIGHT_HYPHEN_CODE ;
-                    if (cells[i][j].hyphens[Cell.CellSide.BOTTOM.ordinal()]) saveArray[index] += SAVE_BOTTOM_HYPHEN_CODE ;
-                    if (cells[i][j].wordSplits[Cell.CellSide.RIGHT.ordinal()]) saveArray[index] += SAVE_RIGHT_WORD_SPLIT_CODE ;
-                    if (cells[i][j].wordSplits[Cell.CellSide.BOTTOM.ordinal()]) saveArray[index] += SAVE_BOTTOM_WORD_SPLIT_CODE ;
+                    saveArray[index] = cells[i][j].getText().toString();   // Save whatever text is in the box to the saveArray. Will be empty if box is empty.
+                    if (cells[i][j].hyphens[Cell.CellSide.RIGHT.ordinal()])
+                        saveArray[index] += SAVE_RIGHT_HYPHEN_CODE;
+                    if (cells[i][j].hyphens[Cell.CellSide.BOTTOM.ordinal()])
+                        saveArray[index] += SAVE_BOTTOM_HYPHEN_CODE;
+                    if (cells[i][j].wordSplits[Cell.CellSide.RIGHT.ordinal()])
+                        saveArray[index] += SAVE_RIGHT_WORD_SPLIT_CODE;
+                    if (cells[i][j].wordSplits[Cell.CellSide.BOTTOM.ordinal()])
+                        saveArray[index] += SAVE_BOTTOM_WORD_SPLIT_CODE;
                 } else {
-                    saveArray[index] = "-" ;
+                    saveArray[index] = "-";
                 }
 
 //                Log.d("SAVEARRAY:", "At index = " + index + ", saveArray[index] = " + saveArray[index]);  // Don't output this at the moment because it seems to work, but spams the log thread. If saving stops working, uncomment this line.
-                index++ ;
+                index++;
             }
         }
 
@@ -785,45 +820,46 @@ public class Crossword {
 //        }
 
 
-        return saveArray ;
+        return saveArray;
     }
+
     public static String[] getSaveArray(File savedFile) {
         // Return the save array so that the app may continue as normal from a saved file
-        String[] saveArray ;
-        ArrayList<String> saveArrayList = new ArrayList<String>() ;
+        String[] saveArray;
+        ArrayList<String> saveArrayList = new ArrayList<String>();
         // Probably not required as Activity calling this method should check the file exists first
         if (!savedFile.exists()) {
             Log.e(LOG_TAG, "saved file does not exist, so cannot be loaded");
             saveArrayList.add(null);  // Return empty array
-            saveArray = saveArrayList.toArray(new String[saveArrayList.size()]) ;
-            return saveArray ;
+            saveArray = saveArrayList.toArray(new String[saveArrayList.size()]);
+            return saveArray;
         }
 
         try {
             // Read file
             BufferedReader br = new BufferedReader(new FileReader(savedFile));
-            String line ;
+            String line;
             while ((line = br.readLine()) != null) {
-                saveArrayList.add(line) ;
+                saveArrayList.add(line);
             }
-            br.close() ;
+            br.close();
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             Log.e(LOG_TAG, e.getMessage());
         }
 
         Log.d(LOG_TAG, "size of file read = " + saveArrayList.size());
 
-        saveArray = saveArrayList.toArray(new String[saveArrayList.size()]) ;
+        saveArray = saveArrayList.toArray(new String[saveArrayList.size()]);
         Log.d(LOG_TAG, "Length of saveArray = " + saveArray.length);
 
-        return saveArray ;
+        return saveArray;
     }
 
     private void getScreenDetails() {
 
-        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE) ;
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics metrics = new DisplayMetrics();
         windowManager.getDefaultDisplay().getMetrics(metrics);
 
@@ -831,8 +867,9 @@ public class Crossword {
         screenHeight = metrics.heightPixels;
 
         Log.d(LOG_TAG, "Screen Width = " + screenWidth);
-        Log.d(LOG_TAG,"Screen Height = " + screenHeight);
+        Log.d(LOG_TAG, "Screen Height = " + screenHeight);
     }
+
     public void toggleZoom() {
         // Method to toggle zooming of the grid
 
@@ -841,15 +878,15 @@ public class Crossword {
 
         // Set cell size based on current state of zoom
         int newCellSize = cellWidth;
-        if(!isZoomedIn) {
+        if (!isZoomedIn) {
             // If not already zoomed in, change value to zoomed in values
-            newCellSize = context.getResources().getDimensionPixelOffset(R.dimen.cell_size_zoomed_in) ;
+            newCellSize = context.getResources().getDimensionPixelOffset(R.dimen.cell_size_zoomed_in);
         }
         // Calculate new font size
 //        float newFontSize = calculateFontSize(newCellSize);
 
         // Change polarity of isZoomedIn
-        isZoomedIn = !isZoomedIn ;
+        isZoomedIn = !isZoomedIn;
 
         // Force all cells to that size
         for (int i = 0; i < rowCount; i++) {
@@ -862,11 +899,12 @@ public class Crossword {
             }
         }
     }
-    public boolean getIsZoomed(){
+
+    public boolean getIsZoomed() {
         return isZoomedIn;
     }
 
-    public void scrollToCell(Cell cell){
+    public void scrollToCell(Cell cell) {
         // Method to call scrollToCell from CrosswordGrid. This will tell the scroll view to scroll to the highlighted cell
         if (crosswordGrid != null && cell != null) {
             crosswordGrid.scrollToView(cell);
@@ -888,8 +926,9 @@ public class Crossword {
     }
 
     public int getHClueCount() {
-        return hClueCount ;
+        return hClueCount;
     }
+
     public int getVClueCount() {
         return vClueCount;
     }
@@ -898,14 +937,14 @@ public class Crossword {
      * @return Whether the crossword is complete; i.e. all clues marked 'complete'.
      */
     private boolean isComplete() {
-        boolean isComplete = true ;
-        for (Clue clue: hClues) {
-            if (!clue.isCompleted()) isComplete = false ;
+        boolean isComplete = true;
+        for (Clue clue : hClues) {
+            if (!clue.isCompleted()) isComplete = false;
         }
-        for (Clue clue: vClues) {
-            if (!clue.isCompleted()) isComplete = false ;
+        for (Clue clue : vClues) {
+            if (!clue.isCompleted()) isComplete = false;
         }
-        return isComplete ;
+        return isComplete;
     }
 
     /**
@@ -913,7 +952,7 @@ public class Crossword {
      */
     public void checkIsComplete() {
         if (this.isComplete()) {
-            showVictoryDialog() ;
+            showVictoryDialog();
         }
     }
 
@@ -923,8 +962,8 @@ public class Crossword {
      */
     private void showVictoryDialog() {
         // Check victory popup enabled
-        SharedPreferences sharedPref =  PreferenceManager.getDefaultSharedPreferences(context) ;
-        boolean showDialog = sharedPref.getBoolean(SettingsFragment.KEY_PREF_VICTORY_POPUP, true) ;
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean showDialog = sharedPref.getBoolean(SettingsFragment.KEY_PREF_VICTORY_POPUP, true);
         // If so, show it
         if (showDialog) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -940,48 +979,49 @@ public class Crossword {
             builder.show();
         }
     }
+
     // ------------------------------------------- Save / Delete / Initialise methods --------------------------------------------
     public void saveCrossword() {
         // Save file to memory. Use files created by initialiseSaveFiles
         String[] saveArray = getSaveArray();
         saveCrossword(saveArray);
     }
+
     public void saveCrossword(String[] saveArray) {
-        try {
+        try { // TODO: Move to try with resources
             Log.d(LOG_TAG, "Writing crossword file...");
             FileWriter fileWriter = new FileWriter(crosswordFile);
-            for (int i = 0 ; i < saveArray.length ; i++) {
+            for (int i = 0; i < saveArray.length; i++) {
 //                Log.d(LOG_TAG, "value at index i = " + i + " = " + saveArray[i]);
                 fileWriter.write(saveArray[i] + "\n");
             }
             fileWriter.close();
 
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             Log.e(LOG_TAG, "Couldn't open fileWriter to save the crossword file.");
             e.printStackTrace();
         }
     }
+
     public void initialiseSaveFiles() {
         // Format File name
-        fileName = date + "-" + title.replaceAll(" ","_").replaceAll("-","__"); //.toLowerCase() ; // Delete this if it works
+        fileName = date + "-" + title.replaceAll(" ", "_").replaceAll("-", "__"); //.toLowerCase() ; // Delete this if it works
         // Create the save files/directories
-        File docsDirectory, photosDirectory ;
+        File docsDirectory, photosDirectory;
         // Android 11 changes how this all works...
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            Log.i(LOG_TAG,"Android version 10+ detected. Using local storage for crossword files");
+            Log.i(LOG_TAG, "Android version 10+ detected. Using local storage for crossword files");
             docsDirectory = context.getFilesDir();
-            photosDirectory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            photosDirectory = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES); // TODO: Move this to use the MediaStore API
         } else {
             docsDirectory = new File(Environment.getExternalStorageDirectory() + "/.CrosswordToolkit");
             photosDirectory = docsDirectory;
         }
         if (!(docsDirectory.exists() && docsDirectory.isDirectory())) {
-            docsDirectory.mkdirs();
-        }
-
-        if (!docsDirectory.mkdir()) {
-            Log.e(LOG_TAG, "Error creating documents directory! In big trouble here...");
+            if (!docsDirectory.mkdirs()) {
+                Log.e(LOG_TAG, "Error creating documents directory! In big trouble here...");
+            }
         }
         saveDir = new File(docsDirectory, fileName);
         photoSaveDir = new File(photosDirectory, fileName);
@@ -1034,7 +1074,7 @@ public class Crossword {
 
             }
         }
-        Log.i(LOG_TAG,"Photo file path:" + clueImageFile.getAbsolutePath());
+        Log.i(LOG_TAG, "Photo file path:" + clueImageFile.getAbsolutePath());
         // Crossword Image path
         crosswordImageFile = new File(photoSaveDir, SAVE_CROSSWORD_IMAGE_FILE_NAME);
         if (!crosswordImageFile.exists()) {

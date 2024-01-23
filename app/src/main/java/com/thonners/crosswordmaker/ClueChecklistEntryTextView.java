@@ -16,36 +16,40 @@ import android.widget.TextView;
 
 public class ClueChecklistEntryTextView extends TextView {
 
-    private final int NUM_COLUMNS = 10 ;    // Number of columns in the GridLayout
+    private final int NUM_COLUMNS = 10;    // Number of columns in the GridLayout
 
-    private Context context ;
-    private Clue clue ;
-    private boolean isChecked = false ;   // Variable to track whether this text should be displayed with a strikethrough or not
+    private Context context;
+    private Clue clue;
+    private boolean isChecked = false;   // Variable to track whether this text should be displayed with a strikethrough or not
 
     /**
      * Default Constructors, for use in xml
+     *
      * @param context
      */
     public ClueChecklistEntryTextView(Context context) {
-        super(context) ;
+        super(context);
     }
+
     public ClueChecklistEntryTextView(Context context, AttributeSet attrs) {
-        super(context, attrs) ;
+        super(context, attrs);
     }
+
     public ClueChecklistEntryTextView(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle) ;
+        super(context, attrs, defStyle);
     }
 
     /**
      * Constructor - for use when creating instances programatically.
      * This should be the only constructor used
+     *
      * @param context Application context
-     * @param clue The clue associated with this view
+     * @param clue    The clue associated with this view
      */
     public ClueChecklistEntryTextView(Context context, Clue clue) {
-        super(context) ;
-        this.context = context ;
-        this.clue = clue ;
+        super(context);
+        this.context = context;
+        this.clue = clue;
         initialise();
     }
 
@@ -64,15 +68,16 @@ public class ClueChecklistEntryTextView extends TextView {
      * Method to toggle the strike-through of this view
      */
     public void toggleChecked() {
-        setChecked(!isChecked) ;
+        setChecked(!isChecked);
     }
 
     /**
      * Method to set whether this view should be checked, and to set the text appearance appropriately
+     *
      * @param checked Whether the text in this view should appear with a strikethrough
      */
     public void setChecked(boolean checked) {
-        isChecked = checked ;
+        isChecked = checked;
 
         // Set the appearance
         if (isChecked) {
@@ -90,11 +95,11 @@ public class ClueChecklistEntryTextView extends TextView {
      * @param clue The clue associated to this checklist entry
      */
     public void setClue(Clue clue) {
-        this.clue = clue ;
+        this.clue = clue;
     }
 
     public Clue getClue() {
-        return this.clue ;
+        return this.clue;
     }
 
 }

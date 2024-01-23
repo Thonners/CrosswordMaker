@@ -15,13 +15,18 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.preference.PreferenceManager;
+
 import androidx.annotation.NonNull;
+
 import com.google.android.material.snackbar.Snackbar;
+
 import android.os.Bundle;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+
 import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
@@ -37,7 +42,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.kobakei.ratethisapp.RateThisApp;
+//import com.kobakei.ratethisapp.RateThisApp;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,23 +56,23 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
 
     private static final int REQUEST_CODE_WRITE_EXTERNAL_STORAGE_PERMISSION = 123;
 
-    private final int RATE_DAYS = 3 ;
-    private final int RATE_LAUNCHES = 5 ;
+    private final int RATE_DAYS = 3;
+    private final int RATE_LAUNCHES = 5;
 
-    private final String firstRunFileName = "firstRun" ;
-    private final String PREFS_NEVER_RATE = "firstRun" ;
+    private final String firstRunFileName = "firstRun";
+    private final String PREFS_NEVER_RATE = "firstRun";
 
-    private ServerConnection serverConnection ;
-    private boolean serverAvailable = false ;
+    private HttpsServerConnection serverConnection;
+    private boolean serverAvailable = false;
 
     private String publication;
-    private String date ;
-    private CharSequence[] publications ;
-    private boolean safeToOverwrite = false ;
-    private LinearLayout mainLayout ;
+    private String date;
+    private CharSequence[] publications;
+    private boolean safeToOverwrite = false;
+    private LinearLayout mainLayout;
 
-    private CrosswordLibraryManager libraryManager ;
-    private ArrayList<CrosswordLibraryManager.SavedCrossword> recentCrosswords ;
+    private CrosswordLibraryManager libraryManager;
+    private ArrayList<CrosswordLibraryManager.SavedCrossword> recentCrosswords;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,10 +83,10 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
 
         // Create / get the views
         setContentView(R.layout.activity_home_material);
-        mainLayout = (LinearLayout) findViewById(R.id.home_main_layout) ;
+        mainLayout = (LinearLayout) findViewById(R.id.home_main_layout);
 
         checkFirstRun();
-        showRateDialog() ;
+        showRateDialog();
 
 
     }
@@ -95,7 +100,7 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
             showToast(getResources().getString(R.string.sdcard_error_1));
             openToolkitActivity();
         }
-        checkServerConnection() ;
+        checkServerConnection();
     }
 
 
@@ -123,7 +128,7 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
             case R.id.action_settings:
                 // Open some settings menu
                 openSettings(this);
-                break ;
+                break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -201,6 +206,7 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
     public void toolkitClicked(View view) {
         openToolkitActivity();
     }
+
     private void openToolkitActivity() {
         // Open just a toolkit activity
         Intent intent = new Intent(this, ToolkitSliderActivity.class);
@@ -209,7 +215,7 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
 
     public void savedClicked(View view) {
         if (sdcardIsAvailable(this)) {
-            if (new CrosswordLibraryManager(this).getSavedCrosswords().size() > 0 ) {
+            if (new CrosswordLibraryManager(this).getSavedCrosswords().size() > 0) {
                 // Open CrosswordLibraryActivity
                 Intent intent = new Intent(this, CrosswordLibraryActivity.class);
                 startActivity(intent);
@@ -238,12 +244,12 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
     public void startNewCrossword() {
-        CrosswordLibraryManager clm = new CrosswordLibraryManager(this) ;
-        boolean safeToWrite = false ;
+        CrosswordLibraryManager clm = new CrosswordLibraryManager(this);
+        boolean safeToWrite = false;
 
         if (clm.crosswordAlreadyExists(publication, date)) {
             Log.d(LOG_TAG, "Crossword file already exists for: " + publication + " - " + date + ". Checking if it's safe to overwrite...");
-            safeToWrite = confirmOverwrite() ;
+            safeToWrite = confirmOverwrite();
         } else {
             safeToWrite = true;
         }
@@ -263,7 +269,7 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
         // Popup with confirmation that the previously saved crossword with this publication(i.e. name) and date will be overwritten
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         // Set the dialog title
-        builder.setTitle(publication + " - " + Crossword.getDisplayDate(this, date)) ;
+        builder.setTitle(publication + " - " + Crossword.getDisplayDate(this, date));
         // Set the action buttons
         builder.setPositiveButton(R.string.dialog_overwrite, new DialogInterface.OnClickListener() {
                     @Override
@@ -274,7 +280,7 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
                     }
                 }
 
-        ) ;
+        );
         builder.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
@@ -287,7 +293,7 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
 
         );
         // Warning Message:
-        TextView dialogMessage = new TextView(this) ;
+        TextView dialogMessage = new TextView(this);
         dialogMessage.setText(R.string.dialog_overwrite_crossword_message);
         dialogMessage.setGravity(Gravity.CENTER);
         builder.setView(dialogMessage);
@@ -295,8 +301,9 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
         AlertDialog overwritePopup = builder.create();
         overwritePopup.show();
 
-        return safeToOverwrite ;
+        return safeToOverwrite;
     }
+
     private void popupPublicationDialogOptions() {
         // Pop up dialog pox with radio buttons of common publications
         // Auto-fill the input EditText with the selected option. Do nothing if 'other' is selected
@@ -304,7 +311,7 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         // Set the dialog title
-        builder.setTitle(R.string.pub_name_dialog_title) ;
+        builder.setTitle(R.string.pub_name_dialog_title);
 
         // Specify the list array, the items to be selected by default,
         // and the listener through which to receive callbacks when items are selected
@@ -332,7 +339,7 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
                     }
                 }
 
-        ) ;
+        );
         builder.setNeutralButton(R.string.pub_other, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -354,10 +361,11 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
         namePopup.show();
 
     }
-    private void popupOtherPublicationDialog(){
+
+    private void popupOtherPublicationDialog() {
         // Popup to allow user to input non-standard publication
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this) ;
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.pub_name_other_dialog_title);
 
         final EditText input = new EditText(this);
@@ -369,11 +377,11 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
             public void onClick(DialogInterface dialog, int which) {
                 // Set selectedPublication to the text entered in the box
                 if (input.getText().toString().equals("")) {
-                    Log.d(LOG_TAG,"Blank entry for publication name. Reopening the dialog");
+                    Log.d(LOG_TAG, "Blank entry for publication name. Reopening the dialog");
                     popupOtherPublicationDialog();  // If it is blank, call this alert again. User can press cancel to get out of it if requried.
-                    Toast.makeText(getApplicationContext(),"A name for the publication is required to continue.",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "A name for the publication is required to continue.", Toast.LENGTH_SHORT).show();
                 } else {
-                    Log.d(LOG_TAG,"Entry for publication name given as:");
+                    Log.d(LOG_TAG, "Entry for publication name given as:");
                     publication = input.getText().toString();
                     // Date dialog popup
                     popupDateDialog();
@@ -386,33 +394,36 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
                 // Cancel clicked so do nothing
                 dialog.cancel();
             }
-        }) ;
+        });
 
-        builder.show() ;
+        builder.show();
     }
+
     private void popupDateDialog() {
         // Pop up dialog pox with NumberPickers for the displayDate
         // Auto-fill the input EditText with the selected option. Do nothing if user presses cancel
         DialogFragment dialogFragment = new StartDatePicker();
         dialogFragment.show(getFragmentManager(), "start_date_picker");
     }
+
     private void showToast(String string) {
-        Toast.makeText(this,string,Toast.LENGTH_LONG).show();
+        Toast.makeText(this, string, Toast.LENGTH_LONG).show();
     }
+
     private void checkFirstRun() {
-        File firstRunFile = new File(getFilesDir(),firstRunFileName) ;
+        File firstRunFile = new File(getFilesDir(), firstRunFileName);
         // If first run file doesn't exist, show the snackbar
         if (firstRunFile.exists()) {
             // This is likely to be true, so will be a faster test than the negative
             Log.d(LOG_TAG, "firstRunFile found, so not showing snackbar.");
         } else {
-            Log.d(LOG_TAG,"First run file not found, so showing snackbar") ;
-            Snackbar.make(mainLayout,R.string.low_ram_snackbar,Snackbar.LENGTH_LONG).show();
+            Log.d(LOG_TAG, "First run file not found, so showing snackbar");
+            Snackbar.make(mainLayout, R.string.low_ram_snackbar, Snackbar.LENGTH_LONG).show();
             // Now create the file for next time
             try {
-                firstRunFile.createNewFile() ;
+                firstRunFile.createNewFile();
             } catch (IOException exception) {
-                Log.d(LOG_TAG,"Error creating first run file: " + exception.getLocalizedMessage()) ;
+                Log.d(LOG_TAG, "Error creating first run file: " + exception.getLocalizedMessage());
             }
         }
     }
@@ -422,8 +433,8 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
      */
     private boolean getOfflineMode() {
         // Get the SharedPrefs to check that offline mode isn't enabled
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this) ;
-        return prefs.getBoolean(SettingsFragment.KEY_PREF_OFFLINE_MODE, false) ;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        return prefs.getBoolean(SettingsFragment.KEY_PREF_OFFLINE_MODE, false);
     }
 
     /**
@@ -432,14 +443,15 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
      */
     private void checkServerConnection() {
         if (!getOfflineMode() && isNetworkAvailable()) {
-            ServerConnection.ServerConnectionListener serverConnectionListener = new ServerConnection.ServerConnectionListener() {
+            HttpsServerConnection.ServerConnectionListener serverConnectionListener = new HttpsServerConnection.ServerConnectionListener() {
                 @Override
                 public void serverConnectionResponse(ServerConnection.SocketIdentifier requestSuccess, ArrayList<String> answers) {
 
                 }
+
                 @Override
                 public void setServerAvailable(boolean isAvailable) {
-                    serverAvailable = isAvailable ;
+                    serverAvailable = isAvailable;
                     if (serverAvailable) {
                         Log.d(LOG_TAG, "Network is available, and server connection test was successful.");
                         //Toast.makeText(getApplicationContext(),getString(R.string.server_available_toast),Toast.LENGTH_SHORT).show();
@@ -451,6 +463,7 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
                 @Override
                 public void callShowLoadingSpinner() {
                 }
+
                 @Override
                 public void callHideLoadingSpinner() {
                 }
@@ -484,8 +497,8 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
 //            serverConnection.testServerConnection() ;
         } else {
             // Force to false is no network available
-            Log.d(LOG_TAG,"No network detected, so no server available");
-            serverAvailable = false ;
+            Log.d(LOG_TAG, "No network detected, so no server available");
+            serverAvailable = false;
         }
     }
 
@@ -500,9 +513,9 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
 
     /**
      * Method to provide easy interface to call stopRateDialog when never is clicked.
-      */
+     */
     private void neverRate() {
-        RateThisApp.stopRateDialog(this);
+//        RateThisApp.stopRateDialog(this);
     }
 
     /**
@@ -546,8 +559,8 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
     @Override
     public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
 
-        String yr = year + "" ;
-        String month = (monthOfYear + 1) + "" ;   // Add 1 to the month so that it displays normally. Calendar returns months 0-11.
+        String yr = year + "";
+        String month = (monthOfYear + 1) + "";   // Add 1 to the month so that it displays normally. Calendar returns months 0-11.
         String day = dayOfMonth + "";
 
         // Do something with the displayDate chosen by the user
@@ -555,13 +568,13 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
             month = "0" + month;
         }
         if (day.length() == 1) {
-            day = "0" + day ;
+            day = "0" + day;
         }
 
         // Date in save format (yyyyMMdd)
-        date = yr + month + day ;
+        date = yr + month + day;
 
-        Log.d(LOG_TAG,"Starting displayDate set, so starting new crossword...");
+        Log.d(LOG_TAG, "Starting displayDate set, so starting new crossword...");
         startNewCrossword();
     }
 
@@ -580,24 +593,26 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
             return new DatePickerDialog(getActivity(), (HomeActivity) getActivity(), startYear, startMonth, startDay);
         }
     }
+
     // Public static methods
     public static void emailDeveloperFeedback(Context context) {
         // Create an email to me with specific subject heading. Outsource actual email sending.
-        Log.d(LOG_TAG,"Trying to launch email to developer");
-        Log.d(LOG_TAG,"email_type: " + context.getString(R.string.email_type));
+        Log.d(LOG_TAG, "Trying to launch email to developer");
+        Log.d(LOG_TAG, "email_type: " + context.getString(R.string.email_type));
 
         // Create Intent & let email client send the message
         Intent i = new Intent(Intent.ACTION_SEND);
         i.setType(context.getResources().getString(R.string.email_type));
-        i.putExtra(Intent.EXTRA_EMAIL  , new String[]{context.getResources().getString(R.string.email_target)});
+        i.putExtra(Intent.EXTRA_EMAIL, new String[]{context.getResources().getString(R.string.email_target)});
         i.putExtra(Intent.EXTRA_SUBJECT, context.getResources().getString(R.string.email_subject));
-        i.putExtra(Intent.EXTRA_TEXT   , context.getResources().getString(R.string.email_body));
+        i.putExtra(Intent.EXTRA_TEXT, context.getResources().getString(R.string.email_body));
         try {
             context.startActivity(Intent.createChooser(i, "Send mail..."));
         } catch (android.content.ActivityNotFoundException ex) {
             Toast.makeText(context, context.getResources().getString(R.string.email_error), Toast.LENGTH_SHORT).show();
         }
     }
+
     public static void showAboutDialog(Context context) {
         // Show a dialog containing an 'about' section
         // Text view (probably should move this to a layout resource later)
@@ -620,14 +635,17 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
         );
         builder.show();
     }
+
     public static void openSettings(Context context) {
-        Intent settingsIntent = new Intent(context, SettingsActivity.class) ;
+        Intent settingsIntent = new Intent(context, SettingsActivity.class);
         context.startActivity(settingsIntent);
         // Toast.makeText(context, "Will create a settings option soon", Toast.LENGTH_SHORT).show();
     }
+
     public static boolean deviceHasCameraCapability(Context context) {
-        return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA) ;
+        return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY);
     }
+
     public static boolean sdcardIsAvailable(Activity activity) {
         // TODO: Check storage permissions for Android 11+ differently...
         if (Build.VERSION.SDK_INT >= 30) {
@@ -655,6 +673,7 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
             }
         }
     }
+
     public static void hideKeyboard(Context context, View view) {
         // Method to hide the keyboard
         InputMethodManager inputManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);

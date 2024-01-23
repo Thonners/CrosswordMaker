@@ -3,6 +3,7 @@ package com.thonners.crosswordmaker;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Build;
+
 import androidx.cardview.widget.CardView;
 
 import android.util.TypedValue;
@@ -12,20 +13,20 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
- *  Footer button, to display some text at the bottom of the layout to which it is added.
- *  Create an instance of the button with the text you'd like to display, then add it to the relevant RelativeLayout.
- *
+ * Footer button, to display some text at the bottom of the layout to which it is added.
+ * Create an instance of the button with the text you'd like to display, then add it to the relevant RelativeLayout.
+ * <p>
  * Created by Thonners on 04/07/15.
  */
 
-public class FooterButton extends CardView{
-    Context context ;
-    TextView tv ;
+public class FooterButton extends CardView {
+    Context context;
+    TextView tv;
     RelativeLayout buttonRL;
 
     public FooterButton(Context context, String textToDisplay) {
         super(context);
-        this.context = context ;
+        this.context = context;
 
         initialise();
         setText(textToDisplay);
@@ -44,7 +45,7 @@ public class FooterButton extends CardView{
         buttonRL.setPadding(getResources().getDimensionPixelOffset(R.dimen.edit_button_padding), getResources().getDimensionPixelOffset(R.dimen.edit_button_padding), getResources().getDimensionPixelOffset(R.dimen.edit_button_padding), getResources().getDimensionPixelOffset(R.dimen.edit_button_padding));
         // Text view
         tv = new TextView(context);
-        RelativeLayout.LayoutParams tvlp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT) ;
+        RelativeLayout.LayoutParams tvlp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         tvlp.addRule(RelativeLayout.CENTER_HORIZONTAL);
         tv.setLayoutParams(tvlp);
         tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.home_card_text_size_main));
@@ -52,7 +53,7 @@ public class FooterButton extends CardView{
         tv.setGravity(View.TEXT_ALIGNMENT_CENTER);
         tv.setTextColor(getResources().getColor(R.color.white));
         buttonRL.addView(tv);
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             this.setCardElevation(getResources().getDimension(R.dimen.z_card_raised));
         }
         this.setVisibility(View.INVISIBLE); // Start invisible

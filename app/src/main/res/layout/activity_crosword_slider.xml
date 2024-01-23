@@ -1,20 +1,37 @@
-<androidx.viewpager.widget.ViewPager
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/pager"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.thonners.crosswordmaker.CrosswordSliderActivity" >
-
-
-    <androidx.viewpager.widget.PagerTabStrip
-        android:id="@+id/pager_title_strip"
+    android:layout_height="match_parent">
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:background="#222222"
-        android:textColor="#fff"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/pager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            tools:context="com.thonners.crosswordmaker.CrosswordSliderActivity" >
 
-</androidx.viewpager.widget.ViewPager>
+
+            <androidx.viewpager.widget.PagerTabStrip
+                android:id="@+id/pager_title_strip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:background="#222222"
+                android:textColor="#fff"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp" />
+
+        </androidx.viewpager.widget.ViewPager>
+        <LinearLayout
+            android:id="@+id/hangman_letters_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/manual_anagram_known_letter_layout_height"
+            android:layout_weight="0"
+            android:layout_margin="@dimen/manual_anagram_known_letter_layout_margin"
+            android:orientation="horizontal"/>
+    </LinearLayout>
+</FrameLayout>

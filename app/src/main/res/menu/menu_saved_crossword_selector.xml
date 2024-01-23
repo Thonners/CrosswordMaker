@@ -3,23 +3,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.thonners.crosswordmaker.CrosswordLibraryActivity">
 
-    <item android:id="@+id/action_edit_delete"
+    <item
+        android:id="@+id/action_edit_delete"
         android:title="@string/action_edit_delete"
         android:orderInCategory="20"
         app:showAsAction="never" />
 
 
-    <item android:id="@+id/action_settings"
+    <item
+        android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:orderInCategory="100"
         app:showAsAction="never" />
 
-    <item android:id="@+id/action_feedback"
+    <item
+        android:id="@+id/action_feedback"
         android:title="@string/action_feedback"
         android:orderInCategory="150"
         app:showAsAction="never" />
 
-    <item android:id="@+id/action_about"
+    <item
+        android:id="@+id/action_about"
         android:title="@string/action_about"
         android:orderInCategory="200"
         app:showAsAction="never" />

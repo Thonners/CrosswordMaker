@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+
 import androidx.fragment.app.Fragment;
+
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -32,30 +34,29 @@ import java.util.ArrayList;
  * Use the {@link CrosswordPageFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CrosswordPageFragment extends Fragment implements  View.OnClickListener, View.OnLongClickListener, Crossword.WordSplitHyphenDeactivatedListener, Clue.ClueInteractionListener{
+public class CrosswordPageFragment extends Fragment implements View.OnClickListener, View.OnLongClickListener, Crossword.WordSplitHyphenDeactivatedListener, Clue.ClueInteractionListener {
 
-    private static final String ARG_TAB_POSITION = "tabPosition" ;
-    private static final String ARG_STRING_ARRAY = "crosswordStringArray" ;
+    private static final String ARG_TAB_POSITION = "tabPosition";
+    private static final String ARG_STRING_ARRAY = "crosswordStringArray";
     private static final String LOG_TAG = "CrosswordPageFragment";
 
-    private final int MAX_COL_COUNT = 10 ;
-
+    private final int MAX_COL_COUNT = 10;
     private CrosswordGrid crosswordGrid;
-    private HorizontalScrollViewNoFocus horizontalScrollViewNoFocus ;
-    private ScrollView verticalScrollView ;
-    private GridLayout acrossCluesChecklist ;
-    private GridLayout downCluesChecklist ;
-    private LinearLayout hangmanLayout ;
-    private FloatingActionButton wordSplitFAB ;
-    private FloatingActionButton hyphenFAB ;
+    private HorizontalScrollViewNoFocus horizontalScrollViewNoFocus;
+    private ScrollView verticalScrollView;
+    private GridLayout acrossCluesChecklist;
+    private GridLayout downCluesChecklist;
+    private LinearLayout hangmanLayout;
+    private FloatingActionButton wordSplitFAB;
+    private FloatingActionButton hyphenFAB;
 
-    private Crossword crossword ;
+    private Crossword crossword;
     private String[] crosswordStringArray;
 
-    private boolean addHyphenActive = false ;
-    private boolean addWordSplitActive = false ;
+    private boolean addHyphenActive = false;
+    private boolean addWordSplitActive = false;
 
-    private int tabPosition ;
+    private int tabPosition;
 
     private OnFragmentInteractionListener mListener;
 
@@ -65,8 +66,9 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
         args.putInt(ARG_TAB_POSITION, position);
         args.putStringArray(ARG_STRING_ARRAY, crosswordArray);
         fragment.setArguments(args);
-        return fragment ;
+        return fragment;
     }
+
     public CrosswordPageFragment() {
         // Required empty public constructor
     }
@@ -84,9 +86,10 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(LOG_TAG,"onResume called. Initialising save Files");
+        Log.d(LOG_TAG, "onResume called. Initialising save Files");
         crossword.initialiseSaveFiles();
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -124,10 +127,9 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
 //        // Add click listener to the cell views, in case we're in add hyphen or add word split mode...
 //        crossword.setClickListenerForAllCells(this);
 
-        return view ;
+        return view;
 
     }
-
 
 
     @Override
@@ -157,13 +159,13 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
 
     private void createCrossword() {
         // Create the crossword
-        crossword = new Crossword(getActivity(), crosswordGrid,crosswordStringArray,false);
+        crossword = new Crossword(getActivity(), crosswordGrid, crosswordStringArray, false);
         crossword.setWordSplitHyphenListener(this);
         crossword.setClueHangmanListener(this);
     }
 
-    public void zoomCrossword(){
-        if(crossword.getIsZoomed()){
+    public void zoomCrossword() {
+        if (crossword.getIsZoomed()) {
             Log.d(LOG_TAG, "Zoom out FAB pressed");
         } else {
             Log.d(LOG_TAG, "Zoom in FAB pressed");
@@ -174,40 +176,42 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
     public Crossword getCrossword() {
         return crossword;
     }
+
     public File getCrosswordSaveDir() {
-        return crossword.getSaveDir() ;
+        return crossword.getSaveDir();
     }
 
     /**
      * Method to create ClueChecklistEntries for the given collection of clues, and add them to the
      * appropriate clues checklist layout (either across or down).
+     *
      * @param gridLayout The GridLayout to populate with <ClueChecklistEntryTextView>s
-     * @param clues An ArrayList of clues, for which to populate the GridLayout
+     * @param clues      An ArrayList of clues, for which to populate the GridLayout
      */
     private void populateCluesChecklists(GridLayout gridLayout, ArrayList<Clue> clues) {
-        Log.d(LOG_TAG,"Populating the clues checklist...");
+        Log.d(LOG_TAG, "Populating the clues checklist...");
         // Get column count, etc.
-        int clueCount = clues.size() ;
-        int colMax = Math.max(Math.min(MAX_COL_COUNT, clueCount),1) ; // Force the colMax to be between 1 and the MAX_COL_COUNT value
-        int rowCount = clueCount / colMax ;
+        int clueCount = clues.size();
+        int colMax = Math.max(Math.min(MAX_COL_COUNT, clueCount), 1); // Force the colMax to be between 1 and the MAX_COL_COUNT value
+        int rowCount = clueCount / colMax;
         gridLayout.setColumnCount(colMax);
         gridLayout.setRowCount(rowCount + 1);
         // Initialise the counters
-        int row = 0, col = 0 ;
+        int row = 0, col = 0;
         // Cycle through the horizontal clues
         for (Clue clue : clues) {
             // Check column isn't at colMax
             if (col == colMax) {
                 row++;
-                col = 0 ;
+                col = 0;
             }
 
-            ClueChecklistEntryTextView c = clue.getChecklistEntryTextView(getActivity()) ;
+            ClueChecklistEntryTextView c = clue.getChecklistEntryTextView(getActivity());
             c.setOnClickListener(this);
             c.setOnLongClickListener(this);
 
             // Set the layout params
-            GridLayout.LayoutParams param =new GridLayout.LayoutParams();
+            GridLayout.LayoutParams param = new GridLayout.LayoutParams();
             param.height = GridLayout.LayoutParams.WRAP_CONTENT;
             param.width = GridLayout.LayoutParams.WRAP_CONTENT;
             param.rightMargin = 5;
@@ -223,22 +227,23 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
             c.setLayoutParams(param);
 
             // Add to the parent view
-            gridLayout.addView(c) ;
+            gridLayout.addView(c);
 
             // Check whether text should have strikethrough or not
             c.getClue().checkClueComplete();
 
             // Increment column
-            col++ ;
+            col++;
         }
-        Log.d(LOG_TAG,"Done.");
+        Log.d(LOG_TAG, "Done.");
     }
 
     /**
      * Method to create the TextView of the clue number to add to the checklist
-     * @param checklistLayout   The layout to which the TextView will be added
-     * @param clueID    The uniqueID of the clue
-     * @param displayNumer  The number to be displayed for the clue
+     *
+     * @param checklistLayout The layout to which the TextView will be added
+     * @param clueID          The uniqueID of the clue
+     * @param displayNumer    The number to be displayed for the clue
      */
     private void makeClueChecklistEntry(LinearLayout checklistLayout, int clueID, int displayNumer) {
 
@@ -247,45 +252,48 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
     /**
      * Method to highlight the clue if a user clicks its {@link ClueChecklistEntryTextView} in the
      * checklist GridLayout
+     *
      * @param view The {@link ClueChecklistEntryTextView} that has been clicked.
      */
     @Override
     public void onClick(View view) {
         // Check it's a clueChecklistTV that's been clicked
-        if( view instanceof ClueChecklistEntryTextView) {
+        if (view instanceof ClueChecklistEntryTextView) {
             Clue clue = ((ClueChecklistEntryTextView) view).getClue();
             clue.highlightClue(clue.getStartCell());
-        } else if (view instanceof FloatingActionButton){
-            Toast.makeText(getContext(),R.string.word_split_instructions_1,Toast.LENGTH_LONG).show();
+        } else if (view instanceof FloatingActionButton) {
+            Toast.makeText(getContext(), R.string.word_split_instructions_1, Toast.LENGTH_LONG).show();
             if (view.equals(wordSplitFAB)) addWordSplit();
             if (view.equals(hyphenFAB)) addHyphen();
         } else if (view instanceof CellView) {
-            Log.d(LOG_TAG,"Cell view clicked");
+            Log.d(LOG_TAG, "Cell view clicked");
             if (this.addHyphenActive || this.addWordSplitActive) {
-                Log.d(LOG_TAG,"Adding something active");
+                Log.d(LOG_TAG, "Adding something active");
             }
-        }else if (view instanceof HorizontalScrollViewNoFocus) {
-            Log.d(LOG_TAG,"HorizontalScrollViewNoFocus view clicked");
+        } else if (view instanceof HorizontalScrollViewNoFocus) {
+            Log.d(LOG_TAG, "HorizontalScrollViewNoFocus view clicked");
             if (this.addHyphenActive || this.addWordSplitActive) {
-                Log.d(LOG_TAG,"Adding something active");
+                Log.d(LOG_TAG, "Adding something active");
 
             }
         }
     }
+
     /**
      * Method to manage the user long-clicking a clue checklist entry to override the automatic management
      * and uncross/cross it off
+     *
      * @param view The {@link ClueChecklistEntryTextView} that has been clicked
      * @return Whether this method has managed/consumed the long click.
      */
     @Override
     public boolean onLongClick(View view) {
         // Check it's a clueChecklistTV that's been clicked
-        if( view instanceof ClueChecklistEntryTextView) {
+        if (view instanceof ClueChecklistEntryTextView) {
             ((ClueChecklistEntryTextView) view).toggleChecked();
-            return true ;
+            return true;
         } else {
-            return false ;
+            return false;
         }
     }
 
@@ -293,10 +301,10 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
      * @param letters Array of Strings for each letter in the clue
      */
     public void updateHangman(char[] letters) {
-        Log.d(LOG_TAG,"Updating hangman..." + String.valueOf(letters));
+        Log.d(LOG_TAG, "Updating hangman..." + String.valueOf(letters));
         this.hangmanLayout.removeAllViews();
         if (letters.length == 0) {
-            Log.d(LOG_TAG,"letters.length = 0");
+            Log.d(LOG_TAG, "letters.length = 0");
             return;
         }
         for (int i = 0; i < letters.length; i++) {
@@ -307,7 +315,7 @@ public class CrosswordPageFragment extends Fragment implements  View.OnClickList
     }
 
     private void addWordSplit() {
-        Log.d(LOG_TAG,"Add word split clicked");
+        Log.d(LOG_TAG, "Add word split clicked");
         if (crossword.isAddWordSplitActive()) {
             // Then deactivate it
             crossword.setAddWordSplitActive(false);

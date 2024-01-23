@@ -1,5 +1,4 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/view_pager"
     android:layout_width="match_parent"
@@ -14,10 +13,12 @@
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
+
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
             <GridLayout
                 android:id="@+id/crossword_grid"
                 android:layout_width="wrap_content"
@@ -26,8 +27,7 @@
                 android:columnCount="1"
                 android:rowCount="1"
                 android:padding="@dimen/grid_padding"
-                android:background="@color/black">
-            </GridLayout>
+                android:background="@color/black"></GridLayout>
 
             <ImageView
                 android:id="@+id/image_view_clues"
@@ -45,7 +45,7 @@
                 android:text="@string/take_clue_picture_prompt"
                 android:padding="@dimen/home_button_padding"
                 android:layout_margin="@dimen/home_button_padding"
-                android:onClick="takePictureClues"/>
+                android:onClick="takePictureClues" />
 
 
         </LinearLayout>

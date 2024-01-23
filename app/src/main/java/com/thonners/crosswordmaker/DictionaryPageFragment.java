@@ -8,9 +8,11 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+
 import androidx.fragment.app.Fragment;
 //import android.app.Fragment;
 import androidx.cardview.widget.CardView;
+
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -36,17 +38,17 @@ import android.widget.Toast;
 public class DictionaryPageFragment extends Fragment {
     private static final String LOG_TAG = "DictionaryFragment";
 
-    public static final int ENTRY_EXIT_ANIMATION_DURATION = 250 ;       // Duration of an entry/exit animation for the results cards
-    public static final int ENTRY_EXIT_ANIMATION_Y_TRANSLATE = 100 ;    // Y translation distance for an entry/exit animation for the results cards
-    public static final int ENTRY_EXIT_ANIMATION_STAGGER = 50 ;        // Delay duration between subsequent views for an entry/exit animation for the results cards
+    public static final int ENTRY_EXIT_ANIMATION_DURATION = 250;       // Duration of an entry/exit animation for the results cards
+    public static final int ENTRY_EXIT_ANIMATION_Y_TRANSLATE = 100;    // Y translation distance for an entry/exit animation for the results cards
+    public static final int ENTRY_EXIT_ANIMATION_STAGGER = 50;        // Delay duration between subsequent views for an entry/exit animation for the results cards
 
-    private Button searchButton ;
-    private EditText inputBox ;
-    private LinearLayout resultsLinearLayout ;
-    private LinearLayout progressLinearLayout ;
+    private Button searchButton;
+    private EditText inputBox;
+    private LinearLayout resultsLinearLayout;
+    private LinearLayout progressLinearLayout;
     private String searchTerm;
     private String searchPrefix = "define:";
-    private boolean searchMWUnderway = false ;
+    private boolean searchMWUnderway = false;
     private String lastSearch = null;
 
     private OnFragmentInteractionListener mListener;
@@ -86,7 +88,7 @@ public class DictionaryPageFragment extends Fragment {
         });
         resultsLinearLayout = (LinearLayout) view.findViewById(R.id.dictionary_results_layout);
         progressLinearLayout = (LinearLayout) view.findViewById(R.id.dictionary_header_progress);
-        return view ;
+        return view;
     }
 
 
@@ -177,15 +179,15 @@ public class DictionaryPageFragment extends Fragment {
                         resultsLinearLayout.addView(theFinalView);
                         // Get the individual cards, and animate them into view
                         if (theFinalView instanceof LinearLayout) {
-                            Log.d(LOG_TAG,"Animating results in...");
-                            for (int i = 0 ; i < theFinalView.getChildCount() ; i++) {
-                                View view = theFinalView.getChildAt(i) ;
+                            Log.d(LOG_TAG, "Animating results in...");
+                            for (int i = 0; i < theFinalView.getChildCount(); i++) {
+                                View view = theFinalView.getChildAt(i);
                                 view.animate()
                                         .translationY(0)
                                         .setDuration(ENTRY_EXIT_ANIMATION_DURATION)
                                         .alpha(1.0f)
                                         .setStartDelay(ENTRY_EXIT_ANIMATION_STAGGER * i)
-                                        .setListener(null) ;
+                                        .setListener(null);
                             }
                         }
                         break;
@@ -198,7 +200,7 @@ public class DictionaryPageFragment extends Fragment {
                         promptTV.animate()
                                 .setDuration(ENTRY_EXIT_ANIMATION_DURATION)
                                 .alpha(1.0f)
-                                .setListener(null) ;
+                                .setListener(null);
                         promptTV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -229,16 +231,16 @@ public class DictionaryPageFragment extends Fragment {
                                                         searchGoogle(searchTerm);
                                                     }
                                                 });
-                                                resultsLinearLayout.addView(searchGoogleCard,0);
+                                                resultsLinearLayout.addView(searchGoogleCard, 0);
                                                 searchGoogleCard.animate()
                                                         .alpha(1.0f)
                                                         .setDuration(ENTRY_EXIT_ANIMATION_DURATION)
                                                         .translationY(0)
-                                                        .setListener(null) ;
+                                                        .setListener(null);
 
                                                 Log.d(LOG_TAG, "Setting options to visible");
                                                 for (int i = 0; i < theFinalView.getChildCount(); i++) {
-                                                    View view = theFinalView.getChildAt(i) ;
+                                                    View view = theFinalView.getChildAt(i);
                                                     view.setAlpha(0.0f);
                                                     view.setTranslationY(ENTRY_EXIT_ANIMATION_Y_TRANSLATE);
                                                     if (view instanceof Card) {
@@ -263,7 +265,7 @@ public class DictionaryPageFragment extends Fragment {
                                                             .setDuration(ENTRY_EXIT_ANIMATION_DURATION)
                                                             .translationY(0)
                                                             .setStartDelay(ENTRY_EXIT_ANIMATION_STAGGER * i)
-                                                            .setListener(null) ;
+                                                            .setListener(null);
                                                 }
                                             }
 
@@ -298,7 +300,7 @@ public class DictionaryPageFragment extends Fragment {
                         resultsLinearLayout.addView(cardView);
                         break;
                 }
-                searchMWUnderway = false ;  // Reset to allow future searches
+                searchMWUnderway = false;  // Reset to allow future searches
             }
         };
         DictionaryMWDownloadDefinition definition = new DictionaryMWDownloadDefinition(getActivity(), query, progressLinearLayout, searchButton, listener);
@@ -313,12 +315,12 @@ public class DictionaryPageFragment extends Fragment {
 
     private void clearResultsView(boolean search) {
         // Get number of children to the view - use this to determine how deep need to go to get to the cards
-        if (resultsLinearLayout.getChildCount() > 0 ) {
+        if (resultsLinearLayout.getChildCount() > 0) {
             if (resultsLinearLayout.getChildAt(0) instanceof LinearLayout) {
-                LinearLayout resultsInnerLinearLayout = (LinearLayout) resultsLinearLayout.getChildAt(0) ;
-                animateViewsOutOfLayout(resultsInnerLinearLayout,search);
+                LinearLayout resultsInnerLinearLayout = (LinearLayout) resultsLinearLayout.getChildAt(0);
+                animateViewsOutOfLayout(resultsInnerLinearLayout, search);
             } else {
-                animateViewsOutOfLayout(resultsLinearLayout,search);
+                animateViewsOutOfLayout(resultsLinearLayout, search);
             }
         } else {
             search();
@@ -327,11 +329,11 @@ public class DictionaryPageFragment extends Fragment {
 
     private void animateViewsOutOfLayout(LinearLayout layout, boolean search) {
         // Prep the animator listener
-        Animator.AnimatorListener animatorListener = null ;
+        Animator.AnimatorListener animatorListener = null;
         // Counter for use in staggering the animation
-        int j = 0 ;
+        int j = 0;
         // Animate the views out
-        for (int i = layout.getChildCount() - 1 ; i >= 0 ; i--) {
+        for (int i = layout.getChildCount() - 1; i >= 0; i--) {
             // Create the listener if it's the final (ie. top) view
             if (i == 0 && search) {
                 animatorListener = new Animator.AnimatorListener() {
@@ -359,9 +361,9 @@ public class DictionaryPageFragment extends Fragment {
                     }
                 };
             }
-            View view = resultsLinearLayout.getChildAt(i) ;
+            View view = resultsLinearLayout.getChildAt(i);
             if (view != null) {
-                Log.d(LOG_TAG,"Animating view removal. childcount = " + layout.getChildCount());
+                Log.d(LOG_TAG, "Animating view removal. childcount = " + layout.getChildCount());
                 view.animate()
                         .setDuration(ENTRY_EXIT_ANIMATION_DURATION)
                         .alpha(0.0f)
@@ -369,7 +371,7 @@ public class DictionaryPageFragment extends Fragment {
                         .setStartDelay(ENTRY_EXIT_ANIMATION_STAGGER * j)
                         .setListener(animatorListener);
             }
-            j++ ;
+            j++;
         }
 
     }
@@ -383,12 +385,14 @@ public class DictionaryPageFragment extends Fragment {
     public void setSearchTerm(String searchTerm) {
         inputBox.setText(searchTerm);
     }
+
     public EditText getInputBox() {
         return inputBox;
     }
+
     public void inputBoxRequestFocus() {
         inputBox.requestFocus();
-        if(!searchMWUnderway) {
+        if (!searchMWUnderway) {
             inputBox.selectAll();
         }
     }

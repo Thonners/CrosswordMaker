@@ -2,7 +2,9 @@ package com.thonners.crosswordmaker;
 
 import android.content.Context;
 import android.os.Build;
+
 import androidx.cardview.widget.CardView;
+
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -14,7 +16,7 @@ import android.widget.TextView;
 
 /**
  * Class to be used in the known letters layout at the bottom of the manual anagram page.
- *
+ * <p>
  * Cardview to display hang-man like spaces, which the user can fill if letters are known.
  *
  * @author M Thomas
@@ -22,26 +24,27 @@ import android.widget.TextView;
  */
 public class ManualAnagramKnownLetterCardView extends CardView {
 
-    private final String LOG_TAG = "MAKnownCard" ;
+    private final String LOG_TAG = "MAKnownCard";
 
-    private LinearLayout parentView ;
-    private View mainView ;
-    private TextView tv ;
-    private String letter  = " ";
-    private int index ;
-    private boolean isActive  = false ;
+    private LinearLayout parentView;
+    private View mainView;
+    private TextView tv;
+    private String letter = " ";
+    private int index;
+    private boolean isActive = false;
 
     private ManualAnagramTextView associatedTV = null;
 
     /**
      * Constructor.
-     * @param context   Application context
-     * @param index     Index number of this view in the string of the answer.
+     *
+     * @param context Application context
+     * @param index   Index number of this view in the string of the answer.
      */
     public ManualAnagramKnownLetterCardView(Context context, int index) {
         super(context);
-        Log.d(LOG_TAG,"KnownCard created.");
-        this.index = index ;
+        Log.d(LOG_TAG, "KnownCard created.");
+        this.index = index;
         initialise(context);
     }
 
@@ -49,9 +52,11 @@ public class ManualAnagramKnownLetterCardView extends CardView {
         super(context);
         initialise(context);
     }
+
     public ManualAnagramKnownLetterCardView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
+
     public ManualAnagramKnownLetterCardView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
@@ -59,30 +64,33 @@ public class ManualAnagramKnownLetterCardView extends CardView {
     /**
      * Method to initialise the view.
      * TODO: Move the textView params to the xml.
-     * @param context   Application context
+     *
+     * @param context Application context
      */
     public void initialise(Context context) {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1f) ;
-        params.leftMargin = 2 ;
-        params.rightMargin = 2 ;
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
+        params.leftMargin = 2;
+        params.rightMargin = 2;
         params.bottomMargin = 3;
         this.setLayoutParams(params);
         tv = (TextView) ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.manual_anagram_known_letters_card_view, null);
-        LinearLayout.LayoutParams tvParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT) ;
+        LinearLayout.LayoutParams tvParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         tv.setGravity(Gravity.CENTER_HORIZONTAL);
-        this.addView(tv,tvParams) ;
+        this.addView(tv, tvParams);
         clearLetter();
     }
+
     public void setParentView(LinearLayout parentView) {
-        this.parentView = parentView ;
+        this.parentView = parentView;
     }
 
     public void setLetter(String letter) {
-        this.letter = letter ;
+        this.letter = letter;
         tv.setText(letter);
     }
+
     public void setLetter(ManualAnagramTextView textView) {
-        associatedTV = textView ;
+        associatedTV = textView;
         associatedTV.setLetterKnown();
         letter = associatedTV.getLetter();
         tv.setText(letter);
@@ -98,10 +106,10 @@ public class ManualAnagramKnownLetterCardView extends CardView {
     /**
      * Method to provide visual feedback to the user that this view is active - i.e. clicking a
      * letter's textView will result in that letter being assigned to this view.
-     *
+     * <p>
      * Show active by raising elevation of the card, or changing background colour, depending on
      * android version.
-     *
+     * <p>
      * If no longer active, clear feedback and reset to normal.
      */
     public void setIsActive(boolean isActive) {
@@ -126,13 +134,13 @@ public class ManualAnagramKnownLetterCardView extends CardView {
         if (associatedTV != null) {
             associatedTV.setLetterKnown(false);
         }
-        associatedTV = null ;
-        this.letter = " " ;
+        associatedTV = null;
+        this.letter = " ";
         tv.setText(" ");
     }
 
     public int getIndex() {
-        return index ;
+        return index;
     }
 
     public boolean isEmpty() {

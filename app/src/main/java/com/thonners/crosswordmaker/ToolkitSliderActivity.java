@@ -3,13 +3,16 @@ package com.thonners.crosswordmaker;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+
 import com.google.android.material.snackbar.Snackbar;
+
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,34 +26,34 @@ public class ToolkitSliderActivity extends AppCompatActivity implements Dictiona
 
     private static final String LOG_TAG = "ToolkitSliderActivity";
 
-    private static final int NUM_PAGES      = 4;     // Number of pages in the slider
-    private static final int MANUAL_ANAGRAM_TAB = 0 ;
-    private static final int DICTIONARY_TAB = 1 ;
-    private static final int ANAGRAM_TAB    = 2 ;
-    private static final int WIKI_TAB = 3 ;
+    private static final int NUM_PAGES = 4;     // Number of pages in the slider
+    private static final int MANUAL_ANAGRAM_TAB = 0;
+    private static final int DICTIONARY_TAB = 1;
+    private static final int ANAGRAM_TAB = 2;
+    private static final int WIKI_TAB = 3;
 
-    private ViewPager pager ;               // Handles the transition between fragments
-    private PagerAdapter pagerAdapter ;     // Provides the pages for the pager
+    private ViewPager pager;               // Handles the transition between fragments
+    private PagerAdapter pagerAdapter;     // Provides the pages for the pager
 
-    private boolean dontShowKeyboard = false ;
+    private boolean dontShowKeyboard = false;
 
-    private CharSequence[] tabTitles ;
+    private CharSequence[] tabTitles;
 
     // Fragments
-    private ManualAnagramPageFragment manualAnagramPageFragment ;
-    private DictionaryPageFragment dictionaryPageFragment ;
-    private AnagramPageFragment anagramPageFragment ;
+    private ManualAnagramPageFragment manualAnagramPageFragment;
+    private DictionaryPageFragment dictionaryPageFragment;
+    private AnagramPageFragment anagramPageFragment;
     private WikiPageFragment wikiPageFragment;
 
-    private boolean firstVisitManualAnagram = true ;
+    private boolean firstVisitManualAnagram = true;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crosword_slider);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        initialise() ;
+        initialise();
 
     }
 
@@ -75,16 +78,16 @@ public class ToolkitSliderActivity extends AppCompatActivity implements Dictiona
                 break;
             case R.id.action_instructions:
                 // Show instructions dialog/activity
-                showInstructions() ;
+                showInstructions();
                 break;
             case R.id.action_about:
                 // Show 'About' Dialog
-                 HomeActivity.showAboutDialog(this);
+                HomeActivity.showAboutDialog(this);
                 break;
             case R.id.action_settings:
                 // Open some settings menu
-                 HomeActivity.openSettings(this);
-                break ;
+                HomeActivity.openSettings(this);
+                break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -93,6 +96,7 @@ public class ToolkitSliderActivity extends AppCompatActivity implements Dictiona
     public interface OnFragmentInteractionListener {
         public void onFragmentInteraction(Uri uri);
     }
+
     public void onFragmentInteraction(Uri uri) {
         Log.d(LOG_TAG, "onFragmentInteraction called");
     }
@@ -105,10 +109,8 @@ public class ToolkitSliderActivity extends AppCompatActivity implements Dictiona
         pager.setOffscreenPageLimit(NUM_PAGES);
         pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onPageScrollStateChanged(int state)
-            {
-                if (state == ViewPager.SCROLL_STATE_IDLE)
-                {
+            public void onPageScrollStateChanged(int state) {
+                if (state == ViewPager.SCROLL_STATE_IDLE) {
                     switch (pager.getCurrentItem()) {
                         case MANUAL_ANAGRAM_TAB:
                             // Show the snackbar if it's the first time the fragment has been seen
@@ -118,11 +120,11 @@ public class ToolkitSliderActivity extends AppCompatActivity implements Dictiona
                                 manualAnagramPageFragment.inputBoxRequestFocus();
                                 showKeyboard(manualAnagramPageFragment.getInputBox());
                             }
-                            break ;
+                            break;
                         case DICTIONARY_TAB:
                             dictionaryPageFragment.inputBoxRequestFocus();
                             if (dontShowKeyboard) {
-                                dontShowKeyboard = false ;  // Reset for next time
+                                dontShowKeyboard = false;  // Reset for next time
                             } else {
                                 showKeyboard(dictionaryPageFragment.getInputBox());
                             }
@@ -138,10 +140,12 @@ public class ToolkitSliderActivity extends AppCompatActivity implements Dictiona
 
                 }
             }
+
             @Override
             public void onPageSelected(int position) {
                 // Empty required method
             }
+
             @Override
             public void onPageScrolled(int position, float offset, int offsetPixels) {
                 // Empty required method
@@ -151,6 +155,7 @@ public class ToolkitSliderActivity extends AppCompatActivity implements Dictiona
         tabTitles = getResources().getTextArray(R.array.tab_titles_toolkit);
 
     }
+
     private void hideKeyboard() {
         // Method to hide the keyboard
         InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -163,6 +168,7 @@ public class ToolkitSliderActivity extends AppCompatActivity implements Dictiona
         InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
     }
+
     /**
      * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in
      * sequence.
@@ -177,10 +183,10 @@ public class ToolkitSliderActivity extends AppCompatActivity implements Dictiona
 
             switch (position) {
                 case MANUAL_ANAGRAM_TAB:
-                    manualAnagramPageFragment = new ManualAnagramPageFragment() ;
-                    return manualAnagramPageFragment ;
+                    manualAnagramPageFragment = new ManualAnagramPageFragment();
+                    return manualAnagramPageFragment;
                 case DICTIONARY_TAB:
-                    dictionaryPageFragment = new DictionaryPageFragment() ;
+                    dictionaryPageFragment = new DictionaryPageFragment();
                     return dictionaryPageFragment;
                 case ANAGRAM_TAB:
                     anagramPageFragment = new AnagramPageFragment();
@@ -214,20 +220,21 @@ public class ToolkitSliderActivity extends AppCompatActivity implements Dictiona
         // Run search
         dictionaryPageFragment.searchClicked();
         // Make sure keyboard isn't shown, as search term is already in box
-        dontShowKeyboard = true ;
+        dontShowKeyboard = true;
         // Change to dictionary tab
         pager.setCurrentItem(DICTIONARY_TAB, true);
     }
 
     private void showInstructions() {
-        InstructionsDialog dialog = new InstructionsDialog() ;
+        InstructionsDialog dialog = new InstructionsDialog();
         dialog.show(getSupportFragmentManager(), getResources().getString(R.string.instructions));
     }
+
     private void showInstructionsSnackbar() {
         // Set to false to prevent snackbar being shown again
-        firstVisitManualAnagram = false ;
+        firstVisitManualAnagram = false;
         // Create & show the snackbar
-        Snackbar.make(pager,R.string.snackbar_instructions,Snackbar.LENGTH_LONG).setAction(R.string.show, new View.OnClickListener() {
+        Snackbar.make(pager, R.string.snackbar_instructions, Snackbar.LENGTH_LONG).setAction(R.string.show, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showInstructions();

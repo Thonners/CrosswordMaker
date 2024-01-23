@@ -3,7 +3,9 @@ package com.thonners.crosswordmaker;
 import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
+
 import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +17,7 @@ import android.webkit.WebViewClient;
 public class WikiPageFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
-    private WebView webView ;
+    private WebView webView;
 
     public WikiPageFragment() {
         // Required empty public constructor
@@ -65,7 +67,6 @@ public class WikiPageFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         public void onFragmentInteraction(Uri uri);
     }
-
 
 
 }

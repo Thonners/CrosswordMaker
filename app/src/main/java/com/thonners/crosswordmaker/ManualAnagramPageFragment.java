@@ -4,10 +4,13 @@ import android.animation.Animator;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+
 import androidx.fragment.app.Fragment;
 import androidx.legacy.widget.Space;
+
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -27,7 +30,7 @@ import java.util.Random;
 
 /**
  * Page Fragment for manual anagram solving.
- *
+ * <p>
  * After the user enters the letters they wish to anagram, shuffles the letters and displays them in
  * a circle
  *
@@ -36,20 +39,20 @@ import java.util.Random;
  */
 public class ManualAnagramPageFragment extends Fragment {
 
-    private static final String LOG_TAG = "ManualAnagram" ;
+    private static final String LOG_TAG = "ManualAnagram";
     private OnManualAnagramFragmentListener mListener;
 
-    private Button shuffleButton ;
+    private Button shuffleButton;
     private FloatingActionButton reshuffleFAB;
-    private EditText inputBox ;
-    private RelativeLayout fragmentParentLayout ;
-    private RelativeLayout outputParentLayout ;
-    private LinearLayout knownLettersLayout ;
-    private boolean shuffleActive = true ; // if true, shuffle button shuffles, if false, button clears editText
-    private ManualAnagramTextView textViews[] ;
+    private EditText inputBox;
+    private RelativeLayout fragmentParentLayout;
+    private RelativeLayout outputParentLayout;
+    private LinearLayout knownLettersLayout;
+    private boolean shuffleActive = true; // if true, shuffle button shuffles, if false, button clears editText
+    private ManualAnagramTextView textViews[];
 
-    private ManualAnagramKnownLetterCardView activeKnownLetterCard = null ;
-    private ManualAnagramTextView activeLetterTV = null ;
+    private ManualAnagramKnownLetterCardView activeKnownLetterCard = null;
+    private ManualAnagramTextView activeLetterTV = null;
 
     /**
      * Required empty constructor
@@ -60,6 +63,7 @@ public class ManualAnagramPageFragment extends Fragment {
 
     /**
      * Standard Method. Over-ridden just because.
+     *
      * @param savedInstanceState
      */
     @Override
@@ -71,6 +75,7 @@ public class ManualAnagramPageFragment extends Fragment {
 
     /**
      * Standard Method. Used to get the instances of the various views, buttons, etc.
+     *
      * @param inflater
      * @param container
      * @param savedInstanceState
@@ -103,7 +108,7 @@ public class ManualAnagramPageFragment extends Fragment {
         inputBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(LOG_TAG,"inputBox clicked, clearing FAB...");
+                Log.d(LOG_TAG, "inputBox clicked, clearing FAB...");
                 hideReshuffleFAB();
             }
         });
@@ -117,7 +122,7 @@ public class ManualAnagramPageFragment extends Fragment {
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 // Text has been changed, so force shuffle/clear functionality back to 'shuffle'
                 shuffleButton.setText(R.string.shuffle);
-                shuffleActive = true ;
+                shuffleActive = true;
                 Log.d(LOG_TAG, "onTextChanged() has been called, so changing shufleActive back to true");
             }
 
@@ -127,33 +132,34 @@ public class ManualAnagramPageFragment extends Fragment {
             }
         });
         outputParentLayout = (RelativeLayout) view.findViewById(R.id.manual_anagram_results);
-        reshuffleFAB = (FloatingActionButton) view.findViewById(R.id.manual_anagram_fab) ;
+        reshuffleFAB = (FloatingActionButton) view.findViewById(R.id.manual_anagram_fab);
         reshuffleFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(LOG_TAG,"Shuffle FAB clicked.");
+                Log.d(LOG_TAG, "Shuffle FAB clicked.");
                 reshuffleClicked();
             }
         });
         reshuffleFAB.setTranslationX(100);
-        knownLettersLayout = (LinearLayout) view.findViewById(R.id.manual_anagram_known_letters_layout) ;
+        knownLettersLayout = (LinearLayout) view.findViewById(R.id.manual_anagram_known_letters_layout);
 
         fragmentParentLayout = (RelativeLayout) view.findViewById(R.id.fragment_parent_layout);
 
-        return view ;
+        return view;
     }
 
     private void showInstructionsSnackbar() {
         // Show a snackbar about the instructions
-        Snackbar snackbar = Snackbar.make(fragmentParentLayout,getResources().getString(R.string.tutorial_snackbar_message),Snackbar.LENGTH_LONG) ;
+        Snackbar snackbar = Snackbar.make(fragmentParentLayout, getResources().getString(R.string.tutorial_snackbar_message), Snackbar.LENGTH_LONG);
         snackbar.setAction(getResources().getText(R.string.show), new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showInstructions() ;
+                showInstructions();
             }
-        }) ;
+        });
         snackbar.show();
     }
+
     /**
      * Method to be called once the shuffle button is clicked. Restructuring required.
      */
@@ -162,8 +168,8 @@ public class ManualAnagramPageFragment extends Fragment {
             // Ensure the knownLetterLayout is cleared
             removeKnownLetterViews();
             // Get the string to be anagrammed
-            String anagram = inputBox.getText().toString().toUpperCase().replaceAll("\\s", "") ;
-            int anagramLength = anagram.length() ;
+            String anagram = inputBox.getText().toString().toUpperCase().replaceAll("\\s", "");
+            int anagramLength = anagram.length();
             if (anagramLength > 0) {
                 populateKnownLettersLayout(anagramLength);
                 createTextViews();
@@ -198,7 +204,7 @@ public class ManualAnagramPageFragment extends Fragment {
 
     /**
      * Method to create the textviews which are to be shown in the main results view.
-     *
+     * <p>
      * Hides the keyboard, clears the results so it's ready for the newly created letters.
      */
     private void createTextViews() {
@@ -241,7 +247,7 @@ public class ManualAnagramPageFragment extends Fragment {
         shuffleArray(textViews);
 
         // Reposition the view
-        for (int i = 0 ; i < textViews.length ; i++) {
+        for (int i = 0; i < textViews.length; i++) {
             textViews[i].setLetterNo(i);
             textViews[i].draw(getAnchorID());
         }
@@ -255,15 +261,16 @@ public class ManualAnagramPageFragment extends Fragment {
 
     /**
      * Method to shuffle the order of the given array
+     *
      * @param array The array to be shuffled
      */
     private void shuffleArray(ManualAnagramTextView[] array) {
-        Random random = new Random() ;
-        for (int i = array.length - 1 ; i > 0 ; i--) {
-            int index = random.nextInt(i + 1) ;
-            ManualAnagramTextView tempTV = array[index] ;
-            array[index] = array[i] ;
-            array[i] = tempTV ;
+        Random random = new Random();
+        for (int i = array.length - 1; i > 0; i--) {
+            int index = random.nextInt(i + 1);
+            ManualAnagramTextView tempTV = array[index];
+            array[index] = array[i];
+            array[i] = tempTV;
         }
     }
 
@@ -285,7 +292,7 @@ public class ManualAnagramPageFragment extends Fragment {
 
                     @Override
                     public void onAnimationEnd(Animator animator) {
-                        clearShuffledViewChildren() ;
+                        clearShuffledViewChildren();
 
                     }
 
@@ -315,7 +322,7 @@ public class ManualAnagramPageFragment extends Fragment {
      * Method to hide the keyboard.
      */
     private void hideKeyboard() {
-    // Method to hide the keyboard
+        // Method to hide the keyboard
         InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
@@ -331,6 +338,7 @@ public class ManualAnagramPageFragment extends Fragment {
 
     /**
      * Returns the instance of the EditText inputBox
+     *
      * @return the EditText instance of the search box.
      */
     public EditText getInputBox() {
@@ -340,50 +348,52 @@ public class ManualAnagramPageFragment extends Fragment {
     /**
      * Method to return the ID of the anchor view - a blank space which will position itself in the
      * centre of the main results view.
+     *
      * @return The int ID of the anchor view
      */
     private int getAnchorID() {
-        Space anchor = new Space(getActivity()) ;
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(0,0);
+        Space anchor = new Space(getActivity());
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(0, 0);
         params.addRule(RelativeLayout.CENTER_IN_PARENT);
-        outputParentLayout.addView(anchor,params);
+        outputParentLayout.addView(anchor, params);
         anchor.setId(100);
-        return anchor.getId() ;
+        return anchor.getId();
     }
 
     /**
      * Method to create the blank KnownLetterCardViews at the bottom of the view.
-     *
+     * <p>
      * Adds onClickListeners to the views to let the user click them, then set the known letter.
+     *
      * @param letterCount The number of letters in the anagram.
      */
     private void populateKnownLettersLayout(int letterCount) {
-        Log.d(LOG_TAG,"Adding known letter empty cards. Lettercount = " + letterCount);
+        Log.d(LOG_TAG, "Adding known letter empty cards. Lettercount = " + letterCount);
         // Clear known letters from old instances. This should also move it off the screen
         clearKnownLetterLayout();
         // Create an array in which to hold the Cards
-        ManualAnagramKnownLetterCardView[] knownLetterCards = new ManualAnagramKnownLetterCardView[letterCount] ;
+        ManualAnagramKnownLetterCardView[] knownLetterCards = new ManualAnagramKnownLetterCardView[letterCount];
         // Cycle through the number of letters and create a card for each one. Add this to the layout, giving it an index appropriately.
-        for (int i = 0 ; i < letterCount ; i++) {
-            Log.d(LOG_TAG,"1. i = " + i);
-            knownLetterCards[i] = new ManualAnagramKnownLetterCardView(getActivity(), i) ;
+        for (int i = 0; i < letterCount; i++) {
+            Log.d(LOG_TAG, "1. i = " + i);
+            knownLetterCards[i] = new ManualAnagramKnownLetterCardView(getActivity(), i);
             knownLetterCards[i].initialise(getActivity());
-            Log.d(LOG_TAG,"2. i = " + i);
+            Log.d(LOG_TAG, "2. i = " + i);
             knownLetterCards[i].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    knownLetterCardClicked((ManualAnagramKnownLetterCardView) view) ;
+                    knownLetterCardClicked((ManualAnagramKnownLetterCardView) view);
                 }
             });
             knownLetterCards[i].setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
-                    knownLetterCardLongClicked((ManualAnagramKnownLetterCardView) view) ;
-                    return true ;
+                    knownLetterCardLongClicked((ManualAnagramKnownLetterCardView) view);
+                    return true;
                 }
             });
 
-            knownLettersLayout.addView(knownLetterCards[i],i);
+            knownLettersLayout.addView(knownLetterCards[i], i);
         }
         knownLettersLayout.animate()
                 .setDuration(350)
@@ -394,10 +404,11 @@ public class ManualAnagramPageFragment extends Fragment {
     /**
      * Method to make a note of which ManualAnagramKnownLetterCardView has been touched, so it can be
      * set to the correct letter when selected by the user.
+     *
      * @param newKnownLetterCard The ManualAnagramKnownLetterCardView touched by the user.
      */
     private void knownLetterCardClicked(ManualAnagramKnownLetterCardView newKnownLetterCard) {
-        Log.d(LOG_TAG,"ActiveKnownLetterCard clicked") ;
+        Log.d(LOG_TAG, "ActiveKnownLetterCard clicked");
         if (activeKnownLetterCard != null && activeKnownLetterCard.getIndex() == newKnownLetterCard.getIndex()) {
             // If the card clicked is already high-lighted, clear the highlight
             clearActiveKnownLetterCard();
@@ -428,9 +439,10 @@ public class ManualAnagramPageFragment extends Fragment {
 
     /**
      * Method to handle a user long-clicking a known letter card.
-     *
+     * <p>
      * If the card is empty, offer option to add hyphen/slash to the right - for compound words.
      * If the card already has a letter, clear it and reset the view to its original state.
+     *
      * @param knownLetterCardView The knownLetterCard that has been long clicked.
      */
     private void knownLetterCardLongClicked(ManualAnagramKnownLetterCardView knownLetterCardView) {
@@ -443,6 +455,7 @@ public class ManualAnagramPageFragment extends Fragment {
             knownLetterCardView.clearLetter();
         }
     }
+
     /**
      * Clears the active known letter card, so that touching a results letter will not result in any action.
      */
@@ -452,11 +465,12 @@ public class ManualAnagramPageFragment extends Fragment {
             activeKnownLetterCard.setIsActive(false);
         }
         // Set the active card to null
-        activeKnownLetterCard = null ;
+        activeKnownLetterCard = null;
     }
 
     /**
      * Method to set the letter of a known letter card manualAnagramTextView.
+     *
      * @param manualAnagramTextView The letter's TextView in the main results layout.
      */
     private void letterTVClicked(ManualAnagramTextView manualAnagramTextView) {
@@ -499,7 +513,7 @@ public class ManualAnagramPageFragment extends Fragment {
             activeLetterTV.setTypeface(null, Typeface.NORMAL);
         }
         // Clear the active TV
-        activeLetterTV = null ;
+        activeLetterTV = null;
     }
 
     /**
@@ -542,6 +556,7 @@ public class ManualAnagramPageFragment extends Fragment {
         // Remove all the cards from the known letters layout
         knownLettersLayout.removeAllViews();
     }
+
     /**
      * Method to remove the reshuffle FAB from view.
      * Should be used whenever the FAB should not be visible, i.e. when the keyboard is up, or there are no letters to display
@@ -555,12 +570,12 @@ public class ManualAnagramPageFragment extends Fragment {
                 .setListener(new Animator.AnimatorListener() {
                     @Override
                     public void onAnimationStart(Animator animator) {
-                        Log.d(LOG_TAG,"hideReshuffleFAB animation starting...");
+                        Log.d(LOG_TAG, "hideReshuffleFAB animation starting...");
                     }
 
                     @Override
                     public void onAnimationEnd(Animator animator) {
-                        Log.d(LOG_TAG,"hideReshuffleFAB animation done.");
+                        Log.d(LOG_TAG, "hideReshuffleFAB animation done.");
                         // Set visibility to gone
                         reshuffleFAB.setVisibility(View.GONE);
                     }
@@ -594,6 +609,6 @@ public class ManualAnagramPageFragment extends Fragment {
 
 
     private void showInstructions() {
-        Log.d(LOG_TAG, "Would show manual anagram instructions now") ;
+        Log.d(LOG_TAG, "Would show manual anagram instructions now");
     }
 }

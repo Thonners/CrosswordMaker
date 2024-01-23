@@ -14,23 +14,23 @@ import android.widget.EditText;
 /**
  * Created by mat on 30/11/14.
  */
-public class Cell extends EditText implements View.OnClickListener, View.OnFocusChangeListener , TextWatcher {
+public class Cell extends EditText implements View.OnClickListener, View.OnFocusChangeListener, TextWatcher {
 
-    private static final String LOG_TAG = "Cell" ;
+    private static final String LOG_TAG = "Cell";
 
-    private Crossword crossword ;
+    private Crossword crossword;
 
-    private int row ;
-    private int column ;
-    private String cellName ; // String to make it quicker to include in debugging. Format (X,Y)
+    private int row;
+    private int column;
+    private String cellName; // String to make it quicker to include in debugging. Format (X,Y)
 
-    private Clue hClue = null ;  // Horizontal clue to which cell belongs - initialise as null, and set later if required.
-    private Clue vClue = null  ; // Vertical clue to which cell belongs
-    private Clue activeClue = null  ; // Set the active clue so that cell focus can move as input is done
-    private CellView cellView = null ;
+    private Clue hClue = null;  // Horizontal clue to which cell belongs - initialise as null, and set later if required.
+    private Clue vClue = null; // Vertical clue to which cell belongs
+    private Clue activeClue = null; // Set the active clue so that cell focus can move as input is done
+    private CellView cellView = null;
 
-    public boolean[] hyphens = new boolean[4] ;
-    public boolean[] wordSplits = new boolean[4] ;
+    public boolean[] hyphens = new boolean[4];
+    public boolean[] wordSplits = new boolean[4];
 
     public enum CellSide {
         LEFT,
@@ -39,25 +39,25 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
         BOTTOM;
     }
 
-    private int maxLength = 1 ; // Max number of letters in the editText
+    private int maxLength = 1; // Max number of letters in the editText
     private InputFilter[] whiteCellInputFilter = {new InputFilter.AllCaps(), new InputFilter.LengthFilter(maxLength), new InputFilter() {
         @Override
         public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
 
             // Input filter ensures that letter entered is a letter. Sets it to "" (i.e. nothing) if not.
-            for (int i = start ; i < end ; i++){
-                if (!Character.isLetter(source.charAt(start))){
+            for (int i = start; i < end; i++) {
+                if (!Character.isLetter(source.charAt(start))) {
                     return "";
                 }
             }
 
             return null;
         }
-    }} ;
+    }};
 
-    private boolean blackCell ;
-    public Character value ;
-    public boolean gridMakingPhase = true ;    // If gridMakingPhase, clicking on a cell changes it from black to white
+    private boolean blackCell;
+    public Character value;
+    public boolean gridMakingPhase = true;    // If gridMakingPhase, clicking on a cell changes it from black to white
 
     // Constructor:
     // For creating the initial grid, all cells start life as white cells
@@ -65,53 +65,56 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
         super(context);
         setCrossword(crossword);
 
-        this.cellView = cellView ;
-        setRow(r) ;
+        this.cellView = cellView;
+        setRow(r);
         setColumn(c);
-        setCellName(row,column);
-        setBlackCellStatus(false) ; // Force all cells to start life white
+        setCellName(row, column);
+        setBlackCellStatus(false); // Force all cells to start life white
 
         this.setBackground(getResources().getDrawable(R.drawable.cell_white));
         this.setTextColor(context.getResources().getColor(R.color.black));
         this.setClickable(true);
         this.setFocusable(false);   // Initialise as false for gridMaker
-        this.setPadding(0,0,0,0);
+        this.setPadding(0, 0, 0, 0);
         this.setGravity(Gravity.CENTER);
         this.setSelectAllOnFocus(true);         // Will select text on focus so user doesn't need to delete previous text if incorrect
         this.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
 
         setOnClickListener(this);
         setOnFocusChangeListener(this);
-      //  setOnKeyListener(this);
+        //  setOnKeyListener(this);
     }
 
     // Maybe for creating the grid after user has made choices (/when camera has worked it out)
     public Cell(Context context, Crossword crossword, int r, int c, boolean blackCellIn) {
         super(context);
 
-        row = r ;
-        column = c ;
+        row = r;
+        column = c;
         blackCell = blackCellIn;
 
         this.setBackground(getResources().getDrawable(R.drawable.cell_white));
     }
 
     private void setCrossword(Crossword cwd) {
-        this.crossword = cwd ;
+        this.crossword = cwd;
     }
 
     private void setBlackCell() {
         this.setBackground(getResources().getDrawable(R.drawable.cell_black));
     }
+
     private void setWhiteCell() {
         this.setBackground(getResources().getDrawable(R.drawable.cell_white));
     }
+
     public void setFocusedMajor() {
-        if (! this.hasFocus()) {
+        if (!this.hasFocus()) {
             requestFocus();
         }
         this.setBackground(getResources().getDrawable(R.drawable.cell_focus_main));
     }
+
     public void setFocusedMinor() {
         // Make sure it's not a black cell, as this can get called when doing hyphens/word splits
         if (!isBlackCell()) {
@@ -120,7 +123,7 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
     }
 
     public void toggleBlackCell() {
-        blackCell = ! blackCell ;
+        blackCell = !blackCell;
 
         if (blackCell) {
             setBlackCell();
@@ -133,11 +136,11 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
     // During grid creation phase toggle black cell. During normal operation, swap clue orientation
     @Override
     public void onClick(View view) {
-        if(gridMakingPhase) {
-            Log.d("GridMakingPhase","Trying to toggleBlackCell()");
+        if (gridMakingPhase) {
+            Log.d("GridMakingPhase", "Trying to toggleBlackCell()");
             toggleBlackCell();
             crossword.toggleOppositeBlackCell(this);    // Get crossword to toggleBlackCell of the cell rotationally opposite this one
-            return ;
+            return;
         }
 
         // If in crossword filling mode, and cell clicked, change clue orientation
@@ -147,7 +150,7 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
 
     // For highlighting active cell & clue during normal operation
     @Override
-    public void onFocusChange(View view, boolean hasFocus){
+    public void onFocusChange(View view, boolean hasFocus) {
         // To change cell highlight if cell has focus
         if (hasFocus) {
 
@@ -184,8 +187,8 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
 
     // For moving on to the next cell once a character has been entered
     @Override
-    public void onTextChanged(CharSequence s, int start,int before, int count){
-        if(activeClue != null) {
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        if (activeClue != null) {
             if (this.getText().toString().length() == maxLength) {
                 activeClue.highlightNextCell(this);
             }
@@ -197,21 +200,23 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
             // Hide the keyboard if the last cell in the clue is completed
             HomeActivity.hideKeyboard(getContext(), this);
             // Check whether this is the last clue to be completed
-            crossword.checkIsComplete() ;
+            crossword.checkIsComplete();
         }
 
     }
+
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
     }
+
     public void afterTextChanged(Editable s) {
     }
 
-    public void setGridMakingPhase(Boolean isGridMakingPhase){
-        gridMakingPhase = isGridMakingPhase ;
+    public void setGridMakingPhase(Boolean isGridMakingPhase) {
+        gridMakingPhase = isGridMakingPhase;
     }
 
     public void setWhiteCellsEditable() {
-        if (! blackCell) {
+        if (!blackCell) {
             // Set focusable if white cell so that text can be edited
             this.setFocusable(true);
             this.setFocusableInTouchMode(true);
@@ -238,59 +243,72 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
         }
     }
 
-    public void setBlackCellStatus(boolean isBlackCell){
-        this.blackCell = isBlackCell ;
+    public void setBlackCellStatus(boolean isBlackCell) {
+        this.blackCell = isBlackCell;
     }
+
     public void setColumn(int col) {
-        this.column = col ;
+        this.column = col;
     }
-    public void setRow (int row) {
-        this.row = row ;
+
+    public void setRow(int row) {
+        this.row = row;
     }
+
     public void setCellName(int row, int col) {
-        this.cellName = "(" + row + "," + col + ")" ;
+        this.cellName = "(" + row + "," + col + ")";
     }
 
     public String getCellName() {
-        return cellName ;
+        return cellName;
     }
+
     public int getCellId(int rowCount) {
-        return (this.row * rowCount + column) ;     // Cells are numbered from 0 through to rowCount^2 -1
+        return (this.row * rowCount + column);     // Cells are numbered from 0 through to rowCount^2 -1
     }
+
     public int getRow() {
-        return this.row ;
+        return this.row;
     }
+
     public int getColumn() {
-        return this.column ;
+        return this.column;
     }
+
     public boolean isBlackCell() {
-        return blackCell ;
+        return blackCell;
     }
+
     public void setHClue(Clue clue) {
-        hClue = clue ;
+        hClue = clue;
     }
+
     public void setVClue(Clue clue) {
-        vClue = clue ;
+        vClue = clue;
     }
+
     public boolean hasHorizontalClue() {
         if (hClue == null) {
-            return false ;
+            return false;
         } else {
-            return true ;
+            return true;
         }
     }
+
     public boolean hasVerticalClue() {
         if (vClue == null) {
-            return false ;
+            return false;
         } else {
-            return true ;
+            return true;
         }
     }
+
     public void clearHighlighting() {
         setWhiteCell();
     }
+
     public void setActiveClue(Clue clue) {
-        activeClue = clue ;
+        activeClue = clue;
     }
 
     /**
@@ -299,7 +317,7 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
      * @return Boolean of whether this cell is empty
      */
     public boolean isEmpty() {
-        return this.getText().toString().isEmpty() ;
+        return this.getText().toString().isEmpty();
     }
 
     public void addHyphen(CellSide side) {
@@ -313,6 +331,7 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
         }
         wordSplits[side.ordinal()] = false;
     }
+
     public void addWordSplit(CellSide side, int cellWidth) {
         if (wordSplits[side.ordinal()]) {
             // If it's already active, remove it this time

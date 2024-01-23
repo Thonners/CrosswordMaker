@@ -8,8 +8,7 @@
     android:layout_height="match_parent">
 
 
-    <androidx.cardview.widget.CardView
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/home_card_toolkit"
         android:layout_gravity="center"
         android:layout_width="fill_parent"
@@ -27,6 +26,7 @@
             android:clickable="true"
             android:onClick="toolkitClicked"
             android:padding="@dimen/home_card_padding">
+
             <TextView
                 android:id="@+id/toolkit_tv1"
                 android:layout_width="match_parent"
@@ -35,7 +35,8 @@
                 android:textSize="@dimen/home_card_text_size_main"
                 android:textStyle="bold"
                 android:textColor="@color/text_default"
-                android:layout_alignParentTop="true"/>
+                android:layout_alignParentTop="true" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -43,17 +44,17 @@
                 android:textSize="@dimen/home_card_text_size_minor"
                 android:textStyle="normal"
                 android:textColor="@color/text_default"
-                android:layout_below="@+id/toolkit_tv1"/>
+                android:layout_below="@+id/toolkit_tv1" />
+
             <ImageView
                 android:layout_width="@dimen/home_card_icon_size"
                 android:layout_height="@dimen/home_card_icon_size"
                 android:layout_alignParentRight="true"
-                android:src="@drawable/ic_tools"/>
+                android:src="@drawable/ic_tools" />
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 
-    <androidx.cardview.widget.CardView
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/home_card_new"
         android:layout_gravity="center"
         android:layout_width="fill_parent"
@@ -71,6 +72,7 @@
             android:clickable="true"
             android:onClick="newClicked"
             android:padding="@dimen/home_card_padding">
+
             <TextView
                 android:id="@+id/home_card_new_tv1"
                 android:layout_width="match_parent"
@@ -79,7 +81,8 @@
                 android:textSize="@dimen/home_card_text_size_main"
                 android:textStyle="bold"
                 android:textColor="@color/text_default"
-                android:layout_alignParentTop="true"/>
+                android:layout_alignParentTop="true" />
+
             <TextView
                 android:id="@+id/home_card_new_tv2"
                 android:layout_width="match_parent"
@@ -88,18 +91,18 @@
                 android:textSize="@dimen/home_card_text_size_minor"
                 android:textStyle="normal"
                 android:textColor="@color/text_default"
-                android:layout_below="@+id/home_card_new_tv1"/>
+                android:layout_below="@+id/home_card_new_tv1" />
+
             <ImageView
                 android:layout_width="@dimen/home_card_icon_size"
                 android:layout_height="@dimen/home_card_icon_size"
                 android:layout_alignParentRight="true"
-                android:src="@drawable/home_new"/>
+                android:src="@drawable/home_new" />
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 
 
-    <androidx.cardview.widget.CardView
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/home_card_recent"
         android:layout_gravity="center"
         android:layout_width="fill_parent"
@@ -110,18 +113,19 @@
         android:layout_marginRight="@dimen/home_card_margin">
 
         <RelativeLayout
-        android:id="@+id/home_card_recent_layout"
+            android:id="@+id/home_card_recent_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:padding="@dimen/home_card_padding">
+
             <ImageView
                 android:id="@+id/home_recent_icon"
                 android:layout_width="@dimen/home_card_icon_size"
                 android:layout_height="@dimen/home_card_icon_size"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:src="@drawable/home_recent"/>
+                android:src="@drawable/home_recent" />
 
             <TextView
                 android:id="@+id/home_recent_title"
@@ -131,8 +135,8 @@
                 android:textSize="@dimen/home_card_text_size_main"
                 android:layout_alignParentTop="true"
                 android:textStyle="bold"
-                android:textColor="@color/text_default"
-                />
+                android:textColor="@color/text_default" />
+
             <TextView
                 android:id="@+id/home_recent_title2"
                 android:layout_width="match_parent"
@@ -141,20 +145,22 @@
                 android:textSize="@dimen/home_card_text_size_minor"
                 android:textColor="@color/text_default"
                 android:layout_below="@+id/home_recent_title"
-                android:textStyle="normal"/>
-            <androidx.cardview.widget.CardView
-                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:textStyle="normal" />
+
+            <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/home_card_recent_1"
                 android:layout_gravity="center"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/home_recent_icon"
                 card_view:cardCornerRadius="0dp">
+
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:padding="@dimen/home_card_padding">
+
                     <TextView
                         android:id="@+id/home_card_recent_1_title"
                         android:layout_width="match_parent"
@@ -163,7 +169,8 @@
                         android:text="@string/home_recent_none1"
                         android:textSize="@dimen/home_card_text_size_main"
                         android:textStyle="normal"
-                        android:textColor="@color/text_default"/>
+                        android:textColor="@color/text_default" />
+
                     <TextView
                         android:id="@+id/home_card_recent_1_date"
                         android:layout_width="match_parent"
@@ -172,22 +179,24 @@
                         android:text="@string/home_recent_none2"
                         android:textSize="@dimen/home_card_text_size_minor"
                         android:textColor="@color/text_default"
-                        android:textStyle="normal"/>
+                        android:textStyle="normal" />
                 </RelativeLayout>
             </androidx.cardview.widget.CardView>
-            <androidx.cardview.widget.CardView
-                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+
+            <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/home_card_recent_2"
                 android:layout_gravity="center"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/home_card_recent_1"
                 card_view:cardCornerRadius="0dp">
+
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:padding="@dimen/home_card_padding">
+
                     <TextView
                         android:id="@+id/home_card_recent_2_title"
                         android:layout_width="match_parent"
@@ -196,7 +205,8 @@
                         android:text="Crossword - 2nd most recent"
                         android:textSize="@dimen/home_card_text_size_main"
                         android:textStyle="normal"
-                        android:textColor="@color/text_default"/>
+                        android:textColor="@color/text_default" />
+
                     <TextView
                         android:id="@+id/home_card_recent_2_date"
                         android:layout_width="match_parent"
@@ -205,22 +215,24 @@
                         android:text="22/03/12"
                         android:textSize="@dimen/home_card_text_size_minor"
                         android:textColor="@color/text_default"
-                        android:textStyle="normal"/>
+                        android:textStyle="normal" />
                 </RelativeLayout>
             </androidx.cardview.widget.CardView>
-            <androidx.cardview.widget.CardView
-                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+
+            <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/home_card_recent_3"
                 android:layout_gravity="center"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/home_card_recent_2"
                 card_view:cardCornerRadius="0dp">
+
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:padding="@dimen/home_card_padding">
+
                     <TextView
                         android:id="@+id/home_card_recent_3_title"
                         android:layout_width="match_parent"
@@ -229,7 +241,8 @@
                         android:text="Crossword - 3rd most recent"
                         android:textSize="@dimen/home_card_text_size_main"
                         android:textStyle="normal"
-                        android:textColor="@color/text_default"/>
+                        android:textColor="@color/text_default" />
+
                     <TextView
                         android:id="@+id/home_card_recent_3_date"
                         android:layout_width="match_parent"
@@ -238,7 +251,7 @@
                         android:text="26/01/15"
                         android:textSize="@dimen/home_card_text_size_minor"
                         android:textColor="@color/text_default"
-                        android:textStyle="normal"/>
+                        android:textStyle="normal" />
                 </RelativeLayout>
             </androidx.cardview.widget.CardView>
 
@@ -246,8 +259,7 @@
     </androidx.cardview.widget.CardView>
 
 
-    <androidx.cardview.widget.CardView
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/home_card_library"
         android:layout_gravity="center"
         android:layout_width="fill_parent"
@@ -264,6 +276,7 @@
             android:background="?android:attr/selectableItemBackground"
             android:onClick="savedClicked"
             android:padding="@dimen/home_card_padding">
+
             <TextView
                 android:id="@+id/home_card_saved_tv1"
                 android:layout_width="match_parent"
@@ -272,7 +285,8 @@
                 android:text="@string/home_library"
                 android:textSize="@dimen/home_card_text_size_main"
                 android:textColor="@color/text_default"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
+
             <TextView
                 android:id="@+id/home_card_saved_tv2"
                 android:layout_width="match_parent"
@@ -281,17 +295,17 @@
                 android:text="@string/home_library2"
                 android:textSize="@dimen/home_card_text_size_minor"
                 android:textColor="@color/text_default"
-                android:textStyle="normal"/>
+                android:textStyle="normal" />
+
             <ImageView
                 android:layout_width="@dimen/home_card_icon_size"
                 android:layout_height="@dimen/home_card_icon_size"
                 android:layout_alignParentRight="true"
-                android:src="@drawable/home_new"/>
+                android:src="@drawable/home_new" />
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 
-    <androidx.cardview.widget.CardView
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/home_card_settings"
         android:layout_gravity="center"
         android:layout_width="fill_parent"
@@ -308,6 +322,7 @@
             android:background="?android:attr/selectableItemBackground"
             android:onClick="settingsClicked"
             android:padding="@dimen/home_card_padding">
+
             <TextView
                 android:id="@+id/home_card_settings_tv1"
                 android:layout_width="match_parent"
@@ -315,7 +330,8 @@
                 android:text="@string/home_settings"
                 android:textSize="@dimen/home_card_text_size_main"
                 android:textColor="@color/text_default"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
+
             <TextView
                 android:id="@+id/home_card_settings_tv2"
                 android:layout_width="match_parent"
@@ -324,15 +340,15 @@
                 android:text="@string/home_settings2"
                 android:textSize="@dimen/home_card_text_size_minor"
                 android:textColor="@color/text_default"
-                android:textStyle="normal"/>
+                android:textStyle="normal" />
+
             <ImageView
                 android:layout_width="@dimen/home_card_icon_size"
                 android:layout_height="@dimen/home_card_icon_size"
                 android:layout_alignParentRight="true"
-                android:src="@drawable/settings"/>
+                android:src="@drawable/settings" />
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
-
 
 
 </LinearLayout>
