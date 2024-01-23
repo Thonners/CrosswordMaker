@@ -14,7 +14,7 @@ import android.widget.EditText;
 /**
  * Created by mat on 30/11/14.
  */
-public class Cell extends EditText implements View.OnClickListener, View.OnFocusChangeListener, TextWatcher {
+public class Cell extends androidx.appcompat.widget.AppCompatEditText implements View.OnClickListener, View.OnFocusChangeListener, TextWatcher {
 
     private static final String LOG_TAG = "Cell";
 
@@ -165,6 +165,7 @@ public class Cell extends EditText implements View.OnClickListener, View.OnFocus
 
 
                 if (activeClue != null) {
+                    Log.d(LOG_TAG, "Active clue not null, highlighting cells. Clue name: " + activeClue.getClueID());
                     activeClue.highlightClue(this);
                 } else {
                     // Default to selecting horizontal clue if cell belongs to both a horizontal and vertical clue but isn't active

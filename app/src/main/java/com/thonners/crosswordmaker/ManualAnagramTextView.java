@@ -17,7 +17,7 @@ import android.util.Log;
  * @author M Thomas
  * @since 18/08/16
  */
-public class ManualAnagramTextView extends TextView {
+public class ManualAnagramTextView extends androidx.appcompat.widget.AppCompatTextView {
 
     private static final String LOG_TAG = "ManualAnagramTextView";
 

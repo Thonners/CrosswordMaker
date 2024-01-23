@@ -367,8 +367,8 @@ public class Crossword {
                 hClues.get(horizontalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
                 cells[row][col].setHClue(hClues.get(horizontalClueIndex));          // Tell the cell which clue it belongs to
 
-//                Log.d("Clues", "New clue found at: r = " + row + " & c = " + col) ;
-//                Log.d("Clues", "horizontalClueIndex = " + horizontalClueIndex + " & hClues.length = " + hClues.size()) ;
+                Log.d("Clues", "New clue found at: r = " + row + " & c = " + col);
+                Log.d("Clues", "horizontalClueIndex = " + horizontalClueIndex + " & hClues.length = " + hClues.size());
 
             } else if (!nextWhiteCellNewClue && !cells[row][col].isBlackCell()) {
                 // If white cell, augment clue count. If not, reset nextWhiteCellNewClue
@@ -377,8 +377,8 @@ public class Crossword {
                 hClues.get(horizontalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
                 cells[row][col].setHClue(hClues.get(horizontalClueIndex));          // Tell the cell which clue it belongs to
 
-                //               Log.d("Clues", "increasing clue length to " + clueLength) ;
-                //               Log.d("Clues", "horizontalClueIndex = " + horizontalClueIndex + " & hClues.length = " + hClues.size()) ;
+                Log.d("Clues", "increasing clue length to " + clueLength);
+                Log.d("Clues", "horizontalClueIndex = " + horizontalClueIndex + " & hClues.length = " + hClues.size());
             }
 
             // If a black cell is found, reset nextWhiteCellNewClue flag
@@ -396,7 +396,7 @@ public class Crossword {
         boolean nextWhiteCellNewClue = true;
         for (int row = 0; row < rowCount; row++) {
 
-            // only go as far as rowCount-1 because there cannot be a horizontal clue starting in the final column.
+            // only go as far as rowCount-1 because there cannot be a vertical clue starting in the final row.
             // Test to see if next cell is a new clue - if next cell is, add to clue collections
             if (row < rowCount - 1 && nextWhiteCellNewClue && !cells[row][col].isBlackCell() && !cells[row + 1][col].isBlackCell()) {
                 vClueCount++;
@@ -408,18 +408,18 @@ public class Crossword {
                 vClues.get(verticalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
                 cells[row][col].setVClue(vClues.get(verticalClueIndex));          // Tell the cell which clue it belongs to
 
-//                Log.d("Clues", "New clue found at: r = " + row + " & c = " + col) ;
-//                Log.d("Clues", "verticalClueIndex = " + verticalClueIndex + " & vClues.length = " + vClues.size()) ;
+                Log.d("Clues", "New clue found at: r = " + row + " & c = " + col);
+                Log.d("Clues", "verticalClueIndex = " + verticalClueIndex + " & vClues.length = " + vClues.size());
 
             } else if (!nextWhiteCellNewClue && !cells[row][col].isBlackCell()) {
                 // If white cell, augment clue count. If not, reset nextWhiteCellNewClue
-                int clueLength = col - vClues.get(verticalClueIndex).getStartCell().getColumn() + 1;
-                vClues.get(verticalClueIndex).setLength(clueLength);
+                int clueLength = row - vClues.get(verticalClueIndex).getStartCell().getRow() + 1;
+                vClues.get(verticalClueIndex).setLength(clueLength); // TODO: Make this length be calculated from the number of cells in the clue, rather than set separately
                 vClues.get(verticalClueIndex).addCellToClue(cells[row][col]);     // Add cell to list of cells in clue
                 cells[row][col].setVClue(vClues.get(verticalClueIndex));          // Tell the cell which clue it belongs to
 
-                //            Log.d("Clues", "increasing clue length to " + clueLength) ;
-                //            Log.d("Clues", "verticalClueIndex = " + verticalClueIndex + " & vClues.length = " + vClues.size()) ;
+                Log.d("Clues", "increasing clue length to " + clueLength);
+                Log.d("Clues", "verticalClueIndex = " + verticalClueIndex + " & vClues.length = " + vClues.size());
             }
 
             // If a black cell is found, reset nextWhiteCellNewClue flag

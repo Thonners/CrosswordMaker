@@ -96,7 +96,7 @@ public class Clue {
      */
     public void highlightClue(Cell focusCell) {
         // Use this array to store the values of the letters in the clue
-        char[] letters = new char[this.clueCells.size()];
+        char[] letters = new char[this.length];
         int cellNumber = 0;
         // Highlight the cells in the clue
         setIsHighlighted();
