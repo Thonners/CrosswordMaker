@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 import com.google.android.material.snackbar.Snackbar;
@@ -453,9 +454,34 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
                 @Override
                 public void callHideLoadingSpinner() {
                 }
-            } ;
-            serverConnection = new ServerConnection(serverConnectionListener) ;
-            serverConnection.testServerConnection() ;
+            };
+            serverConnection = new HttpsServerConnection(serverConnectionListener);
+            serverConnection.testServerConnection();
+//            ServerConnection.ServerConnectionListener serverConnectionListener = new ServerConnection.ServerConnectionListener() {
+//                @Override
+//                public void serverConnectionResponse(ServerConnection.SocketIdentifier requestSuccess, ArrayList<String> answers) {
+//
+//                }
+//                @Override
+//                public void setServerAvailable(boolean isAvailable) {
+//                    serverAvailable = isAvailable ;
+//                    if (serverAvailable) {
+//                        Log.d(LOG_TAG, "Network is available, and server connection test was successful.");
+//                        //Toast.makeText(getApplicationContext(),getString(R.string.server_available_toast),Toast.LENGTH_SHORT).show();
+//                    } else {
+//                        Log.d(LOG_TAG, "Network is available, and server connection test was UNsuccessful.");
+//                    }
+//                }
+//
+//                @Override
+//                public void callShowLoadingSpinner() {
+//                }
+//                @Override
+//                public void callHideLoadingSpinner() {
+//                }
+//            } ;
+//            serverConnection = new ServerConnection(serverConnectionListener) ;
+//            serverConnection.testServerConnection() ;
         } else {
             // Force to false is no network available
             Log.d(LOG_TAG,"No network detected, so no server available");
@@ -483,37 +509,38 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
      * Method to show the rate this app dialog when appropriate
      */
     private void showRateDialog() {
-
-        // Monitor launch times and interval from installation
-        RateThisApp.onStart(this);
-        // Set the desired frequency
-        RateThisApp.Config  config = new RateThisApp.Config(RATE_DAYS, RATE_LAUNCHES);
-        config.setTitle(R.string.rate_title);
-        config.setMessage(R.string.rate_message);
-        config.setYesButtonText(R.string.rate_yes);
-        config.setNoButtonText(R.string.rate_never);
-        config.setCancelButtonText(R.string.rate_later);
-        // Callback from clicks
-        RateThisApp.init(config);
-        RateThisApp.setCallback(new RateThisApp.Callback() {
-            @Override
-            public void onYesClicked() {
-                //Toast.makeText(HomeActivity.this, "Yes event", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onNoClicked() {
-                //Toast.makeText(HomeActivity.this, "No event", Toast.LENGTH_SHORT).show();
-                neverRate();
-            }
-
-            @Override
-            public void onCancelClicked() {
-                //Toast.makeText(HomeActivity.this, "Cancel event", Toast.LENGTH_SHORT).show();
-            }
-        });
-        // If the criteria is satisfied, "Rate this app" dialog will be shown
-        RateThisApp.showRateDialogIfNeeded(this);
+        // TODO: Replace functionality
+//
+//        // Monitor launch times and interval from installation
+//        RateThisApp.onStart(this);
+//        // Set the desired frequency
+//        RateThisApp.Config  config = new RateThisApp.Config(RATE_DAYS, RATE_LAUNCHES);
+//        config.setTitle(R.string.rate_title);
+//        config.setMessage(R.string.rate_message);
+//        config.setYesButtonText(R.string.rate_yes);
+//        config.setNoButtonText(R.string.rate_never);
+//        config.setCancelButtonText(R.string.rate_later);
+//        // Callback from clicks
+//        RateThisApp.init(config);
+//        RateThisApp.setCallback(new RateThisApp.Callback() {
+//            @Override
+//            public void onYesClicked() {
+//                //Toast.makeText(HomeActivity.this, "Yes event", Toast.LENGTH_SHORT).show();
+//            }
+//
+//            @Override
+//            public void onNoClicked() {
+//                //Toast.makeText(HomeActivity.this, "No event", Toast.LENGTH_SHORT).show();
+//                neverRate();
+//            }
+//
+//            @Override
+//            public void onCancelClicked() {
+//                //Toast.makeText(HomeActivity.this, "Cancel event", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//        // If the criteria is satisfied, "Rate this app" dialog will be shown
+//        RateThisApp.showRateDialogIfNeeded(this);
     }
 
     @Override
@@ -603,27 +630,29 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
     }
     public static boolean sdcardIsAvailable(Activity activity) {
         // TODO: Check storage permissions for Android 11+ differently...
-        // Check to see if SD Card is available - This is required to save crosswords
-        Boolean isSDPresent = android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED);
-        if(isSDPresent)
-        {
-            // Check whether this app has write external storage permission or not.
-            int writeExternalStoragePermission = ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            // If do not grant write external storage permission.
-            if(writeExternalStoragePermission != PackageManager.PERMISSION_GRANTED) {
-                // Request user to grant write external storage permission.
-                ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_WRITE_EXTERNAL_STORAGE_PERMISSION);
-                Log.d(LOG_TAG,"No permission for writing to external storage");
+        if (Build.VERSION.SDK_INT >= 30) {
+            Log.d(LOG_TAG, "Android Version 30+ detected. Doing something else to ask for file write permission");
+            return true;
+        } else {
+            // Check to see if SD Card is available - This is required to save crosswords
+            boolean isSDPresent = android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED);
+            if (isSDPresent) {
+                // Check whether this app has write external storage permission or not.
+                int writeExternalStoragePermission = ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                // If do not grant write external storage permission.
+                if (writeExternalStoragePermission != PackageManager.PERMISSION_GRANTED) {
+                    // Request user to grant write external storage permission.
+                    ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_WRITE_EXTERNAL_STORAGE_PERMISSION);
+                    Log.d(LOG_TAG, "No permission for writing to external storage");
+                }
+                // yes SD-card is present
+                Log.d("SD-Card", "SD Card is Present");
+                return true;
+            } else {
+                // Sorry
+                Log.d("SD-Card", "SD Card not Present - cannot save crosswords");
+                return false;
             }
-            // yes SD-card is present
-            Log.d("SD-Card", "SD Card is Present");
-            return true ;
-        }
-        else
-        {
-            // Sorry
-            Log.d("SD-Card", "SD Card not Present - cannot save crosswords");
-            return false ;
         }
     }
     public static void hideKeyboard(Context context, View view) {
