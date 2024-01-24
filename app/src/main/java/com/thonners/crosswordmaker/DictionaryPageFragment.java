@@ -195,7 +195,7 @@ public class DictionaryPageFragment extends Fragment {
                         Log.d(LOG_TAG, "Search returned with suggestions. Showing prompt...");
                         // Add the returned view to the answers
                         resultsLinearLayout.addView(theFinalView);
-                        final TextView promptTV = (TextView) getActivity().findViewById(DictionaryMWDownloadDefinition.PROMPT_TV_ID);
+                        final TextView promptTV = (TextView) theFinalView.getChildAt(0);
                         promptTV.setClickable(true);
                         promptTV.animate()
                                 .setDuration(ENTRY_EXIT_ANIMATION_DURATION)
@@ -314,8 +314,10 @@ public class DictionaryPageFragment extends Fragment {
     }
 
     private void clearResultsView(boolean search) {
+        Log.d(LOG_TAG, "clearResultsView called");
         // Get number of children to the view - use this to determine how deep need to go to get to the cards
         if (resultsLinearLayout.getChildCount() > 0) {
+            Log.d(LOG_TAG, "Linear layout child count > 0");
             if (resultsLinearLayout.getChildAt(0) instanceof LinearLayout) {
                 LinearLayout resultsInnerLinearLayout = (LinearLayout) resultsLinearLayout.getChildAt(0);
                 animateViewsOutOfLayout(resultsInnerLinearLayout, search);

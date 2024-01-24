@@ -39,8 +39,6 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void, Void, String
     private static final String suggestionIdentifier = "<suggestion>";
     private static final String successfulSearchIdentifier = "<entry id=";
 
-    public static final int PROMPT_TV_ID = 2357911;
-
     public static final int SEARCH_NOT_COMPLETED = -1; // Initialise to this value, so if cancelled before proper value can be set, it will be known. Also use if search failed for some other reason.
     public static final int SEARCH_SUCCESSFUL = 0; // For a search which completed successfully
     public static final int SEARCH_SUGGESTIONS = 1; // For an unsuccessful search, but one with suggestions
@@ -119,6 +117,7 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void, Void, String
     protected String doInBackground(Void... params) {
         HttpClient client = new DefaultHttpClient();
         HttpGet request = new HttpGet(url);
+
         String xmlRaw = "";
         try {
             HttpResponse response = client.execute(request);
@@ -133,6 +132,7 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void, Void, String
             }
             in.close();
             xmlRaw = str.toString();
+//            Log.d(LOG_TAG, "Server connection received, xml: " + xmlRaw);
         } catch (IllegalStateException e) {
             Log.e(LOG_TAG, e.getMessage());
         } catch (IOException e) {
@@ -153,7 +153,9 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void, Void, String
     protected void onPostExecute(String rawXML) {
         super.onPostExecute(rawXML);
         // Decode the XML
+        Log.d(LOG_TAG, "Decoding the XML... ");
         final ViewGroup finalView = decodeXML(rawXML);
+        Log.d(LOG_TAG, "XML Decoded. ");
         // Hide progress bar
         progressLinearLayout.animate()
                 .alpha(0.0f)
@@ -216,7 +218,6 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void, Void, String
             // Make the prompt.
             String wordNotFoundPrompt = context.getResources().getString(R.string.dictionary_word_not_found) + " " + context.getResources().getString(R.string.dictionary_suggestions_prompt);
             TextView promptTV = createTextView(wordNotFoundPrompt, WORD_NOT_FOUND);
-            promptTV.setId(PROMPT_TV_ID);
             promptTV.setAlpha(0.0f);
             view.addView(promptTV, 0);
 

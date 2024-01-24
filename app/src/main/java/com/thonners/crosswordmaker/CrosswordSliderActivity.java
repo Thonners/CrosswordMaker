@@ -98,7 +98,7 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
         pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
         pager.setOffscreenPageLimit(NUM_PAGES);
-        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrollStateChanged(int state) {
                 if (state == ViewPager.SCROLL_STATE_IDLE) {
