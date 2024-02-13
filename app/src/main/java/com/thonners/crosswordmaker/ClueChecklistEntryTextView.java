@@ -2,10 +2,7 @@ package com.thonners.crosswordmaker;
 
 import android.content.Context;
 import android.graphics.Paint;
-import android.os.Build;
 import android.util.AttributeSet;
-import android.widget.GridLayout;
-import android.widget.TextView;
 
 /**
  * Class to manage the entries to the clue checklist, under the crossword on the main crossword fragment.
@@ -14,19 +11,11 @@ import android.widget.TextView;
  * @since 15/11/16
  */
 
-public class ClueChecklistEntryTextView extends TextView {
+public class ClueChecklistEntryTextView extends androidx.appcompat.widget.AppCompatTextView {
 
-    private final int NUM_COLUMNS = 10;    // Number of columns in the GridLayout
-
-    private Context context;
     private Clue clue;
     private boolean isChecked = false;   // Variable to track whether this text should be displayed with a strikethrough or not
 
-    /**
-     * Default Constructors, for use in xml
-     *
-     * @param context
-     */
     public ClueChecklistEntryTextView(Context context) {
         super(context);
     }
@@ -48,7 +37,6 @@ public class ClueChecklistEntryTextView extends TextView {
      */
     public ClueChecklistEntryTextView(Context context, Clue clue) {
         super(context);
-        this.context = context;
         this.clue = clue;
         initialise();
     }
@@ -58,9 +46,9 @@ public class ClueChecklistEntryTextView extends TextView {
      */
     private void initialise() {
         // Set the number
-        this.setText(clue.getClueDisplayNumber() + "). ");
+        this.setText(String.format("%d). ", clue.getClueDisplayNumber()));
         // Set the style
-        this.setTextAppearance(context, R.style.clues_checklist);
+        this.setTextAppearance(R.style.clues_checklist);
     }
 
 
@@ -83,11 +71,11 @@ public class ClueChecklistEntryTextView extends TextView {
         if (isChecked) {
             // Set strikethrough
             this.setPaintFlags(this.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-            this.setTextColor(getResources().getColor(R.color.light_grey));
+            this.setTextColor(getResources().getColor(R.color.light_grey, null));
         } else {
             // Set back to normal
             this.setPaintFlags(this.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
-            this.setTextColor(getResources().getColor(R.color.dark_grey));
+            this.setTextColor(getResources().getColor(R.color.dark_grey, null));
         }
     }
 
