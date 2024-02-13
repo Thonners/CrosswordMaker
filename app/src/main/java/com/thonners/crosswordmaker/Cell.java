@@ -11,6 +11,8 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
 
+import androidx.core.content.res.ResourcesCompat;
+
 /**
  * Created by mat on 30/11/14.
  */
@@ -71,8 +73,9 @@ public class Cell extends androidx.appcompat.widget.AppCompatEditText implements
         setCellName(row, column);
         setBlackCellStatus(false); // Force all cells to start life white
 
-        this.setBackground(getResources().getDrawable(R.drawable.cell_white));
-        this.setTextColor(context.getResources().getColor(R.color.black));
+        // TODO: Add theming for cell backgrounds, etc so we can dark theme!
+        this.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.cell_white, null));
+        this.setTextColor(context.getResources().getColor(R.color.black, null));
         this.setClickable(true);
         this.setFocusable(false);   // Initialise as false for gridMaker
         this.setPadding(0, 0, 0, 0);
@@ -93,7 +96,7 @@ public class Cell extends androidx.appcompat.widget.AppCompatEditText implements
         column = c;
         blackCell = blackCellIn;
 
-        this.setBackground(getResources().getDrawable(R.drawable.cell_white));
+        this.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.cell_white, null));
     }
 
     private void setCrossword(Crossword cwd) {
@@ -101,24 +104,24 @@ public class Cell extends androidx.appcompat.widget.AppCompatEditText implements
     }
 
     private void setBlackCell() {
-        this.setBackground(getResources().getDrawable(R.drawable.cell_black));
+        this.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.cell_black, null));
     }
 
     private void setWhiteCell() {
-        this.setBackground(getResources().getDrawable(R.drawable.cell_white));
+        this.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.cell_white, null));
     }
 
     public void setFocusedMajor() {
         if (!this.hasFocus()) {
             requestFocus();
         }
-        this.setBackground(getResources().getDrawable(R.drawable.cell_focus_main));
+        this.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.cell_focus_main, null));
     }
 
     public void setFocusedMinor() {
         // Make sure it's not a black cell, as this can get called when doing hyphens/word splits
         if (!isBlackCell()) {
-            this.setBackground(getResources().getDrawable(R.drawable.cell_focus_minor));
+            this.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.cell_focus_minor, null));
         }
     }
 
