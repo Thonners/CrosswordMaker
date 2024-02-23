@@ -1,5 +1,6 @@
 package com.thonners.crosswordmaker;
 
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -8,6 +9,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.res.ResourcesCompat;
 
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -73,16 +75,16 @@ public class Crossword {
     private int screenWidth;
     private int screenHeight;
     private int cellWidth;
-    private int borderWidth = 1;   // This is the width of the border around the cells. (Needs to be accounted for in cell width calculation else final column is too thin
+    private final int borderWidth = 1;   // This is the width of the border around the cells. (Needs to be accounted for in cell width calculation else final column is too thin
     private int gridPadding;
 
     private float fontSize;
 
-    private boolean editMode = false;
+    private final boolean editMode = false;
     private boolean isZoomedIn = false;
 
-    private ArrayList<Clue> hClues = new ArrayList<Clue>();     // Storage for all the horizontal clues
-    private ArrayList<Clue> vClues = new ArrayList<Clue>();     // Storage for all the vertical clues
+    private final ArrayList<Clue> hClues = new ArrayList<>();     // Storage for all the horizontal clues
+    private final ArrayList<Clue> vClues = new ArrayList<>();     // Storage for all the vertical clues
     private int totalClueCount = 0;
     private int hClueCount = 0;
     private int vClueCount = 0;
@@ -203,7 +205,7 @@ public class Crossword {
         //  grid.setFocusableInTouchMode(true);
         grid.setRowCount(rowCount);
         grid.setColumnCount(rowCount);
-        grid.setBackground(context.getResources().getDrawable(R.drawable.cell_white));
+        grid.setBackground(ResourcesCompat.getDrawable(context.getResources(), R.drawable.cell_white, null));
     }
 
     private void createCells() {
@@ -221,11 +223,11 @@ public class Crossword {
                 // Create the cell
                 cellViews[i][j] = new CellView(context, this, i, j);
                 cells[i][j] = cellViews[i][j].getCell();
-                cells[i][j].setId(cells[i][j].getCellId(rowCount));
+//                cells[i][j].setId(cells[i][j].getCellId(rowCount));
                 //             cells[i][j].setWidth(cellWidth);
                 //             cells[i][j].setHeight(cellWidth);
                 cells[i][j].setAllCaps(true);
-                cells[i][j].setTextColor(context.getResources().getColor(R.color.black));
+                cells[i][j].setTextColor(context.getResources().getColor(R.color.black, null));
 //                cells[i][j].setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize);
 
                 cellViews[i][j].setSize(cellWidth);
@@ -254,11 +256,11 @@ public class Crossword {
                 // Create the cell
                 cellViews[i][j] = new CellView(context, this, i, j);
                 cells[i][j] = cellViews[i][j].getCell();
-                cells[i][j].setId(cells[i][j].getCellId(rowCount));
+//                cells[i][j].setId(cells[i][j].getCellId(rowCount));
                 //             cells[i][j].setWidth(cellWidth);
                 //             cells[i][j].setHeight(cellWidth);
                 cells[i][j].setAllCaps(true);
-                cells[i][j].setTextColor(context.getResources().getColor(R.color.black));
+                cells[i][j].setTextColor(context.getResources().getColor(R.color.black, null));
 //                cells[i][j].setTextSize(TypedValue.COMPLEX_UNIT_PX, fontSize);
 
                 cellViews[i][j].setSize(cellWidth);
@@ -439,13 +441,6 @@ public class Crossword {
     }
 
     /**
-     * Method to sort the collection of vertical clues, such that, if iterated through, they are in
-     * numerical order. Primarily so that when the clues checklist is populated, no sorting need be done.
-     *
-     * Actual sorting algorithm in sortClues(ArrayList<Clue>)
-     */
-
-    /**
      * Method to sort the passed ArrayList of clues so that they will be in order according to their
      * display number
      *
@@ -465,8 +460,8 @@ public class Crossword {
 
         // Add clues to a new ArrayList in the right order
         ArrayList<Clue> newClueList = new ArrayList<>();
-        for (int i = 0; i < sortedClueNos.length; i++) {
-            newClueList.add(clueSet.get(sortedClueNos[i]));
+        for (Integer sortedClueNo : sortedClueNos) {
+            newClueList.add(clueSet.get(sortedClueNo));
         }
 
         return newClueList;
