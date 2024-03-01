@@ -129,7 +129,7 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
         frameDrawer = new Canvas(frame);
         backgroundGrid = new Canvas(gridBitmap);
         bounds = new Rect(0, 0, width, height);
-        Log.d(LOG_TAG, "Canvas initialised");
+        Log.d(LOG_TAG, "Canvas initialised to (w,h) = (" + width + ", " + height + ")");
 
         rows = new Row[crossword.rowCount];
         cols = new Col[crossword.colCount];
@@ -213,13 +213,17 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
         Log.d(LOG_TAG, "onTouch triggered. Motion event: " + event.getAction());
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                int row = rowColIndex[(int) event.getY()];
-                int col = rowColIndex[(int) event.getX()];
+                int row = rowColIndex[Math.max(0, Math.min((int) event.getY(), this.height - 1))];
+                int col = rowColIndex[Math.max(0, Math.min((int) event.getX(), this.width - 1))];
                 Log.d(LOG_TAG, "onTouch ActionDown triggered. Motion event: (" + event.getX() +
                         "," + event.getY() + "). This corresponds to row " + row + ", col: " + col);
-                crossword.toggleBlackCell(row, col);
-                invalidate();
-                return true;
+                if (0 <= row && row < crossword.rowCount && 0 <= col && col < crossword.colCount) {
+                    crossword.toggleBlackCell(row, col);
+                    invalidate();
+                    return true;
+                } else {
+                    Log.d(LOG_TAG, "Touch detected outside the active grid, so ignoring it.");
+                }
         }
         return false;
     }
