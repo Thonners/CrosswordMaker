@@ -3,6 +3,7 @@ package com.thonners.crosswordmaker;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
@@ -79,8 +80,8 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
     private static String LOG_TAG = "CrosswordCanvas";
 
     boolean hasBeenInitialised = false;
-    Bitmap frame, gridBitmap;
-    Canvas frameDrawer, backgroundGrid;
+    Bitmap frame, gridBitmap, blackCellBitmap;
+    Canvas frameDrawer, backgroundGrid, blackCellMask;
     Rect bounds;
     Paint blackPaint, clueHighlightPaint, cellHighlightPaint, whitePaint;
     int width, height, cellWidth, outerPadding;
@@ -126,8 +127,10 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
 
         frame = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         gridBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        blackCellBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         frameDrawer = new Canvas(frame);
         backgroundGrid = new Canvas(gridBitmap);
+        blackCellMask = new Canvas(blackCellBitmap);
         bounds = new Rect(0, 0, width, height);
         Log.d(LOG_TAG, "Canvas initialised to (w,h) = (" + width + ", " + height + ")");
 
@@ -169,6 +172,18 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
 
     }
 
+    private void drawBlackCellMask() {
+        blackCellBitmap.eraseColor(Color.TRANSPARENT);
+        for (int r = 0; r < crossword.rowCount; r++) {
+            for (int c = 0; c < crossword.rowCount; c++) {
+                if (crossword.getCell(r, c).getIsBlackCell()) {
+                    blackCellMask.drawRect(cols[c].getXMin(), rows[r].getYMin(), cols[c].getXMax(),
+                            rows[r].getYMax(), blackPaint);
+                }
+            }
+        }
+    }
+
     /**
      * Calculates to which row/column a pixel index belongs, to facilitate immediate lookup of the
      * row/column on touch later
@@ -193,17 +208,12 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
     @Override
     protected void onDraw(Canvas canvas) {
         // Draw the bitmap on the view canvas
+        // Background grid
         canvas.drawBitmap(gridBitmap, null, bounds, null);
         // Draw the black cells
-        // TODO: Move to a black cell mask that can be calcualted once for a pre-defined grid
-        for (int r = 0; r < crossword.rowCount; r++) {
-            for (int c = 0; c < crossword.rowCount; c++) {
-                if (crossword.getCell(r, c).getIsBlackCell()) {
-                    canvas.drawRect(cols[c].getXMin(), rows[r].getYMin(), cols[c].getXMax(),
-                            rows[r].getYMax(), blackPaint);
-                }
-            }
-        }
+        canvas.drawBitmap(blackCellBitmap, null, bounds, null);
+
+        // TODO: Move to a black cell mask that can be calculated once for a pre-defined grid
         Log.d(LOG_TAG, "Canvas.onDraw called");
     }
 
@@ -217,13 +227,14 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
                 int col = rowColIndex[Math.max(0, Math.min((int) event.getX(), this.width - 1))];
                 Log.d(LOG_TAG, "onTouch ActionDown triggered. Motion event: (" + event.getX() +
                         "," + event.getY() + "). This corresponds to row " + row + ", col: " + col);
-                if (0 <= row && row < crossword.rowCount && 0 <= col && col < crossword.colCount) {
-                    crossword.toggleBlackCell(row, col);
-                    invalidate();
-                    return true;
-                } else {
-                    Log.d(LOG_TAG, "Touch detected outside the active grid, so ignoring it.");
+                crossword.cellTouched(row, col);
+                // Only if editing the grid do we need to redraw the black cell mask
+                if (crossword.editGridMode) {
+                    drawBlackCellMask();
                 }
+                // Redraw the grid!
+                invalidate();
+                return true;
         }
         return false;
     }
