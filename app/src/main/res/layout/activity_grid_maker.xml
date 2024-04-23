@@ -18,17 +18,20 @@
         android:layout_alignParentTop="true"
         android:orientation="vertical">
 
-        <GridLayout
-            android:id="@+id/main_grid"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:columnCount="1"
-            android:rowCount="1"
-            android:padding="@dimen/grid_padding"
-            android:background="@color/black">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_below="@id/main_grid_scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        </GridLayout>
+            <com.thonners.crosswordmaker.CrosswordCanvas
+                android:id="@+id/edit_crossword_canvas"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android.support.design:layout_constraintStart_toStartOf="parent"
+                android.support.design:layout_constraintTop_toTopOf="parent"
+                android.support.design:layout_constrainedWidth="false"
+                android.support.design:layout_constraintDimensionRatio="1:1" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
 
