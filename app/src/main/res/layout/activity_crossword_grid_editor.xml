@@ -29,6 +29,21 @@
         </GridLayout>
     </ScrollView>
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_below="@id/main_grid_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <View
+            android:id="@+id/edit_crossword_canvas"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android.support.design:layout_constraintStart_toStartOf="parent"
+            android.support.design:layout_constraintTop_toTopOf="parent"
+            android.support.design:layout_constrainedWidth="false"
+            android.support.design:layout_constraintDimensionRatio="1:1" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_edit_save"
         android:layout_width="wrap_content"

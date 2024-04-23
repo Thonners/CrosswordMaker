@@ -42,6 +42,13 @@ public class CrosswordGridEditor extends AppCompatActivity {
         createCrossword();
         showWarningToast();
         this.setTitle(crossword.getActivityTitle());
+
+        Log.d(LOG_TAG, "Getting the canvas editor view");
+        CrosswordCanvas canvasEditor = findViewById(R.id.edit_crossword_canvas);
+        Log.d(LOG_TAG, "initialising");
+//        canvasEditor.initialise(500, 500, crossword);
+//        Log.d(LOG_TAG, "Invalidating");
+//        canvasEditor.invalidate();
     }
 
     @Override
