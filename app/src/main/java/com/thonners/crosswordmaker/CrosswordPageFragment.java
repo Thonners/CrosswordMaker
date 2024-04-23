@@ -1,6 +1,7 @@
 package com.thonners.crosswordmaker;
 
 import android.app.Activity;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -38,6 +40,7 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
 
     private static final String ARG_TAB_POSITION = "tabPosition";
     private static final String ARG_STRING_ARRAY = "crosswordStringArray";
+    private static final String ARG_STRING_FILENAME = "com.thonners.crosswordmaker.CrosswordPageFragment.crosswordFilename";
     private static final String LOG_TAG = "CrosswordPageFragment";
 
     private final int MAX_COL_COUNT = 10;
@@ -52,6 +55,9 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
 
     private Crossword crossword;
     private String[] crosswordStringArray;
+    private CrosswordTwo crosswordTwo;
+    private String crosswordFilePath;
+    private CrosswordCanvas canvasEditor;
 
     private boolean addHyphenActive = false;
     private boolean addWordSplitActive = false;
@@ -59,6 +65,15 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
     private int tabPosition;
 
     private OnFragmentInteractionListener mListener;
+
+    public static CrosswordPageFragment newInstance(int position, String crosswordFilePath) {
+        CrosswordPageFragment fragment = new CrosswordPageFragment();
+        Bundle args = new Bundle();
+        args.putInt(ARG_TAB_POSITION, position);
+        args.putString(ARG_STRING_FILENAME, crosswordFilePath);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     public static CrosswordPageFragment newInstance(int position, String[] crosswordArray) {
         CrosswordPageFragment fragment = new CrosswordPageFragment();
@@ -78,8 +93,9 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             tabPosition = getArguments().getInt(ARG_TAB_POSITION);
-            crosswordStringArray = getArguments().getStringArray(ARG_STRING_ARRAY);
+//            crosswordStringArray = getArguments().getStringArray(ARG_STRING_ARRAY);
 
+            crosswordFilePath = getArguments().getString(ARG_STRING_FILENAME);
         }
     }
 
@@ -87,46 +103,65 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
     public void onResume() {
         super.onResume();
         Log.d(LOG_TAG, "onResume called. Initialising save Files");
-        crossword.initialiseSaveFiles();
+//        crossword.initialiseSaveFiles(); // TODO: Uncomment this!
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.e(LOG_TAG, "onCreateView called...");
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_crossword_page, container, false);
         // Get instances of the views
-        crosswordGrid = view.findViewById(R.id.crossword_grid);
-        horizontalScrollViewNoFocus = view.findViewById(R.id.horizontal_scroll_view_crossword);
-        verticalScrollView = view.findViewById(R.id.vertical_scroll_view_crossword);
-        acrossCluesChecklist = view.findViewById(R.id.clues_checklist_across_layout);
-        downCluesChecklist = view.findViewById(R.id.clues_checklist_down_layout);
+        Log.d(LOG_TAG, "Getting the canvas editor view");
+        canvasEditor = view.findViewById(R.id.edit_crossword_canvas);
+//        crosswordGrid = view.findViewById(R.id.crossword_grid);
+//        horizontalScrollViewNoFocus = view.findViewById(R.id.horizontal_scroll_view_crossword);
+//        verticalScrollView = view.findViewById(R.id.vertical_scroll_view_crossword);
+//        acrossCluesChecklist = view.findViewById(R.id.clues_checklist_across_layout);
+//        downCluesChecklist = view.findViewById(R.id.clues_checklist_down_layout);
         wordSplitFAB = view.findViewById(R.id.add_word_split);
         hyphenFAB = view.findViewById(R.id.add_hyphen);
-        hangmanLayout = view.findViewById(R.id.hangman_letters_layout);
+////        hangmanLayout = view.findViewById(R.id.hangman_letters_layout);
+//
+//        // Pass scroll view instances to the crosswordGrid
+//        crosswordGrid.setHorizontalScrollView(horizontalScrollViewNoFocus);
+//        crosswordGrid.setVerticalScrollView(verticalScrollView);
+//
+//        createCrossword();
 
-        // Pass scroll view instances to the crosswordGrid
-        crosswordGrid.setHorizontalScrollView(horizontalScrollViewNoFocus);
-        crosswordGrid.setVerticalScrollView(verticalScrollView);
+        try {
+            crosswordTwo = CrosswordTwo.fromJsonFile(getContext(), crosswordFilePath);
+        } catch (IOException ex) {
+            Log.e(LOG_TAG, "Error loading the crossword!");
+            Log.e(LOG_TAG, ex.getMessage());
+            return view;
+        }
 
-        createCrossword();
+        getActivity().setTitle(crosswordTwo.getActivityTitle());
 
-        getActivity().setTitle(crossword.getActivityTitle());
-
-        // Populate the horizontal clues checklist:
-        populateCluesChecklists(acrossCluesChecklist, crossword.getHClues());
-        // Populate the vertical clues checklist
-        populateCluesChecklists(downCluesChecklist, crossword.getVClues());
+//        // Populate the horizontal clues checklist:
+//        populateCluesChecklists(acrossCluesChecklist, crosswordTwo.getHClues());
+//        // Populate the vertical clues checklist
+//        populateCluesChecklists(downCluesChecklist, crosswordTwo.getVClues());
 
         // Add click listeners for the hyphen/word split FABs
         view.findViewById(R.id.add_word_split).setOnClickListener(this);
         view.findViewById(R.id.add_hyphen).setOnClickListener(this);
         // Reduce their prominence
-        resetFABs();
+//        resetFABs();
 
 //        // Add click listener to the cell views, in case we're in add hyphen or add word split mode...
 //        crossword.setClickListenerForAllCells(this);
 
+        // TODO: Think about managing this better (other function somewhere, deal with portrait/landscape, etc
+        Point size = new Point();
+        getActivity().getWindowManager().getDefaultDisplay().getSize(size);
+        int gridSize = size.x - 80;
+        canvasEditor.initialise(gridSize, gridSize, crosswordTwo);
+        Log.d(LOG_TAG, "Invalidating canvas");
+        canvasEditor.invalidate();
+        Log.e(LOG_TAG, "onCreateView returning...");
         return view;
 
     }
@@ -218,11 +253,7 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
             param.topMargin = 5;
             param.setGravity(Gravity.CENTER);
             // Set the column position, and weight if the framework supports it
-            if (Build.VERSION.SDK_INT >= 21) {
-                param.columnSpec = GridLayout.spec(col, 1.0f);
-            } else {
-                param.columnSpec = GridLayout.spec(col);
-            }
+            param.columnSpec = GridLayout.spec(col, 1.0f);
             param.rowSpec = GridLayout.spec(row);
             c.setLayoutParams(param);
 
@@ -301,17 +332,17 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
      * @param letters Array of Strings for each letter in the clue
      */
     public void updateHangman(char[] letters) {
-        Log.d(LOG_TAG, "Updating hangman..." + String.valueOf(letters));
-        this.hangmanLayout.removeAllViews();
-        if (letters.length == 0) {
-            Log.d(LOG_TAG, "letters.length = 0");
-            return;
-        }
-        for (int i = 0; i < letters.length; i++) {
-            ManualAnagramKnownLetterCardView tv = new ManualAnagramKnownLetterCardView(getContext());
-            tv.setLetter(letters[i] + "");
-            this.hangmanLayout.addView(tv);
-        }
+        Log.d(LOG_TAG, "(NOT) Updating hangman..." + String.valueOf(letters));
+//        this.hangmanLayout.removeAllViews();
+//        if (letters.length == 0) {
+//            Log.d(LOG_TAG, "letters.length = 0");
+//            return;
+//        }
+//        for (int i = 0; i < letters.length; i++) {
+//            ManualAnagramKnownLetterCardView tv = new ManualAnagramKnownLetterCardView(getContext());
+//            tv.setLetter(letters[i] + "");
+//            this.hangmanLayout.addView(tv);
+//        }
     }
 
     private void addWordSplit() {

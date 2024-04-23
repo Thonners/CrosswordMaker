@@ -6,8 +6,6 @@
     tools:context="com.thonners.crosswordmaker.CrosswordPageFragment">
 
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -19,75 +17,69 @@
         android:orientation="vertical"
         tools:context="com.thonners.crosswordmaker.CrosswordActivity">
 
-        <com.thonners.crosswordmaker.HorizontalScrollViewNoFocus
-            android:id="@+id/horizontal_scroll_view_crossword"
-            android:animateLayoutChanges="true"
-            android:windowSoftInputMode="adjustNothing"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <ScrollView
-                android:id="@+id/vertical_scroll_view_crossword"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/cell_white">
-                    <com.thonners.crosswordmaker.CrosswordGrid
-                        android:id="@+id/crossword_grid"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:focusable="false"
-                        android:focusableInTouchMode="false"
-                        android:padding="@dimen/grid_padding">
 
-                    </com.thonners.crosswordmaker.CrosswordGrid>
-            </ScrollView>
-        </com.thonners.crosswordmaker.HorizontalScrollViewNoFocus>
+            <com.thonners.crosswordmaker.CrosswordCanvas
+                android:id="@+id/edit_crossword_canvas"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android.support.design:layout_constraintStart_toStartOf="parent"
+                android.support.design:layout_constraintTop_toTopOf="parent"
+                android.support.design:layout_constrainedWidth="false"
+                android.support.design:layout_constraintDimensionRatio="1:1" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ScrollView
             android:id="@+id/clues_checklist_parent_scroll_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1">
+
             <LinearLayout
                 android:id="@+id/clues_checklist_parent_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
                 <TextView
                     android:id="@+id/clues_checklist_across_header"
                     style="@style/clues_checklist_header"
-                    android:text="@string/across"/>
+                    android:text="@string/across" />
 
                 <GridLayout
                     android:id="@+id/clues_checklist_across_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
 
                 <TextView
                     android:id="@+id/clues_checklist_down_header"
                     style="@style/clues_checklist_header"
-                    android:text="@string/down"/>
+                    android:text="@string/down" />
+
                 <GridLayout
                     android:id="@+id/clues_checklist_down_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                </GridLayout>
+                    android:orientation="horizontal" />
             </LinearLayout>
         </ScrollView>
-        <LinearLayout
-            xmlns:app="http://schemas.android.com/apk/res-auto"
+
+        <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="bottom"
             android:layout_weight="0"
             android:orientation="vertical">
-            <LinearLayout
-                xmlns:app="http://schemas.android.com/apk/res-auto"
+
+            <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="bottom"
                 android:layout_weight="0"
                 android:orientation="horizontal">
+
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/add_word_split"
                     android:layout_width="match_parent"
@@ -106,6 +98,7 @@
                     app:maxImageSize="35dp"
 
                     />
+
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/add_hyphen"
                     android:layout_width="match_parent"
@@ -120,8 +113,7 @@
                     android:src="@drawable/cell_hyphen"
                     android:tooltipText="@string/add_hyphen_tooltip"
                     android:scaleType="center"
-                    app:maxImageSize="15dp"
-                    />
+                    app:maxImageSize="15dp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
