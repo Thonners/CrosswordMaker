@@ -1001,7 +1001,7 @@ public class Crossword {
 
     public void initialiseSaveFiles() {
         // Format File name
-        fileName = date + "-" + title.replaceAll(" ", "_").replaceAll("-", "__"); //.toLowerCase() ; // Delete this if it works
+        fileName = date + "-" + title.replaceAll(" ", "_").replaceAll("-", "__") + "_deprecatedCrossword"; //.toLowerCase() ; // Delete this if it works
         // Create the save files/directories
         File docsDirectory, photosDirectory;
         // Android 11 changes how this all works...
