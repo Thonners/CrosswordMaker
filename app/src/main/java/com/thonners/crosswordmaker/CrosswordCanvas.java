@@ -13,36 +13,6 @@ import android.view.View;
 
 public class CrosswordCanvas extends View implements View.OnTouchListener {
 
-    class CellCanvas {
-        int row, col, cellWidth;
-
-        public CellCanvas(int row, int col, int cellWidth) {
-            this.row = row;
-            this.col = col;
-            this.cellWidth = cellWidth;
-        }
-
-        public int getXMin() {
-            /*
-            0123455678
-            |_||_||_|
-            */
-            return col * cellWidth;
-        }
-
-        public int getXMax() {
-            return (col + 1) * cellWidth - 1;
-        }
-
-        public int getYMin() {
-            return row * cellWidth;
-        }
-
-        public int getYMax() {
-            return (row + 1) * cellWidth - 1;
-        }
-    }
-
     class Row {
         int row, paddingOffset;
 
@@ -77,20 +47,20 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
         }
     }
 
-    private static String LOG_TAG = "CrosswordCanvas";
+    private static final String LOG_TAG = "CrosswordCanvas";
 
-    boolean hasBeenInitialised = false;
-    Bitmap frame, gridBitmap, blackCellBitmap;
-    Canvas frameDrawer, backgroundGrid, blackCellMask;
-    Rect bounds;
-    Paint blackPaint, clueHighlightPaint, cellHighlightPaint, whitePaint;
-    int width, height, cellWidth, outerPadding;
+    private boolean hasBeenInitialised = false;
+    private Bitmap gridBitmap, blackCellBitmap, clueNumberBitmap;
+    private Canvas backgroundGrid, blackCellMask, clueNumberCanvas;
+    private Rect bounds;
+    private Paint blackPaint, clueHighlightPaint, cellHighlightPaint, whitePaint;
+    private int width, height, cellWidth, outerPadding, fontSize;
+    private final int cellSizeOverClueNumberSize = 4, clueNumberPadding = 5;
     private CrosswordTwo crossword;
-    CellCanvas[] cells;
 
-    int[] rowColIndex;
-    Row[] rows;
-    Col[] cols;
+    private int[] rowColIndex;
+    private Row[] rows;
+    private Col[] cols;
 
     public CrosswordCanvas(Context context) {
         super(context);
@@ -112,11 +82,14 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
         this.height = height;
         this.cellWidth = width / crossword.rowCount;
         this.outerPadding = (this.width - (this.cellWidth * crossword.rowCount)) / 2;
+        this.fontSize = cellWidth / cellSizeOverClueNumberSize;
 
         this.crossword = crossword;
+        Log.d(LOG_TAG, "Got crossword: " + crossword);
         blackPaint = new Paint();
         blackPaint.setColor(getResources().getColor(R.color.black, null));
         blackPaint.setStrokeWidth(2);
+        blackPaint.setTextSize(fontSize);
         whitePaint = new Paint();
         whitePaint.setColor(getResources().getColor(R.color.white, null));
         whitePaint.setStyle(Paint.Style.FILL);
@@ -125,12 +98,13 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
         cellHighlightPaint = new Paint();
         cellHighlightPaint.setColor(getResources().getColor(R.color.cell_highlighted, null));
 
-        frame = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         gridBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         blackCellBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        frameDrawer = new Canvas(frame);
+        clueNumberBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
         backgroundGrid = new Canvas(gridBitmap);
         blackCellMask = new Canvas(blackCellBitmap);
+        clueNumberCanvas = new Canvas(clueNumberBitmap);
         bounds = new Rect(0, 0, width, height);
         Log.d(LOG_TAG, "Canvas initialised to (w,h) = (" + width + ", " + height + ")");
 
@@ -144,22 +118,18 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
             cols[i] = new Col(i, outerPadding);
         }
         drawBackgroundGrid();
+        drawBlackCellMask();
+        drawClueNumbers();
         prepopulatePixelIndices();
-//        cells = new CellCanvas[crossword.rowCount * crossword.rowCount];
-//        for (int r = 0; r < crossword.rowCount; r++) {
-//            for (int c = 0; c < crossword.rowCount; c++) {
-//                int iCell = r * crossword.rowCount + c;
-//                cells[iCell] = new CellCanvas(r, c, cellWidth);
-//            }
-//        }
-
     }
 
     private void drawBackgroundGrid() {
         // Draw the border
         if (cols[0].getXMin() > 0) {
             backgroundGrid.drawRect(bounds, blackPaint);
-            backgroundGrid.drawRect(cols[0].getXMin(), rows[0].getYMin(), cols[crossword.rowCount - 1].getXMax(), rows[crossword.rowCount - 1].getYMax(), whitePaint);
+            backgroundGrid.drawRect(cols[0].getXMin(), rows[0].getYMin(),
+                    cols[crossword.rowCount - 1].getXMax(),
+                    rows[crossword.rowCount - 1].getYMax(), whitePaint);
         }
         for (int i = 0; i < crossword.rowCount; i++) {
             // Draw both sides of the rows
@@ -177,10 +147,36 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
         for (int r = 0; r < crossword.rowCount; r++) {
             for (int c = 0; c < crossword.rowCount; c++) {
                 if (crossword.getCell(r, c).getIsBlackCell()) {
-                    blackCellMask.drawRect(cols[c].getXMin(), rows[r].getYMin(), cols[c].getXMax(),
-                            rows[r].getYMax(), blackPaint);
+                    blackCellMask.drawRect(cols[c].getXMin(), rows[r].getYMin(),
+                            cols[c].getXMax(), rows[r].getYMax(), blackPaint);
                 }
             }
+        }
+    }
+
+    private void drawClueNumber(ClueTwo clue) {
+        Log.d(LOG_TAG, "Drawing clue number: " + clue.getClueNumber());
+        CellTwo firstCell = clue.getFirstCell();
+        int xPosition = cols[firstCell.getCol()].getXMin() + clueNumberPadding;
+        int yPosition = rows[firstCell.getRow()].getYMin() + fontSize; // Doesn't need vert padding
+        clueNumberCanvas.drawText("" + clue.getClueNumber(), xPosition, yPosition, blackPaint);
+    }
+
+    private void drawClueNumbers() {
+        if (crossword.editGridMode) {
+            // No clue numbers during edit grid mode
+            // (yet - could find clues live to help know when the grid is done correctly)
+            return;
+        }
+        Log.d(LOG_TAG, "Drawing clue numbers. Crossword has: " + crossword.hClues.length +
+                "hClues");
+
+        for (ClueTwo clue : crossword.hClues) {
+            drawClueNumber(clue);
+        }
+
+        for (ClueTwo clue : crossword.vClues) {
+            drawClueNumber(clue);
         }
     }
 
@@ -212,11 +208,29 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
         canvas.drawBitmap(gridBitmap, null, bounds, null);
         // Draw the black cells
         canvas.drawBitmap(blackCellBitmap, null, bounds, null);
+        // Draw the highlights
+        ClueTwo highlightedClue = crossword.getHighlightedClue();
+        if (highlightedClue != null) {
+            for (CellTwo cell : crossword.getHighlightedClue().getCells()) {
+                if (crossword.getHighlightedCell() != null && cell == crossword.getHighlightedCell()) {
+                    canvas.drawRect(getCellRect(cell), cellHighlightPaint);
+                } else {
+                    canvas.drawRect(getCellRect(cell), clueHighlightPaint);
+                }
+            }
+        }
+        // Draw the clue numbers
+        canvas.drawBitmap(clueNumberBitmap, null, bounds, null);
 
-        // TODO: Move to a black cell mask that can be calculated once for a pre-defined grid
         Log.d(LOG_TAG, "Canvas.onDraw called");
     }
 
+    private Rect getCellRect(CellTwo cell) {
+        int row = cell.getRow();
+        int col = cell.getCol();
+        return new Rect(cols[col].getXMin(), rows[row].getYMin(), cols[col].getXMax(),
+                rows[row].getYMax());
+    }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
