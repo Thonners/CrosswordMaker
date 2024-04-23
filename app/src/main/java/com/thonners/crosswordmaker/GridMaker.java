@@ -92,7 +92,6 @@ public class GridMaker extends AppCompatActivity {
 
     private void initialise() {
         // Get instances of the views in the layout.xml
-        grid = (GridLayout) findViewById(R.id.main_grid);
         linearLayout = (LinearLayout) findViewById(R.id.grid_maker_linear_layout);
         // Get intents
         crosswordTitle = getIntent().getStringExtra(Crossword.CROSSWORD_EXTRA_TITLE);
