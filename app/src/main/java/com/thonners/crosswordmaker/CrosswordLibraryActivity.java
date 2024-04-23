@@ -89,7 +89,7 @@ public class CrosswordLibraryActivity extends AppCompatActivity {
     private void addCrosswordToLayout(int index, CrosswordLibraryManager.SavedCrossword savedCrossword) {
 
         Card card = new Card(getApplicationContext(), savedCrossword.getTitle(), savedCrossword.getDisplayDate(), savedCrossword.getDisplayPercentageComplete());
-        card.setId(index);
+//        card.setId(index);
         card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

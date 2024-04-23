@@ -49,7 +49,7 @@ public class Card extends CardView {
 
         // Create layout parameters
         // Title
-        titleTV.setId(1000);
+//        titleTV.setId(1000);
         RelativeLayout.LayoutParams titleLP = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         titleLP.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         // Date
