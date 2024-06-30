@@ -36,7 +36,7 @@ public class CrosswordTwo {
     public ClueTwo[] hClues = null, vClues = null;
 
     private CellTwo highlightedCell;
-    private ClueTwo highlightedClue;
+    private ClueTwo highlightedClue = null;
     @Expose
     public final int rowCount;
     @Expose
@@ -286,7 +286,7 @@ public class CrosswordTwo {
                 highlightedClue = touchedCell.getOtherClue(highlightedClue);
             } else {
                 highlightedCell = touchedCell;
-                highlightedClue = touchedCell.getPrimaryClue();
+                highlightedClue = touchedCell.getClueForHighlight(highlightedClue);
             }
             if (highlightedClue != null) {
                 Log.d(LOG_TAG, "Highlighted clue: " + highlightedClue.toString());

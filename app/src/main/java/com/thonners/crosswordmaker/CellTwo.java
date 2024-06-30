@@ -142,6 +142,13 @@ public class CellTwo {
         return vClue;
     }
 
+    public ClueTwo getClueForHighlight(ClueTwo previousClue) {
+        if (previousClue != null && (previousClue == this.hClue || previousClue == this.vClue)) {
+            return previousClue;
+        }
+        return getPrimaryClue();
+    }
+
     public String toJson() {
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
         return gson.toJson(this);
