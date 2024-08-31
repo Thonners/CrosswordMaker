@@ -7,10 +7,13 @@ import android.os.Build;
 
 import com.google.android.material.snackbar.Snackbar;
 
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.viewpager.widget.PagerAdapter;
+import androidx.fragment.app.FragmentActivity;
+//import androidx.fragment.app.FragmentManager;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+//import androidx.fragment.app.FragmentStatePagerAdapter;
+//import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 import androidx.fragment.app.Fragment;
 
 import android.os.Bundle;
@@ -25,12 +28,16 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.util.Objects;
+
 
 public class CrosswordSliderActivity extends AppCompatActivity implements CrosswordPageFragment.OnFragmentInteractionListener, CluePageFragment.OnFragmentInteractionListener, DictionaryPageFragment.OnFragmentInteractionListener, AnagramPageFragment.OnAnagramFragmentListener, WikiPageFragment.OnFragmentInteractionListener {
 
     private static final String LOG_TAG = "CrosswordSliderActivity";
 
-    private static final int NUM_PAGES = 6;    // Number of slidable view/pages. Crossword, Clues, Manual anagram, Anagram, Dictionary, Doodle.
+    private static final int NUM_PAGES = 1;    // Number of slidable view/pages. Crossword,
+    // Clues, Manual anagram, Anagram, Dictionary, Doodle.
     private static final int CROSSWORD_TAB = 0;
     private static final int CLUE_TAB = 1;
     private static final int MANUAL_ANAGRAM_TAB = 2;
@@ -38,8 +45,8 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
     private static final int ANAGRAM_TAB = 4;
     private static final int WIKI_TAB = 5;
 
-    private ViewPager pager;               // This handles the animation/transition between pages
-    private PagerAdapter pagerAdapter;     // This provides the pages for the PagerAdapter.
+    private ViewPager2 pager;               // This handles the animation/transition between pages
+    private FragmentStateAdapter pagerAdapter;     // This provides the pages for the PagerAdapter.
     private CrosswordPageFragment.OnFragmentInteractionListener onFragmentInteractionListener;
 
     private boolean dontShowKeyboard = false;
@@ -59,6 +66,9 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
     private String[] crosswordStringArray;
     private Crossword crossword;
 
+    private String crosswordFilePath = "";
+    private CrosswordTwo crosswordTwo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,11 +86,12 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
         Log.d(LOG_TAG, "onPaused called - saving crossword.");
 
         if (crosswordPageFragment != null) {
-            crosswordPageFragment.getCrossword().saveCrossword();
+            crosswordPageFragment.getCrossword().saveCrossword(this);
         }
     }
 
-    //onRestart called only when activity is being restarted after being stopped.Try redirecting here back to home page.
+    //onRestart called only when activity is being restarted after being stopped.Try redirecting
+    // here back to home page.
     @Override
     protected void onRestart() {
         super.onRestart();      // Always call superclass first!
@@ -91,16 +102,28 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
 
     private void initialise() {
         // Get intent Extras
-        crosswordStringArray = getIntent().getStringArrayExtra(Crossword.CROSSWORD_EXTRA);
+        //        crosswordStringArray = getIntent().getStringArrayExtra(Crossword.CROSSWORD_EXTRA);
+        crosswordFilePath = getIntent().getStringExtra(CrosswordTwo.CROSSWORD_EXTRA);
+        try {
+            crosswordTwo = CrosswordTwo.fromJsonFile(this, crosswordFilePath);
+        } catch (IOException ex) {
+            Log.e(LOG_TAG, "Error reading saved JSON file!");
+            return;
+        }
 
         // Instantiate a ViewPager and a PagerAdapter.
-        pager = (ViewPager) findViewById(R.id.pager);
-        pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+        pager = (ViewPager2) findViewById(R.id.pager);
+        // TODO: Fix this working with ViewPager2 instead of the old version... broken everything...
+        pagerAdapter = new ScreenSlidePagerAdapter(this);
+        //        pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
-        pager.setOffscreenPageLimit(NUM_PAGES);
-        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        pager.setOffscreenPageLimit(6);
+        //        pager.setOffscreenPageLimit(NUM_PAGES);
+        pager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            //        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrollStateChanged(int state) {
+                //                if (state == ViewPager2.SCROLL_STATE_IDLE) {
                 if (state == ViewPager.SCROLL_STATE_IDLE) {
                     switch (pager.getCurrentItem()) {
                         case CROSSWORD_TAB:
@@ -213,26 +236,30 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onBackPressed() {
-        if (pager.getCurrentItem() == 0) {
-            // If the user is currently looking at the first step, i.e. the crossword activity, allow the system to handle the
-            // Back button. This calls finish() on this activity and pops the back stack.
-            //super.onBackPressed();
-            if (crosswordPageFragment != null && crosswordPageFragment.getCrossword().getIsZoomed()) {
-                // Zoom out if zoomed in and back pressed
-                crosswordPageFragment.getCrossword().toggleZoom();
-            } else {
-                // If not zoomed in and on crossword fragment, go home.
-                Intent homeIntent = new Intent(this, HomeActivity.class);
-                homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(homeIntent);
-            }
-        } else {
-            // Otherwise, return to the crossword Activity
-            pager.setCurrentItem(0);
-        }
-    }
+    //    @Override
+    //    public void onBackPressed() {
+    //        // TODO: Tidy up our custom back navigation: https://developer.android.com/guide/navigation/navigation-custom-back#activity_onbackpressed
+    //        if (pager.getCurrentItem() == 0) {
+    //            // If the user is currently looking at the first step, i.e. the crossword
+    //            activity, allow the system to handle the
+    //            // Back button. This calls finish() on this activity and pops the back stack.
+    //            //super.onBackPressed();
+    //            if (crosswordPageFragment != null && crosswordPageFragment.getCrossword()
+    //            .getIsZoomed()) {
+    //                // Zoom out if zoomed in and back pressed
+    //                crosswordPageFragment.getCrossword().toggleZoom();
+    //            } else {
+    //                // If not zoomed in and on crossword fragment, go home.
+    //                Intent homeIntent = new Intent(this, HomeActivity.class);
+    //                homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    //                startActivity(homeIntent);
+    //            }
+    //        } else {
+    //            // Otherwise, return to the crossword Activity
+    //            pager.setCurrentItem(0);
+    //        }
+    ////        getOnBackPressedDispatcher().onBackPressed();
+    //    }
 
     public interface OnFragmentInteractionListener {
         public void onFragmentInteraction(Uri uri);
@@ -246,21 +273,26 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
      * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in
      * sequence.
      */
-    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
-        public ScreenSlidePagerAdapter(FragmentManager fm) {
-            super(fm);
+    private class ScreenSlidePagerAdapter extends FragmentStateAdapter {
+        public ScreenSlidePagerAdapter(FragmentActivity fragment) {
+            super(fragment);
         }
 
         @Override
-        public Fragment getItem(int position) {
+        public Fragment createFragment(int position) {
 
             switch (position) {
                 case CROSSWORD_TAB:
-                    crosswordPageFragment = CrosswordPageFragment.newInstance(position, crosswordStringArray);
+                    crosswordPageFragment = CrosswordPageFragment.newInstance(position,
+                            crosswordFilePath);
+                    //                    crosswordPageFragment = CrosswordPageFragment
+                    //                    .newInstance(position, crosswordStringArray);
                     return crosswordPageFragment;
-                case CLUE_TAB:
-                    cluePageFragment = CluePageFragment.newInstance(crosswordStringArray[Crossword.SAVED_ARRAY_INDEX_CLUE_IMAGE]);
-                    return cluePageFragment;
+                //                case CLUE_TAB:
+                //                    cluePageFragment = CluePageFragment.newInstance
+                //                    (crosswordStringArray[Crossword
+                //                    .SAVED_ARRAY_INDEX_CLUE_IMAGE]);
+                //                    return cluePageFragment;
                 case MANUAL_ANAGRAM_TAB:
                     manualAnagramPageFragment = new ManualAnagramPageFragment();
                     return manualAnagramPageFragment;
@@ -280,21 +312,73 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
         }
 
         @Override
-        public int getCount() {
+        public int getItemCount() {
             return NUM_PAGES;
         }
 
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return tabTitles[position];
-        }
+        //        @Override
+        //        public CharSequence getPageTitle(int position) {
+        //            return tabTitles[position];
+        //        }
     }
+    //
+    //    /**
+    //     * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in
+    //     * sequence.
+    //     */
+    //    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
+    //        public ScreenSlidePagerAdapter(FragmentManager fm) {
+    //            super(fm);
+    //        }
+    //
+    //        @Override
+    //        public Fragment getItem(int position) {
+    //
+    //            switch (position) {
+    //                case CROSSWORD_TAB:
+    //                    crosswordPageFragment = CrosswordPageFragment.newInstance(position,
+    //                    crosswordStringArray);
+    //                    return crosswordPageFragment;
+    //                case CLUE_TAB:
+    //                    cluePageFragment = CluePageFragment.newInstance
+    //                    (crosswordStringArray[Crossword.SAVED_ARRAY_INDEX_CLUE_IMAGE]);
+    //                    return cluePageFragment;
+    //                case MANUAL_ANAGRAM_TAB:
+    //                    manualAnagramPageFragment = new ManualAnagramPageFragment();
+    //                    return manualAnagramPageFragment;
+    //                case DICTIONARY_TAB:
+    //                    dictionaryPageFragment = new DictionaryPageFragment();
+    //                    return dictionaryPageFragment;
+    //                case ANAGRAM_TAB:
+    //                    anagramPageFragment = new AnagramPageFragment();
+    //                    return anagramPageFragment;
+    //                case WIKI_TAB:
+    //                    wikiPageFragment = new WikiPageFragment();
+    //                    return wikiPageFragment;
+    //            }
+    //
+    //            // Safety net - in case position is out of range shown above. Should never be
+    //            needed
+    //            return wikiPageFragment;
+    //        }
+    //
+    //        @Override
+    //        public int getCount() {
+    //            return NUM_PAGES;
+    //        }
+    //
+    //        @Override
+    //        public CharSequence getPageTitle(int position) {
+    //            return tabTitles[position];
+    //        }
+    //    }
 
     private void hideKeyboard() {
         // Method to hide the keyboard
         try {
-            InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+            InputMethodManager inputManager =
+                    (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         } catch (NullPointerException npe) {
             Log.d(LOG_TAG, "Caught null pointer exception trying to close keyboard.");
         }
@@ -302,21 +386,22 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
 
     private void hideActionZoom() {
         // Remove/hide the zoom icon from the menu
-        ActionMenuItemView menuZoom = (ActionMenuItemView) findViewById(R.id.action_zoom);
-        menuZoom.setVisibility(View.GONE);
+        //        ActionMenuItemView menuZoom = (ActionMenuItemView) findViewById(R.id.action_zoom);
+        //        menuZoom.setVisibility(View.GONE);
     }
 
     private void showActionZoom() {
         // Replace the zoom icon in the menu
-        ActionMenuItemView menuZoom = (ActionMenuItemView) findViewById(R.id.action_zoom);
-        menuZoom.setVisibility(View.VISIBLE);
+        //        ActionMenuItemView menuZoom = (ActionMenuItemView) findViewById(R.id.action_zoom);
+        //        menuZoom.setVisibility(View.VISIBLE);
     }
 
     private void showKeyboard(View view) {
         Log.d(LOG_TAG, "Show keyboard called");
         // Method to show the keyboard
-        InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputManager.showSoftInput(view, inputManager.SHOW_IMPLICIT);
+        InputMethodManager inputManager =
+                (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
     }
 
     public void searchDictionary(String searchTerm) {
@@ -349,30 +434,29 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
 
     private void toggleZoom() {
         // Toggle the zoom
-        crosswordPageFragment.zoomCrossword();
-
-        // Toggle the icon
-        ActionMenuItemView menuZoom = (ActionMenuItemView) findViewById(R.id.action_zoom);
-
-        // Check Android version sufficient
-        if (Build.VERSION.SDK_INT >= 21) {
-            if (crosswordPageFragment.getCrossword().getIsZoomed()) {
-                menuZoom.setIcon(getDrawable(R.drawable.ic_zoom_out_white));
-            } else {
-                menuZoom.setIcon(getDrawable(R.drawable.ic_zoom_in_white));
-            }
-        }
+        //        crosswordPageFragment.zoomCrossword();
+        //
+        //        // Toggle the icon
+        //        ActionMenuItemView menuZoom = (ActionMenuItemView) findViewById(R.id.action_zoom);
+        //
+        //        // Check Android version sufficient
+        //        if (crosswordPageFragment.getCrossword().getIsZoomed()) {
+        //            menuZoom.setIcon(getDrawable(R.drawable.ic_zoom_out_white));
+        //        } else {
+        //            menuZoom.setIcon(getDrawable(R.drawable.ic_zoom_in_white));
+        //        }
     }
 
     public void saveGrid() {
         // Save the grid
         if (crosswordPageFragment != null) {
-            crosswordPageFragment.getCrossword().saveCrossword();
+            crosswordPageFragment.getCrossword().saveCrossword(this);
 
             Toast toast = Toast.makeText(this, "Crossword progress saved.", Toast.LENGTH_SHORT);
             toast.show();
         } else {
-            Toast toast = Toast.makeText(this, "Something went wrong when trying to save. Please try again.", Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(this, "Something went wrong when trying to save. Please "
+                    + "try again.", Toast.LENGTH_LONG);
             toast.show();
         }
     }

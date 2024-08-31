@@ -72,13 +72,14 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
     private LinearLayout mainLayout;
 
     private CrosswordLibraryManager libraryManager;
-    private ArrayList<CrosswordLibraryManager.SavedCrossword> recentCrosswords;
+    private ArrayList<CrosswordTwo> recentCrosswords;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Initialise SharedPreferences (iff they haven't been set before - the false means don't rewrite the defaults if they already exist)
+        // Initialise SharedPreferences (iff they haven't been set before - the false means don't
+        // rewrite the defaults if they already exist)
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         // Create / get the views
@@ -153,7 +154,7 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
                 recentCard3.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        libraryManager.openCrossword(recentCrosswords.get(2).crosswordDir);
+                        libraryManager.openCrossword(recentCrosswords.get(2).getCrosswordFile());
                     }
                 });
             case 2:
@@ -165,7 +166,7 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
                 recentCard2.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        libraryManager.openCrossword(recentCrosswords.get(1).crosswordDir);
+                        libraryManager.openCrossword(recentCrosswords.get(1).getCrosswordFile());
                     }
                 });
             case 1:
@@ -177,7 +178,7 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
                 recentCard1.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        libraryManager.openCrossword(recentCrosswords.get(0).crosswordDir);
+                        libraryManager.openCrossword(recentCrosswords.get(0).getCrosswordFile());
                     }
                 });
                 break;
@@ -248,7 +249,8 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
         boolean safeToWrite = false;
 
         if (clm.crosswordAlreadyExists(publication, date)) {
-            Log.d(LOG_TAG, "Crossword file already exists for: " + publication + " - " + date + ". Checking if it's safe to overwrite...");
+            Log.d(LOG_TAG, "Crossword file already exists for: " + publication + " - " + date +
+                    ". Checking if it's safe to overwrite...");
             safeToWrite = confirmOverwrite();
         } else {
             safeToWrite = true;
@@ -266,7 +268,8 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
     private boolean confirmOverwrite() {
-        // Popup with confirmation that the previously saved crossword with this publication(i.e. name) and date will be overwritten
+        // Popup with confirmation that the previously saved crossword with this publication(i.e.
+        // name) and date will be overwritten
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         // Set the dialog title
         builder.setTitle(publication + " - " + Crossword.getDisplayDate(this, date));
@@ -315,15 +318,14 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
 
         // Specify the list array, the items to be selected by default,
         // and the listener through which to receive callbacks when items are selected
-        builder.setSingleChoiceItems(publications, -1,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int pub) {
+        builder.setSingleChoiceItems(publications, -1, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int pub) {
 
-                        publication = publications[pub].toString();
+                publication = publications[pub].toString();
 
-                    }
-                });
+            }
+        });
 
 
         // Set the action buttons
@@ -378,8 +380,10 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
                 // Set selectedPublication to the text entered in the box
                 if (input.getText().toString().equals("")) {
                     Log.d(LOG_TAG, "Blank entry for publication name. Reopening the dialog");
-                    popupOtherPublicationDialog();  // If it is blank, call this alert again. User can press cancel to get out of it if requried.
-                    Toast.makeText(getApplicationContext(), "A name for the publication is required to continue.", Toast.LENGTH_SHORT).show();
+                    popupOtherPublicationDialog();  // If it is blank, call this alert again.
+                    // User can press cancel to get out of it if requried.
+                    Toast.makeText(getApplicationContext(), "A name for the publication is " +
+                            "required to continue.", Toast.LENGTH_SHORT).show();
                 } else {
                     Log.d(LOG_TAG, "Entry for publication name given as:");
                     publication = input.getText().toString();
@@ -443,7 +447,8 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
      */
     private void checkServerConnection() {
         if (!getOfflineMode() && isNetworkAvailable()) {
-            HttpsServerConnection.ServerConnectionListener serverConnectionListener = new HttpsServerConnection.ServerConnectionListener() {
+            HttpsServerConnection.ServerConnectionListener serverConnectionListener =
+                    new HttpsServerConnection.ServerConnectionListener() {
                 @Override
                 public void serverConnectionResponse(ServerConnection.SocketIdentifier requestSuccess, ArrayList<String> answers) {
 
@@ -453,10 +458,13 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
                 public void setServerAvailable(boolean isAvailable) {
                     serverAvailable = isAvailable;
                     if (serverAvailable) {
-                        Log.d(LOG_TAG, "Network is available, and server connection test was successful.");
-                        //Toast.makeText(getApplicationContext(),getString(R.string.server_available_toast),Toast.LENGTH_SHORT).show();
+                        Log.d(LOG_TAG, "Network is available, and server connection test was " +
+                                "successful.");
+                        //Toast.makeText(getApplicationContext(),getString(R.string
+                        // .server_available_toast),Toast.LENGTH_SHORT).show();
                     } else {
-                        Log.d(LOG_TAG, "Network is available, and server connection test was UNsuccessful.");
+                        Log.d(LOG_TAG, "Network is available, and server connection test was " +
+                                "UNsuccessful.");
                     }
                 }
 
@@ -470,31 +478,36 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
             };
             serverConnection = new HttpsServerConnection(serverConnectionListener);
             serverConnection.testServerConnection();
-//            ServerConnection.ServerConnectionListener serverConnectionListener = new ServerConnection.ServerConnectionListener() {
-//                @Override
-//                public void serverConnectionResponse(ServerConnection.SocketIdentifier requestSuccess, ArrayList<String> answers) {
-//
-//                }
-//                @Override
-//                public void setServerAvailable(boolean isAvailable) {
-//                    serverAvailable = isAvailable ;
-//                    if (serverAvailable) {
-//                        Log.d(LOG_TAG, "Network is available, and server connection test was successful.");
-//                        //Toast.makeText(getApplicationContext(),getString(R.string.server_available_toast),Toast.LENGTH_SHORT).show();
-//                    } else {
-//                        Log.d(LOG_TAG, "Network is available, and server connection test was UNsuccessful.");
-//                    }
-//                }
-//
-//                @Override
-//                public void callShowLoadingSpinner() {
-//                }
-//                @Override
-//                public void callHideLoadingSpinner() {
-//                }
-//            } ;
-//            serverConnection = new ServerConnection(serverConnectionListener) ;
-//            serverConnection.testServerConnection() ;
+            //            ServerConnection.ServerConnectionListener serverConnectionListener =
+            //            new ServerConnection.ServerConnectionListener() {
+            //                @Override
+            //                public void serverConnectionResponse(ServerConnection
+            //                .SocketIdentifier requestSuccess, ArrayList<String> answers) {
+            //
+            //                }
+            //                @Override
+            //                public void setServerAvailable(boolean isAvailable) {
+            //                    serverAvailable = isAvailable ;
+            //                    if (serverAvailable) {
+            //                        Log.d(LOG_TAG, "Network is available, and server connection
+            //                        test was successful.");
+            //                        //Toast.makeText(getApplicationContext(),getString(R.string
+            //                        .server_available_toast),Toast.LENGTH_SHORT).show();
+            //                    } else {
+            //                        Log.d(LOG_TAG, "Network is available, and server connection
+            //                        test was UNsuccessful.");
+            //                    }
+            //                }
+            //
+            //                @Override
+            //                public void callShowLoadingSpinner() {
+            //                }
+            //                @Override
+            //                public void callHideLoadingSpinner() {
+            //                }
+            //            } ;
+            //            serverConnection = new ServerConnection(serverConnectionListener) ;
+            //            serverConnection.testServerConnection() ;
         } else {
             // Force to false is no network available
             Log.d(LOG_TAG, "No network detected, so no server available");
@@ -506,7 +519,8 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
      * @return Whether the device has a network connection.
      */
     private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null;
     }
@@ -515,7 +529,7 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
      * Method to provide easy interface to call stopRateDialog when never is clicked.
      */
     private void neverRate() {
-//        RateThisApp.stopRateDialog(this);
+        //        RateThisApp.stopRateDialog(this);
     }
 
     /**
@@ -523,44 +537,48 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
      */
     private void showRateDialog() {
         // TODO: Replace functionality
-//
-//        // Monitor launch times and interval from installation
-//        RateThisApp.onStart(this);
-//        // Set the desired frequency
-//        RateThisApp.Config  config = new RateThisApp.Config(RATE_DAYS, RATE_LAUNCHES);
-//        config.setTitle(R.string.rate_title);
-//        config.setMessage(R.string.rate_message);
-//        config.setYesButtonText(R.string.rate_yes);
-//        config.setNoButtonText(R.string.rate_never);
-//        config.setCancelButtonText(R.string.rate_later);
-//        // Callback from clicks
-//        RateThisApp.init(config);
-//        RateThisApp.setCallback(new RateThisApp.Callback() {
-//            @Override
-//            public void onYesClicked() {
-//                //Toast.makeText(HomeActivity.this, "Yes event", Toast.LENGTH_SHORT).show();
-//            }
-//
-//            @Override
-//            public void onNoClicked() {
-//                //Toast.makeText(HomeActivity.this, "No event", Toast.LENGTH_SHORT).show();
-//                neverRate();
-//            }
-//
-//            @Override
-//            public void onCancelClicked() {
-//                //Toast.makeText(HomeActivity.this, "Cancel event", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//        // If the criteria is satisfied, "Rate this app" dialog will be shown
-//        RateThisApp.showRateDialogIfNeeded(this);
+        //
+        //        // Monitor launch times and interval from installation
+        //        RateThisApp.onStart(this);
+        //        // Set the desired frequency
+        //        RateThisApp.Config  config = new RateThisApp.Config(RATE_DAYS, RATE_LAUNCHES);
+        //        config.setTitle(R.string.rate_title);
+        //        config.setMessage(R.string.rate_message);
+        //        config.setYesButtonText(R.string.rate_yes);
+        //        config.setNoButtonText(R.string.rate_never);
+        //        config.setCancelButtonText(R.string.rate_later);
+        //        // Callback from clicks
+        //        RateThisApp.init(config);
+        //        RateThisApp.setCallback(new RateThisApp.Callback() {
+        //            @Override
+        //            public void onYesClicked() {
+        //                //Toast.makeText(HomeActivity.this, "Yes event", Toast.LENGTH_SHORT)
+        //                .show();
+        //            }
+        //
+        //            @Override
+        //            public void onNoClicked() {
+        //                //Toast.makeText(HomeActivity.this, "No event", Toast.LENGTH_SHORT)
+        //                .show();
+        //                neverRate();
+        //            }
+        //
+        //            @Override
+        //            public void onCancelClicked() {
+        //                //Toast.makeText(HomeActivity.this, "Cancel event", Toast.LENGTH_SHORT)
+        //                .show();
+        //            }
+        //        });
+        //        // If the criteria is satisfied, "Rate this app" dialog will be shown
+        //        RateThisApp.showRateDialogIfNeeded(this);
     }
 
     @Override
     public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
 
         String yr = year + "";
-        String month = (monthOfYear + 1) + "";   // Add 1 to the month so that it displays normally. Calendar returns months 0-11.
+        String month = (monthOfYear + 1) + "";   // Add 1 to the month so that it displays
+        // normally. Calendar returns months 0-11.
         String day = dayOfMonth + "";
 
         // Do something with the displayDate chosen by the user
@@ -579,7 +597,8 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
     }
 
     public static class StartDatePicker extends DialogFragment {
-        // public static class StartDatePicker extends DialogFragment implements DatePickerDialog.OnDateSetListener{
+        // public static class StartDatePicker extends DialogFragment implements DatePickerDialog
+        // .OnDateSetListener{
 
         // For displayDate picker
         Calendar c = Calendar.getInstance();
@@ -590,7 +609,8 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             // Use the current displayDate as the default displayDate in the picker
-            return new DatePickerDialog(getActivity(), (HomeActivity) getActivity(), startYear, startMonth, startDay);
+            return new DatePickerDialog(getActivity(), (HomeActivity) getActivity(), startYear,
+                    startMonth, startDay);
         }
     }
 
@@ -603,13 +623,15 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
         // Create Intent & let email client send the message
         Intent i = new Intent(Intent.ACTION_SEND);
         i.setType(context.getResources().getString(R.string.email_type));
-        i.putExtra(Intent.EXTRA_EMAIL, new String[]{context.getResources().getString(R.string.email_target)});
+        i.putExtra(Intent.EXTRA_EMAIL,
+                new String[]{context.getResources().getString(R.string.email_target)});
         i.putExtra(Intent.EXTRA_SUBJECT, context.getResources().getString(R.string.email_subject));
         i.putExtra(Intent.EXTRA_TEXT, context.getResources().getString(R.string.email_body));
         try {
             context.startActivity(Intent.createChooser(i, "Send mail..."));
         } catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(context, context.getResources().getString(R.string.email_error), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, context.getResources().getString(R.string.email_error),
+                    Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -626,13 +648,12 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
         builder.setTitle(context.getString(R.string.about_title));
         builder.setView(aboutTV);
         builder.setNegativeButton(R.string.about_dismiss, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        // Do nothing
-                        dialog.cancel();
-                    }
-                }
-        );
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                // Do nothing
+                dialog.cancel();
+            }
+        });
         builder.show();
     }
 
@@ -649,18 +670,24 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
     public static boolean sdcardIsAvailable(Activity activity) {
         // TODO: Check storage permissions for Android 11+ differently...
         if (Build.VERSION.SDK_INT >= 30) {
-            Log.d(LOG_TAG, "Android Version 30+ detected. Doing something else to ask for file write permission");
+            Log.d(LOG_TAG,
+                    "Android Version 30+ detected. Doing something else to ask for file " +
+                            "write permission");
             return true;
         } else {
             // Check to see if SD Card is available - This is required to save crosswords
-            boolean isSDPresent = android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED);
+            boolean isSDPresent =
+                    android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED);
             if (isSDPresent) {
                 // Check whether this app has write external storage permission or not.
-                int writeExternalStoragePermission = ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                int writeExternalStoragePermission = ContextCompat.checkSelfPermission(activity,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE);
                 // If do not grant write external storage permission.
                 if (writeExternalStoragePermission != PackageManager.PERMISSION_GRANTED) {
                     // Request user to grant write external storage permission.
-                    ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_WRITE_EXTERNAL_STORAGE_PERMISSION);
+                    ActivityCompat.requestPermissions(activity,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            REQUEST_CODE_WRITE_EXTERNAL_STORAGE_PERMISSION);
                     Log.d(LOG_TAG, "No permission for writing to external storage");
                 }
                 // yes SD-card is present
@@ -676,21 +703,26 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
 
     public static void hideKeyboard(Context context, View view) {
         // Method to hide the keyboard
-        InputMethodManager inputManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        InputMethodManager inputManager =
+                (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(view.getWindowToken(),
+                InputMethodManager.HIDE_NOT_ALWAYS);
 
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == REQUEST_CODE_WRITE_EXTERNAL_STORAGE_PERMISSION) {
             int grantResultsLength = grantResults.length;
             if (grantResultsLength > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(getApplicationContext(), "Thanks. Saving progress is now possible", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Thanks. Saving progress is now possible"
+                        , Toast.LENGTH_LONG).show();
             } else {
-                Toast.makeText(getApplicationContext(), "You denied permission to write to storage. This is required to save files.", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "You denied permission to write to " +
+                        "storage. This is required to save files.", Toast.LENGTH_LONG).show();
             }
         }
     }

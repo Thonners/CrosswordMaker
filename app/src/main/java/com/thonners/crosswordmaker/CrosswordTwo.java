@@ -53,7 +53,7 @@ public class CrosswordTwo {
 
         try (FileInputStream fIn = new FileInputStream(jsonFilePath); BufferedReader myReader =
                 new BufferedReader(new InputStreamReader(fIn)); FileReader fileReader =
-                     new FileReader(jsonFilePath)) {
+                new FileReader(jsonFilePath)) {
             String jsonString = "", line;
             while ((line = myReader.readLine()) != null) {
                 jsonString += line;
@@ -73,6 +73,7 @@ public class CrosswordTwo {
         CrosswordTwo crossword = gson.fromJson(json, CrosswordTwo.class);
         crossword.findClues();
         Log.d(LOG_TAG, "Crossword instantiated from JSON: " + crossword);
+        crossword.initialiseSaveFile(context);
         return crossword;
     }
 
@@ -234,6 +235,10 @@ public class CrosswordTwo {
         return gson.toJson(this);
     }
 
+    public String getTitle() {
+        return title;
+    }
+
     public void setTitle(String title) {
         this.title = title;
     }
@@ -244,24 +249,29 @@ public class CrosswordTwo {
 
     public String getDisplayDate() {
         return date.substring(6, 8) + "/" + date.substring(4, 6) + "/" + date.substring(0, 4);
-//        // Method to use for saving the display displayDate. Not sure this is required
-//        SimpleDateFormat sdf = new SimpleDateFormat(SAVE_DATE_FORMAT);      // Save Formatted
-//        displayDate
-//        DateFormat localeDateFormat = android.text.format.DateFormat.getDateFormat(con);    //
-//        Locale displayDate format
-//        Date dateProper;
-//
-//        try {
-//            dateProper = sdf.parse(date);
-//        } catch (Exception e) {
-//            Log.e(LOG_TAG, "Couldn't parse Crossword.displayDate (should be in save format)
-//            into something useful. This is coming from HomeActivity via intents so check the
-//            routing!");
-//            return context.getResources().getString(R.string.error_crossword_date); // Return
-//            the error message to be displayed.
-//        }
-//
-//        return localeDateFormat.format(dateProper);
+        //        // Method to use for saving the display displayDate. Not sure this is required
+        //        SimpleDateFormat sdf = new SimpleDateFormat(SAVE_DATE_FORMAT);      // Save
+        //        Formatted
+        //        displayDate
+        //        DateFormat localeDateFormat = android.text.format.DateFormat.getDateFormat(con)
+        //        ;    //
+        //        Locale displayDate format
+        //        Date dateProper;
+        //
+        //        try {
+        //            dateProper = sdf.parse(date);
+        //        } catch (Exception e) {
+        //            Log.e(LOG_TAG, "Couldn't parse Crossword.displayDate (should be in save
+        //            format)
+        //            into something useful. This is coming from HomeActivity via intents so
+        //            check the
+        //            routing!");
+        //            return context.getResources().getString(R.string.error_crossword_date); //
+        //            Return
+        //            the error message to be displayed.
+        //        }
+        //
+        //        return localeDateFormat.format(dateProper);
     }
 
     public String getActivityTitle() {
@@ -307,6 +317,13 @@ public class CrosswordTwo {
 
     public ClueTwo getHighlightedClue() {
         return highlightedClue;
+    }
+
+    public boolean deleteCrosswordFile() {
+        // TODO: Implement deleting the crossword file
+        Log.d(LOG_TAG, "deleteCrosswordFile() called on " + getActivityTitle() + ", but deleting "
+                + "the crossword file not yet implemented.");
+        return false;
     }
 
     @NonNull

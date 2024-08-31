@@ -36,11 +36,14 @@ import java.util.ArrayList;
  * Use the {@link CrosswordPageFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CrosswordPageFragment extends Fragment implements View.OnClickListener, View.OnLongClickListener, Crossword.WordSplitHyphenDeactivatedListener, Clue.ClueInteractionListener {
+public class CrosswordPageFragment extends Fragment implements View.OnClickListener,
+        View.OnLongClickListener, Crossword.WordSplitHyphenDeactivatedListener,
+        Clue.ClueInteractionListener {
 
     private static final String ARG_TAB_POSITION = "tabPosition";
     private static final String ARG_STRING_ARRAY = "crosswordStringArray";
-    private static final String ARG_STRING_FILENAME = "com.thonners.crosswordmaker.CrosswordPageFragment.crosswordFilename";
+    private static final String ARG_STRING_FILENAME = "com.thonners.crosswordmaker" +
+            ".CrosswordPageFragment.crosswordFilename";
     private static final String LOG_TAG = "CrosswordPageFragment";
 
     private final int MAX_COL_COUNT = 10;
@@ -93,7 +96,7 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             tabPosition = getArguments().getInt(ARG_TAB_POSITION);
-//            crosswordStringArray = getArguments().getStringArray(ARG_STRING_ARRAY);
+            //            crosswordStringArray = getArguments().getStringArray(ARG_STRING_ARRAY);
 
             crosswordFilePath = getArguments().getString(ARG_STRING_FILENAME);
         }
@@ -103,7 +106,7 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
     public void onResume() {
         super.onResume();
         Log.d(LOG_TAG, "onResume called. Initialising save Files");
-//        crossword.initialiseSaveFiles(); // TODO: Uncomment this!
+        //        crossword.initialiseSaveFiles(); // TODO: Uncomment this!
     }
 
     @Override
@@ -115,20 +118,21 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
         // Get instances of the views
         Log.d(LOG_TAG, "Getting the canvas editor view");
         canvasEditor = view.findViewById(R.id.edit_crossword_canvas);
-//        crosswordGrid = view.findViewById(R.id.crossword_grid);
-//        horizontalScrollViewNoFocus = view.findViewById(R.id.horizontal_scroll_view_crossword);
-//        verticalScrollView = view.findViewById(R.id.vertical_scroll_view_crossword);
-//        acrossCluesChecklist = view.findViewById(R.id.clues_checklist_across_layout);
-//        downCluesChecklist = view.findViewById(R.id.clues_checklist_down_layout);
+        //        crosswordGrid = view.findViewById(R.id.crossword_grid);
+        //        horizontalScrollViewNoFocus = view.findViewById(R.id
+        //        .horizontal_scroll_view_crossword);
+        //        verticalScrollView = view.findViewById(R.id.vertical_scroll_view_crossword);
+        //        acrossCluesChecklist = view.findViewById(R.id.clues_checklist_across_layout);
+        //        downCluesChecklist = view.findViewById(R.id.clues_checklist_down_layout);
         wordSplitFAB = view.findViewById(R.id.add_word_split);
         hyphenFAB = view.findViewById(R.id.add_hyphen);
-////        hangmanLayout = view.findViewById(R.id.hangman_letters_layout);
-//
-//        // Pass scroll view instances to the crosswordGrid
-//        crosswordGrid.setHorizontalScrollView(horizontalScrollViewNoFocus);
-//        crosswordGrid.setVerticalScrollView(verticalScrollView);
-//
-//        createCrossword();
+        ////        hangmanLayout = view.findViewById(R.id.hangman_letters_layout);
+        //
+        //        // Pass scroll view instances to the crosswordGrid
+        //        crosswordGrid.setHorizontalScrollView(horizontalScrollViewNoFocus);
+        //        crosswordGrid.setVerticalScrollView(verticalScrollView);
+        //
+        //        createCrossword();
 
         try {
             crosswordTwo = CrosswordTwo.fromJsonFile(getContext(), crosswordFilePath);
@@ -140,21 +144,23 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
 
         getActivity().setTitle(crosswordTwo.getActivityTitle());
 
-//        // Populate the horizontal clues checklist:
-//        populateCluesChecklists(acrossCluesChecklist, crosswordTwo.getHClues());
-//        // Populate the vertical clues checklist
-//        populateCluesChecklists(downCluesChecklist, crosswordTwo.getVClues());
+        //        // Populate the horizontal clues checklist:
+        //        populateCluesChecklists(acrossCluesChecklist, crosswordTwo.getHClues());
+        //        // Populate the vertical clues checklist
+        //        populateCluesChecklists(downCluesChecklist, crosswordTwo.getVClues());
 
         // Add click listeners for the hyphen/word split FABs
         view.findViewById(R.id.add_word_split).setOnClickListener(this);
         view.findViewById(R.id.add_hyphen).setOnClickListener(this);
         // Reduce their prominence
-//        resetFABs();
+        //        resetFABs();
 
-//        // Add click listener to the cell views, in case we're in add hyphen or add word split mode...
-//        crossword.setClickListenerForAllCells(this);
+        //        // Add click listener to the cell views, in case we're in add hyphen or add
+        //        word split mode...
+        //        crossword.setClickListenerForAllCells(this);
 
-        // TODO: Think about managing this better (other function somewhere, deal with portrait/landscape, etc
+        // TODO: Think about managing this better (other function somewhere, deal with
+        //  portrait/landscape, etc
         Point size = new Point();
         getActivity().getWindowManager().getDefaultDisplay().getSize(size);
         int gridSize = size.x - 80;
@@ -173,8 +179,8 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
         try {
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
+            throw new ClassCastException(activity.toString() + " must implement " +
+                    "OnFragmentInteractionListener");
         }
     }
 
@@ -208,8 +214,8 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
         crossword.toggleZoom();
     }
 
-    public Crossword getCrossword() {
-        return crossword;
+    public CrosswordTwo getCrossword() {
+        return crosswordTwo;
     }
 
     public File getCrosswordSaveDir() {
@@ -227,7 +233,8 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
         Log.d(LOG_TAG, "Populating the clues checklist...");
         // Get column count, etc.
         int clueCount = clues.size();
-        int colMax = Math.max(Math.min(MAX_COL_COUNT, clueCount), 1); // Force the colMax to be between 1 and the MAX_COL_COUNT value
+        int colMax = Math.max(Math.min(MAX_COL_COUNT, clueCount), 1); // Force the colMax to be
+        // between 1 and the MAX_COL_COUNT value
         int rowCount = clueCount / colMax;
         gridLayout.setColumnCount(colMax);
         gridLayout.setRowCount(rowCount + 1);
@@ -276,7 +283,8 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
      * @param clueID          The uniqueID of the clue
      * @param displayNumer    The number to be displayed for the clue
      */
-    private void makeClueChecklistEntry(LinearLayout checklistLayout, int clueID, int displayNumer) {
+    private void makeClueChecklistEntry(LinearLayout checklistLayout, int clueID,
+                                        int displayNumer) {
 
     }
 
@@ -311,7 +319,8 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
     }
 
     /**
-     * Method to manage the user long-clicking a clue checklist entry to override the automatic management
+     * Method to manage the user long-clicking a clue checklist entry to override the automatic
+     * management
      * and uncross/cross it off
      *
      * @param view The {@link ClueChecklistEntryTextView} that has been clicked
@@ -333,16 +342,17 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
      */
     public void updateHangman(char[] letters) {
         Log.d(LOG_TAG, "(NOT) Updating hangman..." + String.valueOf(letters));
-//        this.hangmanLayout.removeAllViews();
-//        if (letters.length == 0) {
-//            Log.d(LOG_TAG, "letters.length = 0");
-//            return;
-//        }
-//        for (int i = 0; i < letters.length; i++) {
-//            ManualAnagramKnownLetterCardView tv = new ManualAnagramKnownLetterCardView(getContext());
-//            tv.setLetter(letters[i] + "");
-//            this.hangmanLayout.addView(tv);
-//        }
+        //        this.hangmanLayout.removeAllViews();
+        //        if (letters.length == 0) {
+        //            Log.d(LOG_TAG, "letters.length = 0");
+        //            return;
+        //        }
+        //        for (int i = 0; i < letters.length; i++) {
+        //            ManualAnagramKnownLetterCardView tv = new ManualAnagramKnownLetterCardView
+        //            (getContext());
+        //            tv.setLetter(letters[i] + "");
+        //            this.hangmanLayout.addView(tv);
+        //        }
     }
 
     private void addWordSplit() {
@@ -374,32 +384,17 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
     }
 
     private void setFABActive(FloatingActionButton fabView) {
-        fabView.animate()
-                .scaleX((float) 1.3)
-                .scaleY((float) 1.3)
-                .alpha(1)
-                .setDuration(200)
-                .setInterpolator(new AccelerateDecelerateInterpolator());
+        fabView.animate().scaleX((float) 1.3).scaleY((float) 1.3).alpha(1).setDuration(200).setInterpolator(new AccelerateDecelerateInterpolator());
 
     }
 
     private void setFABDeactive(FloatingActionButton fabView) {
-        fabView.animate()
-                .scaleX((float) 0.5)
-                .scaleY((float) 0.5)
-                .alpha((float) 0.25)
-                .setDuration(200)
-                .setInterpolator(new AccelerateDecelerateInterpolator());
+        fabView.animate().scaleX((float) 0.5).scaleY((float) 0.5).alpha((float) 0.25).setDuration(200).setInterpolator(new AccelerateDecelerateInterpolator());
 
     }
 
     private void setFABNormal(FloatingActionButton fabView) {
-        fabView.animate()
-                .scaleX((float) 1.0)
-                .scaleY((float) 1.0)
-                .alpha((float) 0.5)
-                .setDuration(200)
-                .setInterpolator(new AccelerateDecelerateInterpolator());
+        fabView.animate().scaleX((float) 1.0).scaleY((float) 1.0).alpha((float) 0.5).setDuration(200).setInterpolator(new AccelerateDecelerateInterpolator());
 
     }
 
