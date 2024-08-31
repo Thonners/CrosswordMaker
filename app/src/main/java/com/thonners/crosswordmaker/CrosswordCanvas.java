@@ -1,5 +1,7 @@
 package com.thonners.crosswordmaker;
 
+import static androidx.core.content.ContextCompat.getSystemService;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -10,6 +12,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+
 
 public class CrosswordCanvas extends View implements View.OnTouchListener {
 
@@ -56,6 +60,8 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
     private Paint blackPaint, clueHighlightPaint, cellHighlightPaint, whitePaint;
     private int width, height, cellWidth, outerPadding, fontSize;
     private final int cellSizeOverClueNumberSize = 4, clueNumberPadding = 5;
+    private final int cursorMarginBottom = 15, cursorMarginSide = 15;
+    private final int cursorThickness = 5;
     private CrosswordTwo crossword;
 
     private int[] rowColIndex;
@@ -64,14 +70,17 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
 
     public CrosswordCanvas(Context context) {
         super(context);
+        setFocusableInTouchMode(true); // allows the keyboard to pop up on touch down
     }
 
     public CrosswordCanvas(Context context, AttributeSet attrs) {
         super(context, attrs);
+        setFocusableInTouchMode(true); // allows the keyboard to pop up on touch down
     }
 
     public CrosswordCanvas(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        setFocusableInTouchMode(true); // allows the keyboard to pop up on touch down
     }
 
 
@@ -214,6 +223,7 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
             for (CellTwo cell : crossword.getHighlightedClue().getCells()) {
                 if (crossword.getHighlightedCell() != null && cell == crossword.getHighlightedCell()) {
                     canvas.drawRect(getCellRect(cell), cellHighlightPaint);
+                    canvas.drawRect(getCellCursorRect(cell), blackPaint);
                 } else {
                     canvas.drawRect(getCellRect(cell), clueHighlightPaint);
                 }
@@ -230,6 +240,31 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
         int col = cell.getCol();
         return new Rect(cols[col].getXMin(), rows[row].getYMin(), cols[col].getXMax(),
                 rows[row].getYMax());
+    }
+
+    private Rect getCellCursorRect(CellTwo cell) {
+        int row = cell.getRow();
+        int col = cell.getCol();
+        return new Rect(cols[col].getXMin() + cursorMarginSide,
+                rows[row].getYMax() - cursorMarginBottom - cursorThickness,
+                cols[col].getXMax() - cursorMarginSide,
+                rows[row].getYMax() - cursorMarginBottom);
+    }
+
+    private void showKeyboard() {
+
+        if (this.requestFocus()) {
+            InputMethodManager imm = getSystemService(getContext(),
+                    InputMethodManager.class);
+            imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT);
+        }
+
+    }
+
+    private void hideKeyboard() {
+        InputMethodManager imm = getSystemService(getContext(),
+                InputMethodManager.class);
+        imm.hideSoftInputFromWindow(this.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
     }
 
     @Override
@@ -249,6 +284,20 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
                 // Redraw the grid!
                 invalidate();
                 return true;
+            case MotionEvent.ACTION_UP:
+                int rowUp = rowColIndex[Math.max(0, Math.min((int) event.getY(), this.height - 1))];
+                int colUp = rowColIndex[Math.max(0, Math.min((int) event.getX(), this.width - 1))];
+                if (!crossword.editGridMode) {
+                    if (crossword.getCell(rowUp, colUp).getIsBlackCell()) {
+                        // Hide the keyboard if we've touched a black cell
+                        hideKeyboard();
+                    } else {
+                        // Otherwise, show the keyboard so we can enter text
+                        showKeyboard();
+                    }
+                }
+
+
         }
         return false;
     }
