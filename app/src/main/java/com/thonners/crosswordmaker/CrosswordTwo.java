@@ -274,17 +274,22 @@ public class CrosswordTwo {
         //        return localeDateFormat.format(dateProper);
     }
 
+    public String getDisplayPercentageComplete() {
+        // TODO: Calculate % complete and store it in the object/file somewhere
+        return "??%";
+    }
+
     public String getActivityTitle() {
         return getDisplayDate() + ": " + title;
     }
 
     public void cellTouched(int row, int col) {
+        if (row < 0 || row >= rowCount || col < 0 || col >= colCount) {
+            Log.d(LOG_TAG, "Touch detected outside the active grid, so ignoring it.");
+            return;
+        }
         if (editGridMode) {
-            if (0 <= row && row < rowCount && 0 <= col && col < colCount) {
-                toggleBlackCell(row, col);
-            } else {
-                Log.d(LOG_TAG, "Touch detected outside the active grid, so ignoring it.");
-            }
+            toggleBlackCell(row, col);
         } else {
             CellTwo touchedCell = getCell(row, col);
             if (touchedCell.getIsBlackCell()) {
