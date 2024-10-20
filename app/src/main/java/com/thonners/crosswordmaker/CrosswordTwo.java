@@ -2,6 +2,8 @@ package com.thonners.crosswordmaker;
 
 import android.content.Context;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 
@@ -18,7 +20,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-public class CrosswordTwo {
+public class CrosswordTwo implements View.OnKeyListener {
 
     private static final String LOG_TAG = "CrosswordTwo";
 
@@ -335,5 +337,160 @@ public class CrosswordTwo {
     public String toString() {
         if (title.isEmpty() || date.isEmpty()) return "Uninitialised Crossword";
         return getActivityTitle();
+    }
+
+
+    public boolean onKey(View v, int keyCode, KeyEvent event) {
+        // TODO: Move this key even handling into the CrosswordTwo class,
+        //  make a list of legit keys that we will respond to (i.e. all the letters + backspace +
+        //  enter)
+        //  Set the cell value to the pressed letter and highlight next cell (/collapse keyboard
+        //  if final cell in clue)
+        //  Rotate cell if enter pressed (if poss)
+        //  delete cell value and highlight previous cell if backspace (aka DEL) pressed
+        Log.d(LOG_TAG, "onKeyListener");
+        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+            switch (event.getKeyCode()) {
+                case KeyEvent.KEYCODE_DEL:
+                    Log.d(LOG_TAG, "Backspace pressed: " + event.getDisplayLabel());
+                    return true;
+                case KeyEvent.KEYCODE_ENTER:
+                    Log.d(LOG_TAG, "Enter pressed: " + event.getDisplayLabel());
+                    return true;
+                case KeyEvent.KEYCODE_A:
+                    highlightedCell.setCharacter("A");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_B:
+                    highlightedCell.setCharacter("B");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_C:
+                    highlightedCell.setCharacter("C");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_D:
+                    highlightedCell.setCharacter("D");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_E:
+                    highlightedCell.setCharacter("E");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_F:
+                    highlightedCell.setCharacter("F");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_G:
+                    highlightedCell.setCharacter("G");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_H:
+                    highlightedCell.setCharacter("H");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_I:
+                    highlightedCell.setCharacter("I");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_J:
+                    highlightedCell.setCharacter("J");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_K:
+                    highlightedCell.setCharacter("K");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_L:
+                    highlightedCell.setCharacter("L");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_M:
+                    highlightedCell.setCharacter("M");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_N:
+                    highlightedCell.setCharacter("N");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_O:
+                    highlightedCell.setCharacter("O");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_P:
+                    highlightedCell.setCharacter("P");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_Q:
+                    highlightedCell.setCharacter("Q");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_R:
+                    highlightedCell.setCharacter("R");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_S:
+                    highlightedCell.setCharacter("S");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_T:
+                    highlightedCell.setCharacter("T");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_U:
+                    highlightedCell.setCharacter("U");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_V:
+                    highlightedCell.setCharacter("V");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_W:
+                    highlightedCell.setCharacter("W");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_X:
+                    highlightedCell.setCharacter("X");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_Y:
+                    highlightedCell.setCharacter("Y");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+                case KeyEvent.KEYCODE_Z:
+                    highlightedCell.setCharacter("Z");
+                    Log.d(LOG_TAG,
+                            "ACTION_DOWN: " + event.getDisplayLabel() + ", keycode: " + event);
+                    return true;
+            }
+            Log.d(LOG_TAG,
+                    "Invalid key pressed: " + event.getDisplayLabel() + ", keycode: " + event);
+        }
+        return false;
     }
 }

@@ -8,10 +8,14 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.text.InputType;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.BaseInputConnection;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 
 
@@ -86,6 +90,10 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
 
     public void initialise(int width, int height, CrosswordTwo crossword) {
         this.setOnTouchListener(this);
+
+
+        setOnKeyListener(crossword); // TODO: Should this be set here?
+
         hasBeenInitialised = true;
         this.width = width;
         this.height = height;
@@ -247,23 +255,20 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
         int col = cell.getCol();
         return new Rect(cols[col].getXMin() + cursorMarginSide,
                 rows[row].getYMax() - cursorMarginBottom - cursorThickness,
-                cols[col].getXMax() - cursorMarginSide,
-                rows[row].getYMax() - cursorMarginBottom);
+                cols[col].getXMax() - cursorMarginSide, rows[row].getYMax() - cursorMarginBottom);
     }
 
     private void showKeyboard() {
 
         if (this.requestFocus()) {
-            InputMethodManager imm = getSystemService(getContext(),
-                    InputMethodManager.class);
+            InputMethodManager imm = getSystemService(getContext(), InputMethodManager.class);
             imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT);
         }
 
     }
 
     private void hideKeyboard() {
-        InputMethodManager imm = getSystemService(getContext(),
-                InputMethodManager.class);
+        InputMethodManager imm = getSystemService(getContext(), InputMethodManager.class);
         imm.hideSoftInputFromWindow(this.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
     }
 
@@ -300,5 +305,15 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
 
         }
         return false;
+    }
+
+    @Override
+    public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
+        Log.d(LOG_TAG, "InputConnection created");
+        BaseInputConnection fic = new BaseInputConnection(this, false);
+        outAttrs.actionLabel = null;
+        outAttrs.inputType = InputType.TYPE_NULL;
+        outAttrs.imeOptions = EditorInfo.IME_ACTION_NEXT;
+        return fic;
     }
 }
