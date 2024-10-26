@@ -58,11 +58,13 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
     private static final String LOG_TAG = "CrosswordCanvas";
 
     private boolean hasBeenInitialised = false;
-    private Bitmap gridBitmap, blackCellBitmap, clueNumberBitmap;
-    private Canvas backgroundGrid, blackCellMask, clueNumberCanvas;
+    private Bitmap gridBitmap, blackCellBitmap, clueNumberBitmap, cellLetterBitmap;
+    private Canvas backgroundGrid, blackCellMask, clueNumberCanvas, cellLetterCanvas;
     private Rect bounds;
-    private Paint blackPaint, clueHighlightPaint, cellHighlightPaint, whitePaint;
-    private int width, height, cellWidth, outerPadding, fontSize;
+    private Paint blackPaint, clueHighlightPaint, cellHighlightPaint, cellLetterPaint, whitePaint;
+    private int width, height, cellWidth, outerPadding, clueNumberFontSize;
+    private double cellLetterFontSize;
+    private final double cellSizeOverCellLetterSize = 1.2;
     private final int cellSizeOverClueNumberSize = 4, clueNumberPadding = 5;
     private final int cursorMarginBottom = 15, cursorMarginSide = 15;
     private final int cursorThickness = 5;
@@ -87,7 +89,6 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
         setFocusableInTouchMode(true); // allows the keyboard to pop up on touch down
     }
 
-
     public void initialise(int width, int height, CrosswordTwo crossword) {
         this.setOnTouchListener(this);
 
@@ -99,14 +100,15 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
         this.height = height;
         this.cellWidth = width / crossword.rowCount;
         this.outerPadding = (this.width - (this.cellWidth * crossword.rowCount)) / 2;
-        this.fontSize = cellWidth / cellSizeOverClueNumberSize;
+        this.cellLetterFontSize = cellWidth / cellSizeOverCellLetterSize;
+        this.clueNumberFontSize = cellWidth / cellSizeOverClueNumberSize;
 
         this.crossword = crossword;
         Log.d(LOG_TAG, "Got crossword: " + crossword);
         blackPaint = new Paint();
         blackPaint.setColor(getResources().getColor(R.color.black, null));
         blackPaint.setStrokeWidth(2);
-        blackPaint.setTextSize(fontSize);
+        blackPaint.setTextSize(clueNumberFontSize);
         whitePaint = new Paint();
         whitePaint.setColor(getResources().getColor(R.color.white, null));
         whitePaint.setStyle(Paint.Style.FILL);
@@ -114,14 +116,21 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
         clueHighlightPaint.setColor(getResources().getColor(R.color.clue_highlighted, null));
         cellHighlightPaint = new Paint();
         cellHighlightPaint.setColor(getResources().getColor(R.color.cell_highlighted, null));
-
+        cellLetterPaint = new Paint();
+        cellLetterPaint.setColor(getResources().getColor(R.color.black, null));
+        cellLetterPaint.setStrokeWidth(2);
+        cellLetterPaint.setTextSize((float) cellLetterFontSize);
+        cellLetterPaint.setTextAlign(Paint.Align.CENTER);
+        //        cellLetterPaint.setTypeface(...)
         gridBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         blackCellBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         clueNumberBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        cellLetterBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
         backgroundGrid = new Canvas(gridBitmap);
         blackCellMask = new Canvas(blackCellBitmap);
         clueNumberCanvas = new Canvas(clueNumberBitmap);
+        cellLetterCanvas = new Canvas(cellLetterBitmap);
         bounds = new Rect(0, 0, width, height);
         Log.d(LOG_TAG, "Canvas initialised to (w,h) = (" + width + ", " + height + ")");
 
@@ -175,7 +184,8 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
         Log.d(LOG_TAG, "Drawing clue number: " + clue.getClueNumber());
         CellTwo firstCell = clue.getFirstCell();
         int xPosition = cols[firstCell.getCol()].getXMin() + clueNumberPadding;
-        int yPosition = rows[firstCell.getRow()].getYMin() + fontSize; // Doesn't need vert padding
+        int yPosition = rows[firstCell.getRow()].getYMin() + clueNumberFontSize; // Doesn't need
+        // vert padding
         clueNumberCanvas.drawText("" + clue.getClueNumber(), xPosition, yPosition, blackPaint);
     }
 
@@ -194,6 +204,30 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
 
         for (ClueTwo clue : crossword.vClues) {
             drawClueNumber(clue);
+        }
+    }
+
+    private void drawCellLetters() {
+        if (crossword.editGridMode) {
+            // No clue letters during edit grid mode
+            return;
+        }
+        Log.d(LOG_TAG, "Drawing cell letters. Crossword has: " + crossword.hClues.length +
+                "hClues");
+        // Clear any previous letters so they don't superpose
+        cellLetterBitmap.eraseColor(Color.TRANSPARENT);
+
+        for (int r = 0; r < crossword.rowCount; r++) {
+            for (int c = 0; c < crossword.rowCount; c++) {
+                CellTwo cell = crossword.getCell(r, c);
+                String cellLetter = cell.getCharacterAsString();
+                if (cellLetter.isEmpty()) continue;
+                int xPosition = (cols[c].getXMin() + cols[c].getXMax()) / 2;
+                int yPosition =
+                        (int) ((rows[r].getYMin() + rows[r].getYMax()) * 0.5 - (cellLetterPaint.descent() + cellLetterPaint.ascent()) / 2);
+                cellLetterCanvas.drawText(cellLetter, xPosition, yPosition, cellLetterPaint);
+
+            }
         }
     }
 
@@ -239,6 +273,9 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
         }
         // Draw the clue numbers
         canvas.drawBitmap(clueNumberBitmap, null, bounds, null);
+        // Draw the letters
+        drawCellLetters();
+        canvas.drawBitmap(cellLetterBitmap, null, bounds, null);
 
         Log.d(LOG_TAG, "Canvas.onDraw called");
     }
