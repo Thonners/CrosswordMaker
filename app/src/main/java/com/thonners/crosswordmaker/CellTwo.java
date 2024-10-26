@@ -129,15 +129,15 @@ public class CellTwo {
         verticalClue.addCell(this);
     }
 
-    public ClueTwo getOtherClue(ClueTwo currentClue) {
+    public ClueTwo getOtherClue(ClueTwo currentClue) throws NoOtherClueException {
         ClueTwo.Orientation currentClueOrientation = currentClue.getOrientation();
         switch (currentClueOrientation) {
             case VERTICAL:
-                return getHClue();
+                if (getHClue() != null) return getHClue();
             case HORIZONTAL:
-                return getVClue();
+                if (getVClue() != null) return getVClue();
         }
-        return null;
+        throw new NoOtherClueException();
     }
 
     public ClueTwo getPrimaryClue() {
@@ -170,4 +170,8 @@ public class CellTwo {
     public String toString() {
         return "Cell(" + row + ", " + col + ")";
     }
+}
+
+class NoOtherClueException extends Exception {
+
 }

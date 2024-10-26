@@ -310,7 +310,11 @@ public class CrosswordTwo implements View.OnKeyListener {
             }
             boolean flipOrientation = (highlightedCell != null) && (highlightedCell == touchedCell);
             if (flipOrientation) {
-                highlightedClue = touchedCell.getOtherClue(highlightedClue);
+                try {
+                    highlightedClue = touchedCell.getOtherClue(highlightedClue);
+                } catch (NoOtherClueException e) {
+                    // Do nothing
+                }
             } else {
                 highlightedCell = touchedCell;
                 highlightedClue = touchedCell.getClueForHighlight(highlightedClue);
@@ -360,6 +364,19 @@ public class CrosswordTwo implements View.OnKeyListener {
             crosswordCanvasInterface.hideKeyboard();
         }
         if (this.crosswordCanvasInterface != null) crosswordCanvasInterface.redraw();
+    }
+
+    private void enterClicked() {
+        try {
+            Log.d(LOG_TAG, "Old orientation :" + highlightedClue.getOrientation());
+            highlightedClue = highlightedCell.getOtherClue(highlightedClue);
+            Log.d(LOG_TAG, "Clue orientation switched :)");
+            Log.d(LOG_TAG, "New orientation :" + highlightedClue.getOrientation());
+            crosswordCanvasInterface.redraw();
+        } catch (NoOtherClueException e) {
+            // No need to do anything if there's no other clue
+            Log.d(LOG_TAG, "NoOtherClueException thrown");
+        }
     }
 
     public boolean onKey(View v, int keyCode, KeyEvent event) {
