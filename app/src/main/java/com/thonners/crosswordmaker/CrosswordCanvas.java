@@ -19,7 +19,8 @@ import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 
 
-public class CrosswordCanvas extends View implements View.OnTouchListener {
+public class CrosswordCanvas extends View implements View.OnTouchListener,
+        CrosswordTwo.CrosswordCanvasInterface {
 
     class Row {
         int row, paddingOffset;
@@ -104,6 +105,7 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
         this.clueNumberFontSize = cellWidth / cellSizeOverClueNumberSize;
 
         this.crossword = crossword;
+        this.crossword.setRedrawListener(this);
         Log.d(LOG_TAG, "Got crossword: " + crossword);
         blackPaint = new Paint();
         blackPaint.setColor(getResources().getColor(R.color.black, null));
@@ -147,6 +149,10 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
         drawBlackCellMask();
         drawClueNumbers();
         prepopulatePixelIndices();
+    }
+
+    public void redraw() {
+        this.invalidate();
     }
 
     private void drawBackgroundGrid() {
@@ -304,7 +310,7 @@ public class CrosswordCanvas extends View implements View.OnTouchListener {
 
     }
 
-    private void hideKeyboard() {
+    public void hideKeyboard() {
         InputMethodManager imm = getSystemService(getContext(), InputMethodManager.class);
         imm.hideSoftInputFromWindow(this.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
     }
