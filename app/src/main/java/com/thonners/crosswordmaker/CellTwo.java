@@ -56,6 +56,11 @@ public class CellTwo {
         this.hasTrailingHyphen = hasTrailingHyphen;
     }
 
+    public String getCharacterAsString() {
+        if (this.character == null) return "";
+        return this.character.toString();
+    }
+
     public void setCharacter(String s) {
         if (!s.isEmpty()) {
             this.character = s.charAt(s.length() - 1);
