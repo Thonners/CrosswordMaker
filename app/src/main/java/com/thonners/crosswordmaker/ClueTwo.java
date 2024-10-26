@@ -9,8 +9,7 @@ public class ClueTwo {
     private final ArrayList<CellTwo> cells = new ArrayList<>();
 
     public enum Orientation {
-        HORIZONTAL,
-        VERTICAL
+        HORIZONTAL, VERTICAL
     }
 
     private final Orientation orientation;
@@ -38,6 +37,16 @@ public class ClueTwo {
         return null;
     }
 
+    public CellTwo getNextCell(CellTwo previousCell) throws NoMoreCellsException {
+        boolean thisCellIsNextCell = false;
+        for (CellTwo cell : this.cells) {
+            if (thisCellIsNextCell) return cell;
+            thisCellIsNextCell = (previousCell == cell);
+        }
+        throw new NoMoreCellsException();
+        //        return null;
+    }
+
     public Orientation getOrientation() {
         return orientation;
     }
@@ -49,10 +58,11 @@ public class ClueTwo {
     @NonNull
     @Override
     public String toString() {
-        return "ClueTwo{" +
-                "orientation=" + orientation +
-                ", clueNumber=" + clueNumber +
-                ", cells=" + cells +
-                '}';
+        return "ClueTwo{" + "orientation=" + orientation + ", clueNumber=" + clueNumber + ", " +
+                "cells=" + cells + '}';
     }
+}
+
+class NoMoreCellsException extends Exception {
+
 }
