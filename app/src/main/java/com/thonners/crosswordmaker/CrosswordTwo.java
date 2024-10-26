@@ -368,6 +368,20 @@ public class CrosswordTwo implements View.OnKeyListener {
         if (this.crosswordCanvasInterface != null) crosswordCanvasInterface.redraw();
     }
 
+    private void backspaceClicked() {
+        highlightedCell.setCharacter("");
+
+        try {
+            highlightedCell = highlightedClue.getPreviousCell(highlightedCell);
+        } catch (NoMoreCellsException e) {
+            // Then we've done the last cell in this clue :)
+            highlightedCell = null;
+            highlightedClue = null;
+            crosswordCanvasInterface.hideKeyboard();
+        }
+        if (this.crosswordCanvasInterface != null) crosswordCanvasInterface.redraw();
+    }
+
     private void enterClicked() {
         try {
             Log.d(LOG_TAG, "Old orientation :" + highlightedClue.getOrientation());
@@ -394,11 +408,11 @@ public class CrosswordTwo implements View.OnKeyListener {
             switch (event.getKeyCode()) {
                 case KeyEvent.KEYCODE_DEL:
                     Log.d(LOG_TAG, "Backspace pressed: " + event.getDisplayLabel());
-                    // TODO
+                    backspaceClicked();
                     return true;
                 case KeyEvent.KEYCODE_ENTER:
                     Log.d(LOG_TAG, "Enter pressed: " + event.getDisplayLabel());
-                    // TODO
+                    enterClicked();
                     return true;
                 case KeyEvent.KEYCODE_A:
                     setCellLetter("A");
