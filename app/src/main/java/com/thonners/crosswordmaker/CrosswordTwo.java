@@ -306,6 +306,8 @@ public class CrosswordTwo implements View.OnKeyListener {
             CellTwo touchedCell = getCell(row, col);
             if (touchedCell.getIsBlackCell()) {
                 Log.d(LOG_TAG, "Black cell touched: " + touchedCell);
+                highlightedClue = null;
+                highlightedCell = null;
                 return;
             }
             boolean flipOrientation = (highlightedCell != null) && (highlightedCell == touchedCell);
