@@ -64,6 +64,8 @@ public class CellTwo {
     public void setCharacter(String s) {
         if (!s.isEmpty()) {
             this.character = s.charAt(s.length() - 1);
+        } else {
+            this.character = null;
         }
     }
 
