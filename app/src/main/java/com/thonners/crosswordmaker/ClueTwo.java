@@ -47,6 +47,22 @@ public class ClueTwo {
         //        return null;
     }
 
+    public CellTwo getPreviousCell(CellTwo subsequentCell) throws NoMoreCellsException {
+        CellTwo previousCell = null;
+        for (CellTwo cell : this.cells) {
+            if (previousCell == null) {
+                // If it's null and we match, then we're already at the first cell
+                if (subsequentCell == cell) throw new NoMoreCellsException();
+            } else {
+                if (subsequentCell == cell) {
+                    return previousCell;
+                }
+            }
+            previousCell = cell;
+        }
+        throw new NoMoreCellsException();
+    }
+
     public Orientation getOrientation() {
         return orientation;
     }
