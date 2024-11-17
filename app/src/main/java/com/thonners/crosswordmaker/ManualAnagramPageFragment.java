@@ -48,7 +48,8 @@ public class ManualAnagramPageFragment extends Fragment {
     private RelativeLayout fragmentParentLayout;
     private RelativeLayout outputParentLayout;
     private LinearLayout knownLettersLayout;
-    private boolean shuffleActive = true; // if true, shuffle button shuffles, if false, button clears editText
+    private boolean shuffleActive = true; // if true, shuffle button shuffles, if false, button
+    // clears editText
     private ManualAnagramTextView textViews[];
 
     private ManualAnagramKnownLetterCardView activeKnownLetterCard = null;
@@ -123,7 +124,8 @@ public class ManualAnagramPageFragment extends Fragment {
                 // Text has been changed, so force shuffle/clear functionality back to 'shuffle'
                 shuffleButton.setText(R.string.shuffle);
                 shuffleActive = true;
-                Log.d(LOG_TAG, "onTextChanged() has been called, so changing shufleActive back to true");
+                Log.d(LOG_TAG, "onTextChanged() has been called, so changing shufleActive back to" +
+                        " true");
             }
 
             @Override
@@ -141,7 +143,8 @@ public class ManualAnagramPageFragment extends Fragment {
             }
         });
         reshuffleFAB.setTranslationX(100);
-        knownLettersLayout = (LinearLayout) view.findViewById(R.id.manual_anagram_known_letters_layout);
+        knownLettersLayout =
+                (LinearLayout) view.findViewById(R.id.manual_anagram_known_letters_layout);
 
         fragmentParentLayout = (RelativeLayout) view.findViewById(R.id.fragment_parent_layout);
 
@@ -150,7 +153,8 @@ public class ManualAnagramPageFragment extends Fragment {
 
     private void showInstructionsSnackbar() {
         // Show a snackbar about the instructions
-        Snackbar snackbar = Snackbar.make(fragmentParentLayout, getResources().getString(R.string.tutorial_snackbar_message), Snackbar.LENGTH_LONG);
+        Snackbar snackbar = Snackbar.make(fragmentParentLayout,
+                getResources().getString(R.string.tutorial_snackbar_message), Snackbar.LENGTH_LONG);
         snackbar.setAction(getResources().getText(R.string.show), new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -218,7 +222,8 @@ public class ManualAnagramPageFragment extends Fragment {
         // Get the text (force it to upper case for when it gets displayed, and remove all spaces)
         String input = inputBox.getText().toString().toUpperCase().replaceAll("\\s", "");
         int lettersLength = input.length();
-        Log.d(LOG_TAG, "Letters to be shuffled: " + input + ", there are " + lettersLength + " letters.");
+        Log.d(LOG_TAG, "Letters to be shuffled: " + input + ", there are " + lettersLength + " " +
+                "letters.");
 
         // Split string into letters
         char[] letters = input.toCharArray();
@@ -226,7 +231,8 @@ public class ManualAnagramPageFragment extends Fragment {
         // Create the TextViews & add to outputParentLayout
         textViews = new ManualAnagramTextView[lettersLength];
         for (int i = 0; i < lettersLength; i++) {
-            textViews[i] = new ManualAnagramTextView(getActivity(), letters[i], lettersLength, outputParentLayout, getAnchorID());
+            textViews[i] = new ManualAnagramTextView(getActivity(), letters[i], lettersLength,
+                    outputParentLayout, getAnchorID());
             textViews[i].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -253,10 +259,7 @@ public class ManualAnagramPageFragment extends Fragment {
         }
 
         // Animate the parent view's reentry
-        outputParentLayout.animate()
-                .setDuration(350)
-                .alpha(1.0f)
-                .setListener(null);
+        outputParentLayout.animate().setDuration(350).alpha(1.0f).setListener(null);
     }
 
     /**
@@ -281,31 +284,28 @@ public class ManualAnagramPageFragment extends Fragment {
      * Clears the letters from the results view.
      */
     private void hideShuffledView() {
-        outputParentLayout.animate()
-                .setDuration(350)
-                .alpha(0.0f)
-                .setListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animator) {
+        outputParentLayout.animate().setDuration(350).alpha(0.0f).setListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
 
-                    }
+            }
 
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
-                        clearShuffledViewChildren();
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                clearShuffledViewChildren();
 
-                    }
+            }
 
-                    @Override
-                    public void onAnimationCancel(Animator animator) {
+            @Override
+            public void onAnimationCancel(Animator animator) {
 
-                    }
+            }
 
-                    @Override
-                    public void onAnimationRepeat(Animator animator) {
+            @Override
+            public void onAnimationRepeat(Animator animator) {
 
-                    }
-                });
+            }
+        });
     }
 
     /**
@@ -323,13 +323,16 @@ public class ManualAnagramPageFragment extends Fragment {
      */
     private void hideKeyboard() {
         // Method to hide the keyboard
-        InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        InputMethodManager inputManager =
+                (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+                InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
     /**
      * Method to request the focus for the input text box. This is called by the main activity to
-     * select the text that was in the textview from before, to allow typing to replace the old text.
+     * select the text that was in the textview from before, to allow typing to replace the old
+     * text.
      */
     public void inputBoxRequestFocus() {
         inputBox.requestFocus();
@@ -356,7 +359,7 @@ public class ManualAnagramPageFragment extends Fragment {
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(0, 0);
         params.addRule(RelativeLayout.CENTER_IN_PARENT);
         outputParentLayout.addView(anchor, params);
-        anchor.setId(100);
+        anchor.setId(View.generateViewId());
         return anchor.getId();
     }
 
@@ -372,8 +375,10 @@ public class ManualAnagramPageFragment extends Fragment {
         // Clear known letters from old instances. This should also move it off the screen
         clearKnownLetterLayout();
         // Create an array in which to hold the Cards
-        ManualAnagramKnownLetterCardView[] knownLetterCards = new ManualAnagramKnownLetterCardView[letterCount];
-        // Cycle through the number of letters and create a card for each one. Add this to the layout, giving it an index appropriately.
+        ManualAnagramKnownLetterCardView[] knownLetterCards =
+                new ManualAnagramKnownLetterCardView[letterCount];
+        // Cycle through the number of letters and create a card for each one. Add this to the
+        // layout, giving it an index appropriately.
         for (int i = 0; i < letterCount; i++) {
             Log.d(LOG_TAG, "1. i = " + i);
             knownLetterCards[i] = new ManualAnagramKnownLetterCardView(getActivity(), i);
@@ -395,14 +400,12 @@ public class ManualAnagramPageFragment extends Fragment {
 
             knownLettersLayout.addView(knownLetterCards[i], i);
         }
-        knownLettersLayout.animate()
-                .setDuration(350)
-                .translationY(0)
-                .setListener(null);
+        knownLettersLayout.animate().setDuration(350).translationY(0).setListener(null);
     }
 
     /**
-     * Method to make a note of which ManualAnagramKnownLetterCardView has been touched, so it can be
+     * Method to make a note of which ManualAnagramKnownLetterCardView has been touched, so it
+     * can be
      * set to the correct letter when selected by the user.
      *
      * @param newKnownLetterCard The ManualAnagramKnownLetterCardView touched by the user.
@@ -415,7 +418,9 @@ public class ManualAnagramPageFragment extends Fragment {
         } else {
             // If a letter is active, set this card to that letter, otherwise, activate the card
             if (activeLetterTV != null) {
-                // Set the active known letter card to this card. Do this so that the Z heights are correct after it's cleared later (setting active then not active raises it higher than its original height).
+                // Set the active known letter card to this card. Do this so that the Z heights
+                // are correct after it's cleared later (setting active then not active raises it
+                // higher than its original height).
                 activeKnownLetterCard = newKnownLetterCard;
                 activeKnownLetterCard.setIsActive();
                 // Set this card to that letter!
@@ -424,14 +429,17 @@ public class ManualAnagramPageFragment extends Fragment {
                 clearActiveKnownLetterCard();
                 clearActiveLetterTV();
             } else {
-                // Check that the card is empty. If not, prompt user to clear the card before re-filling it
+                // Check that the card is empty. If not, prompt user to clear the card before
+                // re-filling it
                 if (newKnownLetterCard.isEmpty()) {
-                    // Clear any previously set card before setting this one, to avoid two cards looking active to the user
+                    // Clear any previously set card before setting this one, to avoid two cards
+                    // looking active to the user
                     clearActiveKnownLetterCard();
                     activeKnownLetterCard = newKnownLetterCard;
                     activeKnownLetterCard.setIsActive();
                 } else {
-                    // Not sure what to do, if anything, if user clicks a card that's already filled.
+                    // Not sure what to do, if anything, if user clicks a card that's already
+                    // filled.
                 }
             }
         }
@@ -457,7 +465,8 @@ public class ManualAnagramPageFragment extends Fragment {
     }
 
     /**
-     * Clears the active known letter card, so that touching a results letter will not result in any action.
+     * Clears the active known letter card, so that touching a results letter will not result in
+     * any action.
      */
     private void clearActiveKnownLetterCard() {
         // Clear any set features, such as card elevation from a previously active card
@@ -478,7 +487,8 @@ public class ManualAnagramPageFragment extends Fragment {
         if (activeKnownLetterCard != null) {
             // Check that this letter isn't already assigned to another known letter card
             if (!manualAnagramTextView.isKnown()) {
-                // If so, set it to the touched letter. This will also set the textView to known, i.e. greyed out.
+                // If so, set it to the touched letter. This will also set the textView to known,
+                // i.e. greyed out.
                 activeKnownLetterCard.setLetter(manualAnagramTextView);
                 //activeKnownLetterCard.setLetter(letter);
                 // Clear the active card / letter TV so as not to contaminate future touches
@@ -486,7 +496,8 @@ public class ManualAnagramPageFragment extends Fragment {
                 clearActiveLetterTV();
             }
         } else {
-            // Set or clear the activeLetterTV depending on whether it's already set to the same letter
+            // Set or clear the activeLetterTV depending on whether it's already set to the same
+            // letter
             if (activeLetterTV != null && activeLetterTV.getLetterNo() == manualAnagramTextView.getLetterNo()) {
                 clearActiveLetterTV();
             } else {
@@ -505,7 +516,8 @@ public class ManualAnagramPageFragment extends Fragment {
 
     /**
      * Clear the activeLetterTV variable, so that no TV is currently active.
-     * This means a user can click a known letter to activate it, rather than set the current 'activeLetterTV'
+     * This means a user can click a known letter to activate it, rather than set the current
+     * 'activeLetterTV'
      */
     private void clearActiveLetterTV() {
         // Clear any highlighting if required
@@ -522,31 +534,28 @@ public class ManualAnagramPageFragment extends Fragment {
      */
     private void clearKnownLetterLayout() {
         // Transition the view off the screen
-        knownLettersLayout.animate()
-                .setDuration(350)
-                .translationY(knownLettersLayout.getHeight())
-                .setListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animator) {
+        knownLettersLayout.animate().setDuration(350).translationY(knownLettersLayout.getHeight()).setListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
 
-                    }
+            }
 
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
-                        // Remove all the cards from the known letters layout
-                        removeKnownLetterViews();
-                    }
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                // Remove all the cards from the known letters layout
+                removeKnownLetterViews();
+            }
 
-                    @Override
-                    public void onAnimationCancel(Animator animator) {
+            @Override
+            public void onAnimationCancel(Animator animator) {
 
-                    }
+            }
 
-                    @Override
-                    public void onAnimationRepeat(Animator animator) {
+            @Override
+            public void onAnimationRepeat(Animator animator) {
 
-                    }
-                });
+            }
+        });
     }
 
     /**
@@ -559,37 +568,34 @@ public class ManualAnagramPageFragment extends Fragment {
 
     /**
      * Method to remove the reshuffle FAB from view.
-     * Should be used whenever the FAB should not be visible, i.e. when the keyboard is up, or there are no letters to display
+     * Should be used whenever the FAB should not be visible, i.e. when the keyboard is up, or
+     * there are no letters to display
      */
     private void hideReshuffleFAB() {
         // Animate it off the screen
-        reshuffleFAB.animate()
-                .translationX(100)
-                .setDuration(350)
-                .alpha(0.0f)
-                .setListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animator) {
-                        Log.d(LOG_TAG, "hideReshuffleFAB animation starting...");
-                    }
+        reshuffleFAB.animate().translationX(100).setDuration(350).alpha(0.0f).setListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+                Log.d(LOG_TAG, "hideReshuffleFAB animation starting...");
+            }
 
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
-                        Log.d(LOG_TAG, "hideReshuffleFAB animation done.");
-                        // Set visibility to gone
-                        reshuffleFAB.setVisibility(View.GONE);
-                    }
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                Log.d(LOG_TAG, "hideReshuffleFAB animation done.");
+                // Set visibility to gone
+                reshuffleFAB.setVisibility(View.GONE);
+            }
 
-                    @Override
-                    public void onAnimationCancel(Animator animator) {
+            @Override
+            public void onAnimationCancel(Animator animator) {
 
-                    }
+            }
 
-                    @Override
-                    public void onAnimationRepeat(Animator animator) {
+            @Override
+            public void onAnimationRepeat(Animator animator) {
 
-                    }
-                });
+            }
+        });
     }
 
     /**
@@ -600,11 +606,7 @@ public class ManualAnagramPageFragment extends Fragment {
         reshuffleFAB.setVisibility(View.VISIBLE);
         reshuffleFAB.setAlpha(0.0f);
         // Animate its entry
-        reshuffleFAB.animate()
-                .translationX(0)
-                .alpha(1.0f)
-                .setDuration(350)
-                .setListener(null);
+        reshuffleFAB.animate().translationX(0).alpha(1.0f).setDuration(350).setListener(null);
     }
 
 
