@@ -13,10 +13,14 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * CrosswordLibraryActivity Activity
  * Shows a list of all the crosswords saved by the user on their device.
- * Shows completion % of the crossword, calculated as number of filled spaces over total number of white spaces
+ * Shows completion % of the crossword, calculated as number of filled spaces over total number
+ * of white spaces
  * <p>
  * Created by Thonners on 06/05/15.
  */
@@ -29,6 +33,9 @@ public class CrosswordLibraryActivity extends AppCompatActivity {
     RelativeLayout mainLayout;
     RelativeLayout layout;
     CardView editButton;
+    int[] cardIDs;
+    int nCrosswords;
+    List<CrosswordTwo> savedCrosswords;
     int editCrosswordIndex = -1;
 
     @Override
@@ -43,10 +50,13 @@ public class CrosswordLibraryActivity extends AppCompatActivity {
 
         libraryManager = new CrosswordLibraryManager(this);
 
-        int i = 1;
-        for (CrosswordLibraryManager.SavedCrossword savedCrossword : libraryManager.getSavedCrosswords()) {
-            addCrosswordToLayout(i, savedCrossword);
-            i++;
+        savedCrosswords = libraryManager.getSavedCrosswords();
+        nCrosswords = savedCrosswords.size();
+        Log.d(LOG_TAG, "nCrosswords: " + nCrosswords);
+        cardIDs = new int[savedCrosswords.size()];
+        for (int i = 0; i < nCrosswords; i++) {
+            Log.d(LOG_TAG, "Adding crossword to the list: " + i);
+            addCrosswordToLayout(i, savedCrosswords.get(i));
         }
 
     }
@@ -86,10 +96,13 @@ public class CrosswordLibraryActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void addCrosswordToLayout(int index, CrosswordLibraryManager.SavedCrossword savedCrossword) {
+    private void addCrosswordToLayout(int index, CrosswordTwo savedCrossword) {
 
-        Card card = new Card(getApplicationContext(), savedCrossword.getTitle(), savedCrossword.getDisplayDate(), savedCrossword.getDisplayPercentageComplete());
-//        card.setId(index);
+        Card card = new Card(getApplicationContext(), savedCrossword.getTitle(),
+                savedCrossword.getDisplayDate(), savedCrossword.getDisplayPercentageComplete());
+        card.setId(View.generateViewId());
+        cardIDs[index] = card.getId();
+
         card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -104,11 +117,13 @@ public class CrosswordLibraryActivity extends AppCompatActivity {
                 return true;
             }
         });
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        if (index == 1) {
+        RelativeLayout.LayoutParams layoutParams =
+                new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT);
+        if (index == 0) {
             layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         } else {
-            layoutParams.addRule(RelativeLayout.BELOW, index - 1);
+            layoutParams.addRule(RelativeLayout.BELOW, cardIDs[index - 1]);
         }
         card.setLayoutParams(layoutParams);
         layout.addView(card);
@@ -116,10 +131,20 @@ public class CrosswordLibraryActivity extends AppCompatActivity {
     }
 
     private void crosswordSelected(View view) {
-        int i = view.getId() - 1;  // get index of save file
+        int id = view.getId();
+        Log.d(LOG_TAG, "View ID: " + id + ". IDs: " + Arrays.toString(cardIDs));
+        Log.d(LOG_TAG, "Saved Crosswords: " + libraryManager.getSavedCrosswords());
+        int i = 0;
+        for (int j = 0; j < nCrosswords; j++) {
+            Log.d(LOG_TAG, "j = " + j);
+            if (id == cardIDs[j]) {
+                i = j;
+            }
+        }
         // View index starts at 1, but file index at 0, so need to -1
-        Log.d(LOG_TAG, "Crossword selected: " + libraryManager.getSavedCrosswords().get(i).getTitle());
-        libraryManager.openCrossword(libraryManager.getSavedCrosswords().get(i).getCrosswordDir());
+        Log.d(LOG_TAG,
+                "Crossword selected: " + libraryManager.getSavedCrosswords().get(i).getTitle());
+        libraryManager.openCrossword(libraryManager.getSavedCrosswords().get(i).getCrosswordFile());
     }
 
     private void toggleCardSelection(View view) {
@@ -158,7 +183,8 @@ public class CrosswordLibraryActivity extends AppCompatActivity {
             }
             // Set selected view to raised elevation
             card.setElevation(getResources().getDimension(R.dimen.z_library_card_highlighted));
-            card.toggleCardSelected();  // Put it back to selected as it's turned off by the for loop above
+            card.toggleCardSelected();  // Put it back to selected as it's turned off by the for
+            // loop above
         } else {
             card.setBackgroundColor(getResources().getColor(R.color.light_grey));
         }
@@ -198,16 +224,19 @@ public class CrosswordLibraryActivity extends AppCompatActivity {
     private void editCrossword() {
         // Launch new activity to edit the selected crossword
         if (editCrosswordIndex < 0) {
-            Log.d(LOG_TAG, "editCrosswordIndex < 0 - not doing anything (why is this method being called???!?!?!");
+            Log.d(LOG_TAG, "editCrosswordIndex < 0 - not doing anything (why is this method " +
+                    "being" + " called???!?!?!");
         } else {
-            Log.d(LOG_TAG, "Opening edit task for: " + libraryManager.getSavedCrosswords().get(editCrosswordIndex).getTitle());
-            libraryManager.openEditCrossword(libraryManager.getSavedCrosswords().get(editCrosswordIndex).getCrosswordDir());
+            Log.d(LOG_TAG,
+                    "Opening edit task for: " + libraryManager.getSavedCrosswords().get(editCrosswordIndex).getTitle());
+            libraryManager.openEditCrossword(libraryManager.getSavedCrosswords().get(editCrosswordIndex).getCrosswordFile());
 
         }
     }
 
     private void showEditTutorialToast() {
-        Toast.makeText(this, getResources().getString(R.string.edit_delete_tutorial), Toast.LENGTH_LONG).show();
+        Toast.makeText(this, getResources().getString(R.string.edit_delete_tutorial),
+                Toast.LENGTH_LONG).show();
     }
 
 }

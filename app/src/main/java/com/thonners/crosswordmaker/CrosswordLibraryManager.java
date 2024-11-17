@@ -37,7 +37,7 @@ public class CrosswordLibraryManager {
 
     private int noRecentCrosswords = 3;    // Number of recent crosswords to track
 
-    private ArrayList<SavedCrossword> savedCrosswords = new ArrayList<>();
+    private ArrayList<CrosswordTwo> savedCrosswords = new ArrayList<>();
     private ArrayList<File> savedCrosswordFiles = new ArrayList<>();
     private ArrayList<CrosswordTwo> recentCrosswords = new ArrayList<>();
 
@@ -55,7 +55,7 @@ public class CrosswordLibraryManager {
 
     }
 
-    public ArrayList<SavedCrossword> getSavedCrosswords() {
+    public ArrayList<CrosswordTwo> getSavedCrosswords() {
         getSavedFiles();
         processSavedFiles();
         return savedCrosswords;
@@ -103,15 +103,20 @@ public class CrosswordLibraryManager {
     private void processSavedFiles() {
         if (foundCrosswordFiles != null) {
             for (int i = 0; i < foundCrosswordFiles.length; i++) {
-                if (foundCrosswordFiles[i].isDirectory() && foundCrosswordFiles[i].getName().contains("-")) {
-                    addCrosswordToLibrary(new SavedCrossword(context, foundCrosswordFiles[i]));
+                if (foundCrosswordFiles[i].isFile() && foundCrosswordFiles[i].getName().endsWith(("json"))) {
+                    try {
+                        addCrosswordToLibrary(CrosswordTwo.fromJsonFile(context,
+                                foundCrosswordFiles[i].getCanonicalPath()));
+                    } catch (Exception e) {
+                        Log.e(LOG_TAG, "Error processing saved file: " + e.getMessage());
+                    }
                 }
             }
         }
 
     }
 
-    private void addCrosswordToLibrary(SavedCrossword savedCrossword) {
+    private void addCrosswordToLibrary(CrosswordTwo savedCrossword) {
         savedCrosswords.add(savedCrossword);
         savedCrosswordFiles.add(savedCrossword.getCrosswordFile());
     }
