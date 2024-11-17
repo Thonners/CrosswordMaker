@@ -167,7 +167,7 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
         canvasEditor.initialise(gridSize, gridSize, crosswordTwo);
         Log.d(LOG_TAG, "Invalidating canvas");
         canvasEditor.invalidate();
-        Log.e(LOG_TAG, "onCreateView returning...");
+        Log.d(LOG_TAG, "onCreateView returning...");
         return view;
 
     }

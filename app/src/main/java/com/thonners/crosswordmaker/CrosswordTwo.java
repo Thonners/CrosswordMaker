@@ -297,7 +297,9 @@ public class CrosswordTwo implements View.OnKeyListener {
 
     public void cellTouched(int row, int col) {
         if (row < 0 || row >= rowCount || col < 0 || col >= colCount) {
-            Log.d(LOG_TAG, "Touch detected outside the active grid, so ignoring it.");
+            Log.d(LOG_TAG, "Touch detected outside the active grid, so removing highlights.");
+            highlightedClue = null;
+            highlightedCell = null;
             return;
         }
         if (editGridMode) {

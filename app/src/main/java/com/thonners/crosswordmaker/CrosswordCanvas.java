@@ -336,7 +336,7 @@ public class CrosswordCanvas extends View implements View.OnTouchListener,
                 int rowUp = rowColIndex[Math.max(0, Math.min((int) event.getY(), this.height - 1))];
                 int colUp = rowColIndex[Math.max(0, Math.min((int) event.getX(), this.width - 1))];
                 if (!crossword.editGridMode) {
-                    if (crossword.getCell(rowUp, colUp).getIsBlackCell()) {
+                    if (rowUp == -1 || colUp == -1 || crossword.getCell(rowUp, colUp).getIsBlackCell()) {
                         // Hide the keyboard if we've touched a black cell
                         hideKeyboard();
                     } else {
