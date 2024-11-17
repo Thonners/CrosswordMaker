@@ -36,7 +36,8 @@ public class Card extends CardView {
     // Home page Cards
 
     // Saved crossword
-    public Card(Context context, String crosswordTitle, String crosswordDate, String crosswordPercentage) {
+    public Card(Context context, String crosswordTitle, String crosswordDate,
+                String crosswordPercentage) {
         super(context);
         initialise(context);
 
@@ -49,14 +50,20 @@ public class Card extends CardView {
 
         // Create layout parameters
         // Title
-//        titleTV.setId(1000);
-        RelativeLayout.LayoutParams titleLP = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        titleTV.setId(View.generateViewId()); // TODO: Handle these view IDs properly
+        RelativeLayout.LayoutParams titleLP =
+                new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT);
         titleLP.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         // Date
-        RelativeLayout.LayoutParams dateLP = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams dateLP =
+                new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT);
         dateLP.addRule(RelativeLayout.BELOW, titleTV.getId());
         // Percentage
-        RelativeLayout.LayoutParams percentageLP = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        RelativeLayout.LayoutParams percentageLP =
+                new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+                        RelativeLayout.LayoutParams.WRAP_CONTENT);
         percentageLP.addRule(RelativeLayout.BELOW, titleTV.getId());
         percentageLP.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 
@@ -99,7 +106,8 @@ public class Card extends CardView {
         layout.setPadding(padding, padding, padding, padding);
         // Provide feedback when button pressed. Pretty rubbish atm. Could be improved.
         TypedValue outValue = new TypedValue();
-        context.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
+        context.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue,
+                true);
         layout.setBackgroundResource(outValue.resourceId);
 
         this.addView(layout);
@@ -114,39 +122,48 @@ public class Card extends CardView {
         switch (displayType) {
             case DICTIONARY_WORD:  // Bold
                 tv.setTypeface(null, Typeface.BOLD);
-                tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.getResources().getDimension(R.dimen.dictionary_word));
+                tv.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                        context.getResources().getDimension(R.dimen.dictionary_word));
                 break;
             case DICTIONARY_WORD_TYPE: // Italic
                 tv.setTypeface(null, Typeface.ITALIC);
-                tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.getResources().getDimension(R.dimen.dictionary_word_type));
+                tv.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                        context.getResources().getDimension(R.dimen.dictionary_word_type));
                 break;
             case DICTIONARY_DEFINITION: // Normal
-                tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.getResources().getDimension(R.dimen.dictionary_definition));
+                tv.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                        context.getResources().getDimension(R.dimen.dictionary_definition));
                 break;
             case DICTIONARY_WORD_NOT_FOUND: // Bold
                 tv.setTypeface(null, Typeface.BOLD);
-                tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.getResources().getDimension(R.dimen.dictionary_word_not_found));
+                tv.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                        context.getResources().getDimension(R.dimen.dictionary_word_not_found));
                 break;
             case DICTIONARY_SUGGESTION: // Normal?
-                tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.getResources().getDimension(R.dimen.dictionary_suggestion));
+                tv.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                        context.getResources().getDimension(R.dimen.dictionary_suggestion));
                 break;
             case ANAGRAM_ANSWER:
                 tv.setTypeface(null, Typeface.BOLD);
-                tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.getResources().getDimension(R.dimen.main_text_view));
+                tv.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                        context.getResources().getDimension(R.dimen.main_text_view));
                 break;
             case CROSSWORD_TITLE: // Bold
                 tv.setTypeface(null, Typeface.BOLD);
                 tv.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
-                tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.getResources().getDimension(R.dimen.home_card_text_size_main));
+                tv.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                        context.getResources().getDimension(R.dimen.home_card_text_size_main));
                 break;
             case CROSSWORD_DATE: // Normal
                 tv.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
-                tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.getResources().getDimension(R.dimen.home_card_text_size_minor));
+                tv.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                        context.getResources().getDimension(R.dimen.home_card_text_size_minor));
                 break;
             case CROSSWORD_PERCENTAGE: //Italic
                 tv.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
                 tv.setTypeface(null, Typeface.ITALIC);
-                tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.getResources().getDimension(R.dimen.home_card_text_size_minor));
+                tv.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                        context.getResources().getDimension(R.dimen.home_card_text_size_minor));
                 break;
         }
 
