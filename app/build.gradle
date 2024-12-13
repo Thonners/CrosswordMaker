@@ -28,6 +28,9 @@ android {
         abortOnError false
     }
     namespace 'com.thonners.crosswordmaker'
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
