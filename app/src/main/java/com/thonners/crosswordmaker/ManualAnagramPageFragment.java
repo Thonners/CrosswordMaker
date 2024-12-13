@@ -124,8 +124,8 @@ public class ManualAnagramPageFragment extends Fragment {
                 // Text has been changed, so force shuffle/clear functionality back to 'shuffle'
                 shuffleButton.setText(R.string.shuffle);
                 shuffleActive = true;
-                Log.d(LOG_TAG, "onTextChanged() has been called, so changing shufleActive back to" +
-                        " true");
+                Log.d(LOG_TAG,
+                        "onTextChanged() has been called, so changing shufleActive back " + "to" + " true");
             }
 
             @Override
@@ -222,8 +222,9 @@ public class ManualAnagramPageFragment extends Fragment {
         // Get the text (force it to upper case for when it gets displayed, and remove all spaces)
         String input = inputBox.getText().toString().toUpperCase().replaceAll("\\s", "");
         int lettersLength = input.length();
-        Log.d(LOG_TAG, "Letters to be shuffled: " + input + ", there are " + lettersLength + " " +
-                "letters.");
+        Log.d(LOG_TAG,
+                "Letters to be shuffled: " + input + ", there are " + lettersLength + " " +
+                        "letters.");
 
         // Split string into letters
         char[] letters = input.toCharArray();
