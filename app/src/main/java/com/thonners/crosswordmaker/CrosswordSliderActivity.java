@@ -36,7 +36,7 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
 
     private static final String LOG_TAG = "CrosswordSliderActivity";
 
-    private static final int NUM_PAGES = 1;    // Number of slidable view/pages. Crossword,
+    private static final int NUM_PAGES = 6;    // Number of slidable view/pages. Crossword,
     // Clues, Manual anagram, Anagram, Dictionary, Doodle.
     private static final int CROSSWORD_TAB = 0;
     private static final int CLUE_TAB = 1;
@@ -308,6 +308,7 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
             }
 
             // Safety net - in case position is out of range shown above. Should never be needed
+            wikiPageFragment = new WikiPageFragment();
             return wikiPageFragment;
         }
 
