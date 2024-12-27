@@ -48,6 +48,9 @@ public class CrosswordTwo implements View.OnKeyListener {
     @Expose
     private final boolean isRotationallySymmetric;
 
+    @Expose
+    private String clueImageFilepath = "";
+
     private File crosswordFile = null;
     private CrosswordCanvasInterface crosswordCanvasInterface = null;
 
@@ -72,7 +75,9 @@ public class CrosswordTwo implements View.OnKeyListener {
             return fromJson(context, jsonString);
         } catch (IOException ex) {
             Log.e(LOG_TAG, "Exception occurred during file save. Target filename: " + jsonFilePath);
-            Log.e(LOG_TAG, ex.getMessage());
+            if (ex.getLocalizedMessage() != null) {
+                Log.e(LOG_TAG, ex.getLocalizedMessage());
+            }
             throw ex;
         }
     }
@@ -217,6 +222,14 @@ public class CrosswordTwo implements View.OnKeyListener {
 
     public File getCrosswordFile() {
         return crosswordFile;
+    }
+
+    public String getClueImageFilepath() {
+        return clueImageFilepath;
+    }
+
+    public void setClueImageFilepath(String clueImageFilepath) {
+        this.clueImageFilepath = clueImageFilepath;
     }
 
     public CellTwo getCell(int row, int col) {

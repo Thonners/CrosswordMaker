@@ -32,6 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
 
 import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
 
@@ -49,7 +50,8 @@ public class CluePageFragment extends Fragment {
     private static final String LOG_TAG = "CluePageFragment";
     private static final int REQUEST_IMAGE_CAPTURE = 1;    // Int used in camera intent
     private static final int REQUEST_CAMERA_PERMISSION = 2;
-    private static int MIN_CLUE_IMAGE_RES = 100;  // Minimum number of pixels for clue image width to use for resampling
+    private static int MIN_CLUE_IMAGE_RES = 100;  // Minimum number of pixels for clue image
+    // width to use for resampling
     private static final String ARG_FILE_PATH = "filePath";
 
 
@@ -65,12 +67,11 @@ public class CluePageFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
 
-    public static CluePageFragment newInstance(String filePath) {
-        Log.d(LOG_TAG, "Initial filePath for clue image: " + filePath);
+    public static CluePageFragment newInstance(String crosswordFilePath) {
+        Log.d(LOG_TAG, "CrosswordFilePath for clue image: " + crosswordFilePath);
         CluePageFragment fragment = new CluePageFragment();
         Bundle args = new Bundle();
-        String imageFilePath = filePath;
-        args.putString(ARG_FILE_PATH, imageFilePath);
+        args.putString(ARG_FILE_PATH, crosswordFilePath);
         fragment.setArguments(args);
         return fragment;
     }
@@ -83,8 +84,16 @@ public class CluePageFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            imageFilePath = getArguments().getString(ARG_FILE_PATH);
-            Log.d(LOG_TAG, "imageFilePath = " + imageFilePath);
+            String crosswordFilePath = getArguments().getString(ARG_FILE_PATH);
+            Log.d(LOG_TAG, "CrosswordFilePath = " + crosswordFilePath);
+            try {
+                CrosswordTwo cw = CrosswordTwo.fromJsonFile(getContext(), crosswordFilePath);
+                imageFilePath = cw.getClueImageFilepath();
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Unable to load crossword from JSON file: " + crosswordFilePath +
+                        "\nIOException thrown: " + e.getMessage());
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -127,7 +136,8 @@ public class CluePageFragment extends Fragment {
                     }
                 });
             } else {
-                // If no picture file found and device doesn't have camera availability, display error message
+                // If no picture file found and device doesn't have camera availability, display
+                // error message
                 TextView textView = view.findViewById(R.id.take_picture_clues_text_view);
                 textView.setText(getResources().getString(R.string.take_clue_picture_error));
             }
@@ -140,8 +150,8 @@ public class CluePageFragment extends Fragment {
         try {
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
+            throw new ClassCastException(activity.toString() + " must implement " +
+                    "OnFragmentInteractionListener");
         }
     }
 
@@ -188,16 +198,13 @@ public class CluePageFragment extends Fragment {
     }
 
     private boolean clueImageFileExists() {        // Initialise the file required
+        if (imageFilePath == null || imageFilePath.isEmpty()) return false;
         try {
             clueImageFile = new File(imageFilePath);
         } catch (Exception e) {
             Log.e(LOG_TAG, "Couldn't create imageFile. Exception message: " + e.getMessage());
         }
-        if (clueImageFile.length() > 10) {
-            return true;
-        } else {
-            return false;
-        }
+        return clueImageFile.length() > 10;
     }
 
     public void dispatchTakePictureIntent() {
@@ -218,7 +225,9 @@ public class CluePageFragment extends Fragment {
                     Log.d(LOG_TAG, "clueImage != null");
                     //Give intent the save path
                     Uri photoURI = FileProvider.getUriForFile(getContext(),
-                            getActivity().getPackageName() + ".provider",      // This provider name is set in the manifest & must match, else there will be permissions errors
+                            getActivity().getPackageName() + ".provider",      // This provider
+                            // name is set in the manifest & must match, else there will be
+                            // permissions errors
                             clueImageFile);
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
 
@@ -230,11 +239,13 @@ public class CluePageFragment extends Fragment {
                 // display error state to the user
                 Log.d(LOG_TAG, " Caught activity not found exception");
             } catch (Exception ex) {
-                Log.e(LOG_TAG, "Caught exception when trying to make camera intent: " + ex.getMessage());
+                Log.e(LOG_TAG,
+                        "Caught exception when trying to make camera intent: " + ex.getMessage());
             }
         } else {
             Log.d(LOG_TAG, "Requesting Camera permission.");
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
         }
     }
 
@@ -247,12 +258,15 @@ public class CluePageFragment extends Fragment {
             removePhotoButton();
             Log.d(LOG_TAG, "Image set and button removed.");
         } else {
-            Log.d(LOG_TAG, "resultCode = RESULT_CANCELLED, (or the request code did not match REQUEST_IMAGE_CAPTURE) so not doing anything.");
+            Log.d(LOG_TAG,
+                    "resultCode = RESULT_CANCELLED, (or the request code did not match " +
+                            "REQUEST_IMAGE_CAPTURE) so not doing anything.");
         }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
@@ -260,7 +274,8 @@ public class CluePageFragment extends Fragment {
             if (grantResultsLength > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 dispatchTakePictureIntent();
             } else {
-                Toast.makeText(getActivity(), "Camera permissions are required to take a picture of the clues.", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "Camera permissions are required to take a picture "
+                        + "of the clues.", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -277,7 +292,8 @@ public class CluePageFragment extends Fragment {
         int imageHeight = options.outHeight;
         int imageWidth = options.outWidth;
         String imageType = options.outMimeType;
-        Log.d(LOG_TAG, "Bounds: imageHeight = " + imageHeight + ", imageWidth = " + imageWidth + ", imageType = " + imageType);
+        Log.d(LOG_TAG, "Bounds: imageHeight = " + imageHeight + ", imageWidth = " + imageWidth +
+                ", imageType = " + imageType);
 
         Log.d(LOG_TAG, "clueImageView.getWidth() = " + clueImageViewTouch.getWidth());
         options.inSampleSize = calculateInSampleSize(options, clueImageViewTouch.getWidth());
@@ -292,7 +308,9 @@ public class CluePageFragment extends Fragment {
         // Check that reqWidth is sensible
         if (reqWidth < MIN_CLUE_IMAGE_RES) {
             reqWidth = getScreenWidth();
-            reqWidth = Math.min(reqWidth, 4096);    // 4096 is the maximum bitmap size that can be imported into a 'texture'. Limit it here to prevent it falling over on larger resolutioned screens.
+            reqWidth = Math.min(reqWidth, 4096);    // 4096 is the maximum bitmap size that can
+            // be imported into a 'texture'. Limit it here to prevent it falling over on larger
+            // resolutioned screens.
         }
         // Raw width of image
         final int width = options.outWidth;
@@ -323,13 +341,15 @@ public class CluePageFragment extends Fragment {
     private void showOverwriteClueImageFileDialog() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(getResources().getString(R.string.dialog_overwrite_clue_image_message));
-        builder.setPositiveButton(getResources().getString(R.string.dialog_overwrite), new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(getResources().getString(R.string.dialog_overwrite),
+                new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dispatchTakePictureIntent();
             }
         });
-        builder.setNegativeButton(getResources().getString(R.string.dialog_cancel), new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(getResources().getString(R.string.dialog_cancel),
+                new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
