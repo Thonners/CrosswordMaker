@@ -1,6 +1,7 @@
 package com.thonners.crosswordmaker;
 
 import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -49,11 +50,22 @@ public class CrosswordTwo implements View.OnKeyListener {
     private final boolean isRotationallySymmetric;
 
     @Expose
-    private String clueImageFilepath = "";
+    private String clueImageUriString = Uri.EMPTY.toString();
+
+    private Uri clueImageUri = null;
 
     private File crosswordFile = null;
     private CrosswordCanvasInterface crosswordCanvasInterface = null;
 
+    public interface CrosswordTitleInterface {
+        String getTitle();
+    }
+
+    public interface CrosswordClueImageInterface {
+        void setClueImage(Uri uri);
+
+        Uri getClueImageUri();
+    }
 
     public interface CrosswordCanvasInterface {
         void redraw();
@@ -202,6 +214,7 @@ public class CrosswordTwo implements View.OnKeyListener {
         try (FileWriter fileWriter = new FileWriter(crosswordFile)) {
             fileWriter.write(toJson());
             Log.d(LOG_TAG, "Crossword Saved to: " + crosswordFile.getPath());
+            Log.d(LOG_TAG, toJson());
         } catch (IOException ex) {
             Log.e(LOG_TAG,
                     "Exception occurred during file save. Target filename: " + crosswordFile.getName());
@@ -224,12 +237,17 @@ public class CrosswordTwo implements View.OnKeyListener {
         return crosswordFile;
     }
 
-    public String getClueImageFilepath() {
-        return clueImageFilepath;
+    public Uri getClueImageUri() {
+        //        if (clueImageUriString.isEmpty()) {
+        //            return null;
+        //        }
+        Log.d(LOG_TAG, "clueImageUriString = " + clueImageUriString);
+        return Uri.parse(clueImageUriString);
     }
 
-    public void setClueImageFilepath(String clueImageFilepath) {
-        this.clueImageFilepath = clueImageFilepath;
+    public void setClueImageUri(Uri clueImageUri) {
+        this.clueImageUriString = clueImageUri.toString();
+        Log.d(LOG_TAG, "Uri string: " + this.clueImageUriString);
     }
 
     public CellTwo getCell(int row, int col) {

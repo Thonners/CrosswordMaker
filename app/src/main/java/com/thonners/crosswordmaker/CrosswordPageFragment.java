@@ -38,7 +38,8 @@ import java.util.ArrayList;
  */
 public class CrosswordPageFragment extends Fragment implements View.OnClickListener,
         View.OnLongClickListener, Crossword.WordSplitHyphenDeactivatedListener,
-        Clue.ClueInteractionListener {
+        Clue.ClueInteractionListener, CrosswordTwo.CrosswordClueImageInterface,
+        CrosswordTwo.CrosswordTitleInterface {
 
     private static final String ARG_TAB_POSITION = "tabPosition";
     private static final String ARG_STRING_ARRAY = "crosswordStringArray";
@@ -188,6 +189,21 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void setClueImage(Uri uri) {
+        this.crosswordTwo.setClueImageUri(uri);
+    }
+
+    @Override
+    public Uri getClueImageUri() {
+        return crosswordTwo.getClueImageUri();
+    }
+
+    @Override
+    public String getTitle() {
+        return crosswordTwo.getActivityTitle();
     }
 
     /**

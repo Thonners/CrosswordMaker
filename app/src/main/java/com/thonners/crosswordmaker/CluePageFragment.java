@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -13,6 +14,9 @@ import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -20,7 +24,6 @@ import androidx.fragment.app.Fragment;
 import android.provider.MediaStore;
 
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -54,26 +57,60 @@ public class CluePageFragment extends Fragment {
     // width to use for resampling
     private static final String ARG_FILE_PATH = "filePath";
 
-
-    Crossword crossword;
-    String imageFilePath;
-    GridLayout grid;
-    ImageView clueImageView;
     TouchImageView clueImageViewTouch;
-    File clueImageFile;
-    Bitmap clueImageBitmap;
     View takeCluePhotoButton;
-
+    // GetContent creates an ActivityResultLauncher<String> to let you pass in the mime type you
+    // want to let the user select
+    ActivityResultLauncher<String> mGetContent =
+            registerForActivityResult(new ActivityResultContracts.GetContent(),
+                    new ActivityResultCallback<Uri>() {
+        @Override
+        public void onActivityResult(Uri uri) {
+            // Handle the returned Uri
+            Log.d(LOG_TAG, "Received callback from activity result with URI: " + uri.toString());
+        }
+    });
+    ActivityResultLauncher<Uri> mGetImageFromCamera =
+            registerForActivityResult(new ActivityResultContracts.TakePicture(),
+                    new ActivityResultCallback<Boolean>() {
+        @Override
+        public void onActivityResult(Boolean result) {
+            Log.d(LOG_TAG,
+                    "Camera callback from activity result with boolean: " + result.toString());
+            if (result) {
+                //                imageUri = clueImageInterface.getClueImageUri();
+                Log.d(LOG_TAG, "Image URI: " + getImageUri().toString());
+                clueImageViewTouch.setImageURI(getImageUri());
+                clueImageViewTouch.invalidate();
+                removePhotoButton();
+                Log.d(LOG_TAG, "Image set and button removed.");
+            } else {
+                Log.w(LOG_TAG, "Camera app was unable to save image to URI: " + getImageUri());
+            }
+        }
+    });
     private OnFragmentInteractionListener mListener;
+    private CrosswordTwo.CrosswordClueImageInterface clueImageInterface;
+    private CrosswordTwo.CrosswordTitleInterface titleInterface;
 
-
-    public static CluePageFragment newInstance(String crosswordFilePath) {
+    public static CluePageFragment newInstance(String crosswordFilePath,
+                                               CrosswordTwo.CrosswordClueImageInterface clueImageInterface, CrosswordTwo.CrosswordTitleInterface titleInterface) {
         Log.d(LOG_TAG, "CrosswordFilePath for clue image: " + crosswordFilePath);
         CluePageFragment fragment = new CluePageFragment();
         Bundle args = new Bundle();
         args.putString(ARG_FILE_PATH, crosswordFilePath);
         fragment.setArguments(args);
+        fragment.setClueImageInterface(clueImageInterface);
+        fragment.setTitleInterface(titleInterface);
         return fragment;
+    }
+
+    private void setTitleInterface(CrosswordTwo.CrosswordTitleInterface titleInterface) {
+        this.titleInterface = titleInterface;
+    }
+
+    private void setClueImageInterface(CrosswordTwo.CrosswordClueImageInterface clueImageInterface) {
+        this.clueImageInterface = clueImageInterface;
     }
 
     public CluePageFragment() {
@@ -83,18 +120,9 @@ public class CluePageFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            String crosswordFilePath = getArguments().getString(ARG_FILE_PATH);
-            Log.d(LOG_TAG, "CrosswordFilePath = " + crosswordFilePath);
-            try {
-                CrosswordTwo cw = CrosswordTwo.fromJsonFile(getContext(), crosswordFilePath);
-                imageFilePath = cw.getClueImageFilepath();
-            } catch (IOException e) {
-                Log.e(LOG_TAG, "Unable to load crossword from JSON file: " + crosswordFilePath +
-                        "\nIOException thrown: " + e.getMessage());
-                throw new RuntimeException(e);
-            }
-        }
+        Log.d(LOG_TAG, "onCreate called");
+        Log.d(LOG_TAG, "clueImageInterface = " + clueImageInterface.getClueImageUri().toString());
+        // TODO: Remove the crossword file path string from the bundle as we don't need it
     }
 
     @Override
@@ -175,14 +203,15 @@ public class CluePageFragment extends Fragment {
         public void onFragmentInteraction(Uri uri);
     }
 
-    private void setClueImageInView() {
-        Log.d(LOG_TAG, "trying to get the photo from: " + clueImageFile.getAbsolutePath());
-        //Show image in clueImageView
-        clueImageBitmap = getImage(clueImageFile);
+    private Uri getImageUri() {
+        return clueImageInterface.getClueImageUri();
+    }
 
+    private void setClueImageInView() {
         Log.d(LOG_TAG, "Setting image");
-        //clueImageView.setImageBitmap(clueImageBitmap);
-        clueImageViewTouch.setImageBitmap(clueImageBitmap);
+        Log.d(LOG_TAG, "Uri: " + getImageUri().toString());
+        clueImageViewTouch.setImageURI(getImageUri());
+        clueImageViewTouch.invalidate();
         Log.d(LOG_TAG, "Image should be set.");
         clueImageViewTouch.setZoom(2.0f);
         clueImageViewTouch.setZoom(1.0f);
@@ -197,44 +226,34 @@ public class CluePageFragment extends Fragment {
         }
     }
 
-    private boolean clueImageFileExists() {        // Initialise the file required
-        if (imageFilePath == null || imageFilePath.isEmpty()) return false;
-        try {
-            clueImageFile = new File(imageFilePath);
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "Couldn't create imageFile. Exception message: " + e.getMessage());
-        }
-        return clueImageFile.length() > 10;
+    private boolean clueImageFileExists() {   // Initialise the file required - this used to do this
+        // TODO Simplify this (if it's even required?) Compare to Uri.EMPTY
+        if (getImageUri() == null) return false;
+        return !getImageUri().getPath().isEmpty();
     }
+
 
     public void dispatchTakePictureIntent() {
         Log.d(LOG_TAG, "dispatchPictureIntent method started");
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) == PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PERMISSION_GRANTED) {
             Log.d(LOG_TAG, "Camera permissions granted. Starting the takePictureIntent");
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             if (takePictureIntent.resolveActivity(getContext().getPackageManager()) == null)
                 Log.d(LOG_TAG, " resolveImageIntent == null");
             if (getActivity().getPackageManager() == null)
                 Log.d(LOG_TAG, " getPackageManager == null");
-            if (getContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA))
+            if (getContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
                 Log.d(LOG_TAG, " camera feature == null");
 
             try {
-                // Check file exists
-                if (clueImageFile != null) {
-                    Log.d(LOG_TAG, "clueImage != null");
-                    //Give intent the save path
-                    Uri photoURI = FileProvider.getUriForFile(getContext(),
-                            getActivity().getPackageName() + ".provider",      // This provider
-                            // name is set in the manifest & must match, else there will be
-                            // permissions errors
-                            clueImageFile);
-                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-
-                    Log.d(LOG_TAG, "taking the picture");
-                    //Take the picture
-                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-                }
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.TITLE, titleInterface.getTitle());
+                values.put(MediaStore.Images.Media.DESCRIPTION, "Clue image");
+                Uri newClueImageUri =
+                        requireContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                Log.d(LOG_TAG, " Trying to save URI as: " + newClueImageUri.toString());
+                clueImageInterface.setClueImage(newClueImageUri);
+                mGetImageFromCamera.launch(newClueImageUri);
             } catch (ActivityNotFoundException e) {
                 // display error state to the user
                 Log.d(LOG_TAG, " Caught activity not found exception");
@@ -246,6 +265,7 @@ public class CluePageFragment extends Fragment {
             Log.d(LOG_TAG, "Requesting Camera permission.");
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+            dispatchTakePictureIntent();
         }
     }
 

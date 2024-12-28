@@ -285,11 +285,10 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
                 case CROSSWORD_TAB:
                     crosswordPageFragment = CrosswordPageFragment.newInstance(position,
                             crosswordFilePath);
-                    //                    crosswordPageFragment = CrosswordPageFragment
-                    //                    .newInstance(position, crosswordStringArray);
                     return crosswordPageFragment;
                 case CLUE_TAB:
-                    cluePageFragment = CluePageFragment.newInstance(crosswordFilePath);
+                    cluePageFragment = CluePageFragment.newInstance(crosswordFilePath,
+                            crosswordPageFragment, crosswordPageFragment);
                     return cluePageFragment;
                 case MANUAL_ANAGRAM_TAB:
                     manualAnagramPageFragment = new ManualAnagramPageFragment();
