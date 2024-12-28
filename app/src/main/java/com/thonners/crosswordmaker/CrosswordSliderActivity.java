@@ -448,7 +448,7 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
     public void saveGrid() {
         // Save the grid
         if (crosswordPageFragment != null) {
-            crosswordPageFragment.getCrossword().saveCrossword(this);
+            crosswordPageFragment.saveCrossword();
 
             Toast toast = Toast.makeText(this, "Crossword progress saved.", Toast.LENGTH_SHORT);
             toast.show();

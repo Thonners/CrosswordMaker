@@ -3,7 +3,6 @@ package com.thonners.crosswordmaker;
 import android.app.Activity;
 import android.graphics.Point;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -14,8 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.Animation;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -39,7 +36,7 @@ import java.util.ArrayList;
 public class CrosswordPageFragment extends Fragment implements View.OnClickListener,
         View.OnLongClickListener, Crossword.WordSplitHyphenDeactivatedListener,
         Clue.ClueInteractionListener, CrosswordTwo.CrosswordClueImageInterface,
-        CrosswordTwo.CrosswordTitleInterface {
+        CrosswordTwo.CrosswordTitleInterface, CrosswordTwo.CrosswordSaveInterface {
 
     private static final String ARG_TAB_POSITION = "tabPosition";
     private static final String ARG_STRING_ARRAY = "crosswordStringArray";
@@ -204,6 +201,11 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
     @Override
     public String getTitle() {
         return crosswordTwo.getActivityTitle();
+    }
+
+    @Override
+    public void saveCrossword() {
+        crosswordTwo.saveCrossword(requireContext());
     }
 
     /**

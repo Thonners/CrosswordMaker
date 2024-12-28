@@ -61,6 +61,10 @@ public class CrosswordTwo implements View.OnKeyListener {
         String getTitle();
     }
 
+    public interface CrosswordSaveInterface {
+        void saveCrossword();
+    }
+
     public interface CrosswordClueImageInterface {
         void setClueImage(Uri uri);
 
