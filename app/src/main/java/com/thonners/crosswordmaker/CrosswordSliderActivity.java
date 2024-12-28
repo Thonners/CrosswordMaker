@@ -1,26 +1,18 @@
 package com.thonners.crosswordmaker;
 
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
-
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
-//import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
-//import androidx.fragment.app.FragmentStatePagerAdapter;
-//import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.widget.ViewPager2;
 import androidx.fragment.app.Fragment;
-
-import android.os.Bundle;
-
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.menu.ActionMenuItemView;
 
+import android.content.Context;
+import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,7 +20,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.Objects;
 
 
@@ -63,11 +54,8 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
 
     private boolean firstVisitManualAnagram = true;
 
-    private String[] crosswordStringArray;
-    private Crossword crossword;
 
     private String crosswordFilePath = "";
-    private CrosswordTwo crosswordTwo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,28 +90,16 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
 
     private void initialise() {
         // Get intent Extras
-        //        crosswordStringArray = getIntent().getStringArrayExtra(Crossword.CROSSWORD_EXTRA);
         crosswordFilePath = getIntent().getStringExtra(CrosswordTwo.CROSSWORD_EXTRA);
-        try {
-            crosswordTwo = CrosswordTwo.fromJsonFile(this, crosswordFilePath);
-        } catch (IOException ex) {
-            Log.e(LOG_TAG, "Error reading saved JSON file!");
-            return;
-        }
 
         // Instantiate a ViewPager and a PagerAdapter.
-        pager = (ViewPager2) findViewById(R.id.pager);
-        // TODO: Fix this working with ViewPager2 instead of the old version... broken everything...
+        pager = findViewById(R.id.pager);
         pagerAdapter = new ScreenSlidePagerAdapter(this);
-        //        pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         pager.setAdapter(pagerAdapter);
-        pager.setOffscreenPageLimit(6);
-        //        pager.setOffscreenPageLimit(NUM_PAGES);
+        pager.setOffscreenPageLimit(NUM_PAGES);
         pager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            //        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrollStateChanged(int state) {
-                //                if (state == ViewPager2.SCROLL_STATE_IDLE) {
                 if (state == ViewPager.SCROLL_STATE_IDLE) {
                     switch (pager.getCurrentItem()) {
                         case CROSSWORD_TAB:
@@ -278,6 +254,7 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
             super(fragment);
         }
 
+        @NonNull
         @Override
         public Fragment createFragment(int position) {
 
@@ -313,63 +290,7 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
         public int getItemCount() {
             return NUM_PAGES;
         }
-
-        //        @Override
-        //        public CharSequence getPageTitle(int position) {
-        //            return tabTitles[position];
-        //        }
     }
-    //
-    //    /**
-    //     * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in
-    //     * sequence.
-    //     */
-    //    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
-    //        public ScreenSlidePagerAdapter(FragmentManager fm) {
-    //            super(fm);
-    //        }
-    //
-    //        @Override
-    //        public Fragment getItem(int position) {
-    //
-    //            switch (position) {
-    //                case CROSSWORD_TAB:
-    //                    crosswordPageFragment = CrosswordPageFragment.newInstance(position,
-    //                    crosswordStringArray);
-    //                    return crosswordPageFragment;
-    //                case CLUE_TAB:
-    //                    cluePageFragment = CluePageFragment.newInstance
-    //                    (crosswordStringArray[Crossword.SAVED_ARRAY_INDEX_CLUE_IMAGE]);
-    //                    return cluePageFragment;
-    //                case MANUAL_ANAGRAM_TAB:
-    //                    manualAnagramPageFragment = new ManualAnagramPageFragment();
-    //                    return manualAnagramPageFragment;
-    //                case DICTIONARY_TAB:
-    //                    dictionaryPageFragment = new DictionaryPageFragment();
-    //                    return dictionaryPageFragment;
-    //                case ANAGRAM_TAB:
-    //                    anagramPageFragment = new AnagramPageFragment();
-    //                    return anagramPageFragment;
-    //                case WIKI_TAB:
-    //                    wikiPageFragment = new WikiPageFragment();
-    //                    return wikiPageFragment;
-    //            }
-    //
-    //            // Safety net - in case position is out of range shown above. Should never be
-    //            needed
-    //            return wikiPageFragment;
-    //        }
-    //
-    //        @Override
-    //        public int getCount() {
-    //            return NUM_PAGES;
-    //        }
-    //
-    //        @Override
-    //        public CharSequence getPageTitle(int position) {
-    //            return tabTitles[position];
-    //        }
-    //    }
 
     private void hideKeyboard() {
         // Method to hide the keyboard
@@ -384,8 +305,9 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
 
     private void hideActionZoom() {
         // Remove/hide the zoom icon from the menu
-        //        ActionMenuItemView menuZoom = (ActionMenuItemView) findViewById(R.id.action_zoom);
-        //        menuZoom.setVisibility(View.GONE);
+        //                ActionMenuItemView menuZoom = (ActionMenuItemView) findViewById(R.id
+        //                .action_zoom);
+        //                menuZoom.setVisibility(View.GONE);
     }
 
     private void showActionZoom() {
