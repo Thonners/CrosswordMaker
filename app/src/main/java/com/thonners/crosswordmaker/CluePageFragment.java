@@ -17,7 +17,6 @@ import android.os.Bundle;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
@@ -48,7 +47,7 @@ import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
  * Use the {@link CluePageFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CluePageFragment extends Fragment {
+public class CluePageFragment extends Fragment implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     private static final String LOG_TAG = "CluePageFragment";
     private static final int REQUEST_IMAGE_CAPTURE = 1;    // Int used in camera intent
@@ -57,11 +56,14 @@ public class CluePageFragment extends Fragment {
     // width to use for resampling
     private static final String ARG_FILE_PATH = "filePath";
 
-    TouchImageView clueImageViewTouch;
-    View takeCluePhotoButton;
+    private TouchImageView clueImageViewTouch;
+    private View takeCluePhotoButton;
+    private Uri clueImageUri = Uri.EMPTY;
+
+
     // GetContent creates an ActivityResultLauncher<String> to let you pass in the mime type you
     // want to let the user select
-    ActivityResultLauncher<String> mGetContent =
+    private final ActivityResultLauncher<String> mGetContent =
             registerForActivityResult(new ActivityResultContracts.GetContent(),
                     new ActivityResultCallback<Uri>() {
         @Override
@@ -70,7 +72,7 @@ public class CluePageFragment extends Fragment {
             Log.d(LOG_TAG, "Received callback from activity result with URI: " + uri.toString());
         }
     });
-    ActivityResultLauncher<Uri> mGetImageFromCamera =
+    private final ActivityResultLauncher<Uri> mGetImageFromCamera =
             registerForActivityResult(new ActivityResultContracts.TakePicture(),
                     new ActivityResultCallback<Boolean>() {
         @Override
@@ -78,7 +80,7 @@ public class CluePageFragment extends Fragment {
             Log.d(LOG_TAG,
                     "Camera callback from activity result with boolean: " + result.toString());
             if (result) {
-                //                imageUri = clueImageInterface.getClueImageUri();
+                clueImageInterface.setClueImage(clueImageUri);
                 Log.d(LOG_TAG, "Image URI: " + getImageUri().toString());
                 clueImageViewTouch.setImageURI(getImageUri());
                 clueImageViewTouch.invalidate();
@@ -87,6 +89,16 @@ public class CluePageFragment extends Fragment {
             } else {
                 Log.w(LOG_TAG, "Camera app was unable to save image to URI: " + getImageUri());
             }
+        }
+    });
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(),
+                    isGranted -> {
+        if (isGranted) {
+            dispatchTakePictureIntent();
+        } else {
+            Toast.makeText(getActivity(), "Camera permissions are required to take a picture " +
+                    "of the clues.", Toast.LENGTH_LONG).show();
         }
     });
     private OnFragmentInteractionListener mListener;
@@ -226,10 +238,9 @@ public class CluePageFragment extends Fragment {
         }
     }
 
-    private boolean clueImageFileExists() {   // Initialise the file required - this used to do this
-        // TODO Simplify this (if it's even required?) Compare to Uri.EMPTY
-        if (getImageUri() == null) return false;
-        return !getImageUri().getPath().isEmpty();
+    private boolean clueImageFileExists() {
+        Uri uri = getImageUri();
+        return (getImageUri() != null && !getImageUri().toString().matches(Uri.EMPTY.toString()));
     }
 
 
@@ -249,11 +260,10 @@ public class CluePageFragment extends Fragment {
                 ContentValues values = new ContentValues();
                 values.put(MediaStore.Images.Media.TITLE, titleInterface.getTitle());
                 values.put(MediaStore.Images.Media.DESCRIPTION, "Clue image");
-                Uri newClueImageUri =
+                clueImageUri =
                         requireContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-                Log.d(LOG_TAG, " Trying to save URI as: " + newClueImageUri.toString());
-                clueImageInterface.setClueImage(newClueImageUri);
-                mGetImageFromCamera.launch(newClueImageUri);
+                Log.d(LOG_TAG, " Trying to save URI as: " + clueImageUri.toString());
+                mGetImageFromCamera.launch(clueImageUri);
             } catch (ActivityNotFoundException e) {
                 // display error state to the user
                 Log.d(LOG_TAG, " Caught activity not found exception");
@@ -263,99 +273,8 @@ public class CluePageFragment extends Fragment {
             }
         } else {
             Log.d(LOG_TAG, "Requesting Camera permission.");
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
-            dispatchTakePictureIntent();
+            requestPermissionLauncher.launch(Manifest.permission.CAMERA);
         }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Called when camera intent returns. Now load image just taken
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode != Activity.RESULT_CANCELED) {
-            Log.d(LOG_TAG, "Camera activity returned.");
-            setClueImageInView();
-            removePhotoButton();
-            Log.d(LOG_TAG, "Image set and button removed.");
-        } else {
-            Log.d(LOG_TAG,
-                    "resultCode = RESULT_CANCELLED, (or the request code did not match " +
-                            "REQUEST_IMAGE_CAPTURE) so not doing anything.");
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == REQUEST_CAMERA_PERMISSION) {
-            int grantResultsLength = grantResults.length;
-            if (grantResultsLength > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                dispatchTakePictureIntent();
-            } else {
-                Toast.makeText(getActivity(), "Camera permissions are required to take a picture "
-                        + "of the clues.", Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
-    private Bitmap getImage(File bitmapFile) {
-        // Decode bitmapFile and return the bitmap for use in an ImageView
-        Log.d(LOG_TAG, "trying to get the photo from: " + bitmapFile.getAbsolutePath());
-
-        // Decode bounds to get size image size. For use in loading a smaller scaled image
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        Log.d(LOG_TAG, "Decoding bounds...");
-        BitmapFactory.decodeFile(bitmapFile.getAbsolutePath(), options);
-        int imageHeight = options.outHeight;
-        int imageWidth = options.outWidth;
-        String imageType = options.outMimeType;
-        Log.d(LOG_TAG, "Bounds: imageHeight = " + imageHeight + ", imageWidth = " + imageWidth +
-                ", imageType = " + imageType);
-
-        Log.d(LOG_TAG, "clueImageView.getWidth() = " + clueImageViewTouch.getWidth());
-        options.inSampleSize = calculateInSampleSize(options, clueImageViewTouch.getWidth());
-        // Turn off justDecodeBounds so that the file is properly decoded
-        options.inJustDecodeBounds = false;
-
-        return BitmapFactory.decodeFile(bitmapFile.getAbsolutePath(), options);
-    }
-
-    public int calculateInSampleSize(BitmapFactory.Options options, int reqWidth) {
-        Log.d(LOG_TAG, "Calculating bitmap sample size...");
-        // Check that reqWidth is sensible
-        if (reqWidth < MIN_CLUE_IMAGE_RES) {
-            reqWidth = getScreenWidth();
-            reqWidth = Math.min(reqWidth, 4096);    // 4096 is the maximum bitmap size that can
-            // be imported into a 'texture'. Limit it here to prevent it falling over on larger
-            // resolutioned screens.
-        }
-        // Raw width of image
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (width > reqWidth) {
-            final int halfWidth = width / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-
-            Log.d(LOG_TAG, "halfWidth / inSampleSize =  " + (halfWidth / inSampleSize));
-            while ((halfWidth / inSampleSize) > reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-        Log.d(LOG_TAG, "Final sample size = " + inSampleSize);
-        return inSampleSize;
-    }
-
-    private int getScreenWidth() {
-        Point size = new Point();
-        getActivity().getWindowManager().getDefaultDisplay().getSize(size);
-
-        return size.x;
     }
 
     private void showOverwriteClueImageFileDialog() {
@@ -385,4 +304,5 @@ public class CluePageFragment extends Fragment {
             dispatchTakePictureIntent();
         }
     }
+
 }
