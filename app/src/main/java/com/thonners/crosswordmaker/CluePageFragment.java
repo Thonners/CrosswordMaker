@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -17,6 +18,7 @@ import android.os.Bundle;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
@@ -166,7 +168,7 @@ public class CluePageFragment extends Fragment implements ActivityCompat.OnReque
             setClueImageInView();
             removePhotoButton();
         } else {
-            if (HomeActivity.deviceHasCameraCapability(getActivity())) {
+            if (HomeActivity.deviceHasCameraCapability(requireActivity())) {
                 takeCluePhotoButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -184,8 +186,8 @@ public class CluePageFragment extends Fragment implements ActivityCompat.OnReque
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
     }
 
     @Override
