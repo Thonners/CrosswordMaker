@@ -101,7 +101,6 @@ public class CluePageFragment extends Fragment implements ActivityCompat.OnReque
                     "of the clues.", Toast.LENGTH_LONG).show();
         }
     });
-    private OnFragmentInteractionListener mListener;
     private CrosswordTwo.CrosswordClueImageInterface clueImageInterface;
     private CrosswordTwo.CrosswordTitleInterface titleInterface;
 
@@ -187,18 +186,11 @@ public class CluePageFragment extends Fragment implements ActivityCompat.OnReque
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement " +
-                    "OnFragmentInteractionListener");
-        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
     /**
