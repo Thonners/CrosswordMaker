@@ -224,7 +224,7 @@ public class CluePageFragment extends Fragment implements ActivityCompat.OnReque
         }
     }
 
-    private void removeImage() {
+    public void removeImage() {
         Log.d(LOG_TAG, "Removing image");
         clueImageInterface.setClueImage(Uri.EMPTY);
         getCluesLayout.setVisibility(View.VISIBLE);

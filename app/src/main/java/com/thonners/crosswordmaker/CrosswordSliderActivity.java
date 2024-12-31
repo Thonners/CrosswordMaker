@@ -396,9 +396,8 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
     }
 
     private void retakeCluesPicture() {
-
         pager.setCurrentItem(CLUE_TAB, true);
-        cluePageFragment.dispatchTakePictureIntent();
+        cluePageFragment.removeImage();
     }
 
     private void showInstructions() {
