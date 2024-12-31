@@ -6,6 +6,7 @@ import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -45,27 +46,30 @@ public class CluePageFragment extends Fragment implements ActivityCompat.OnReque
     private View fromGalleryButton;
     private Uri clueImageUri = Uri.EMPTY;
 
+    private CrosswordTwo.CrosswordClueImageInterface clueImageInterface;
+    private CrosswordTwo.CrosswordTitleInterface titleInterface;
 
-    // GetContent creates an ActivityResultLauncher<String> to let you pass in the mime type you
-    // want to let the user select
-    private final ActivityResultLauncher<String> mGetContent =
-            registerForActivityResult(new ActivityResultContracts.GetContent(),
-                    new ActivityResultCallback<Uri>() {
-        @Override
-        public void onActivityResult(Uri uri) {
-            // Handle the returned Uri
-            if (uri == null) {
-                Log.w(LOG_TAG, "Received null URI from activity result.");
-            } else {
-                Log.d(LOG_TAG,
-                        "Received callback from activity result with URI: " + uri.toString());
-                clueImageInterface.setClueImage(uri);
-                Log.d(LOG_TAG, "Image URI: " + getImageUri().toString());
-                setClueImageInView();
-            }
+    // Create an ActivityLauncher to select an image from the gallery.
+    private final ActivityResultLauncher<String[]> getImageFromGallery =
+            registerForActivityResult(new ActivityResultContracts.OpenDocument(), uri -> {
+        if (uri != null) {
+            // Persistable URI permission granted (GetContent() only gives us one-time-use
+            // permissions, OpenDocument lets us keep the access permission for next time.
+            Log.d(LOG_TAG, "Received callback from activity result with URI: " + uri);
+            clueImageInterface.setClueImage(uri);
+            Log.d(LOG_TAG, "Image URI: " + getImageUri().toString());
+            setClueImageInView();
+            // Take persistable permission so that we can open this image next time the user
+            // opens the app:
+            final int takeFlags =
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+            requireActivity().getContentResolver().takePersistableUriPermission(uri, takeFlags);
+        } else {
+            // User canceled the selection
+            Log.d(LOG_TAG, "User cancelled the selection - received null URI from picker.");
         }
     });
-    private final ActivityResultLauncher<Uri> mGetImageFromCamera =
+    private final ActivityResultLauncher<Uri> getImageFromCamera =
             registerForActivityResult(new ActivityResultContracts.TakePicture(),
                     new ActivityResultCallback<Boolean>() {
         @Override
@@ -91,8 +95,6 @@ public class CluePageFragment extends Fragment implements ActivityCompat.OnReque
                     "of the clues.", Toast.LENGTH_LONG).show();
         }
     });
-    private CrosswordTwo.CrosswordClueImageInterface clueImageInterface;
-    private CrosswordTwo.CrosswordTitleInterface titleInterface;
 
     public static CluePageFragment newInstance(String crosswordFilePath,
                                                CrosswordTwo.CrosswordClueImageInterface clueImageInterface, CrosswordTwo.CrosswordTitleInterface titleInterface) {
@@ -161,7 +163,7 @@ public class CluePageFragment extends Fragment implements ActivityCompat.OnReque
                 });
                 fromGalleryButton.setOnClickListener(v -> {
                     Log.d(LOG_TAG, "From gallery button pressed");
-                    mGetContent.launch("image/*");
+                    getImageFromGallery.launch(new String[]{"image/*"});
                 });
 
             } else {
@@ -239,7 +241,7 @@ public class CluePageFragment extends Fragment implements ActivityCompat.OnReque
                 clueImageUri =
                         requireContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
                 Log.d(LOG_TAG, " Trying to save URI as: " + clueImageUri);
-                mGetImageFromCamera.launch(clueImageUri);
+                getImageFromCamera.launch(clueImageUri);
             } catch (ActivityNotFoundException e) {
                 // display error state to the user
                 Log.d(LOG_TAG, " Caught activity not found exception");
