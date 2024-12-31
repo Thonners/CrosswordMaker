@@ -26,6 +26,9 @@ Thumbs.db
 # Android Studio
 *.iml
 .idea
+.externalNativeBuild/
+.cxx/
+output.json
 #.idea/workspace.xml - remove # and delete .idea if it better suit your needs.
 .gradle
 build/
@@ -38,16 +41,12 @@ obj/
 .externalNativeBuild
 
 
-
+# From Android.gitignore on GitHub:
 # Built application files
-build/
 /*/build/
 
 # Crashlytics configuations
 com_crashlytics_export_strings.xml
-
-# Local configuration file (sdk path, etc)
-local.properties
 
 # Gradle generated files
 .gradle/
@@ -67,13 +66,33 @@ local.properties
 .idea/modules.xml
 .idea/scopes/scope_settings.xml
 .idea/vcs.xml
-*.iml
 
 # OS-specific files
-.DS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
 ehthumbs.db
-Thumbs.db
+
+# Log/OS Files
+*.log
+
+# Android Studio generated files and folders
+
+# IntelliJ
+.idea/
+misc.xml
+deploymentTargetDropDown.xml
+render.experimental.xml
+
+# Keystore files
+*.jks
+*.keystore
+
+# Google Services (e.g. APIs or Firebase)
+google-services.json
+
+# Android Profiling
+*.hprof
+# Metadata created after successful build.
+/app/release/output-metadata.json
