@@ -121,7 +121,9 @@
     <string name="saved_file_selection_prompt">Select crossword to load:</string>
     <string name="crossword_title_input_hint">Enter the crossword publication...</string>
     <string name="crossword_date_input_hint">Enter the crossword date...</string>
-    <string name="take_clue_picture_prompt">Click here to take a picture of the clues</string>
+    <string name="take_clue_picture_prompt">How should we get the clues?</string>
+    <string name="take_clue_picture_prompt_camera">New picture</string>
+    <string name="take_clue_picture_prompt_library">From gallery</string>
     <string name="take_clue_picture_error">Sorry, no camera device found.\nThis is required to take a picture of the clues.</string>
 
     <!-- Publication name selector Dialog -->
