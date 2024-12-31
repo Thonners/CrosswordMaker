@@ -23,7 +23,7 @@ import android.widget.Toast;
 import java.util.Objects;
 
 
-public class CrosswordSliderActivity extends AppCompatActivity implements CrosswordPageFragment.OnFragmentInteractionListener, CluePageFragment.OnFragmentInteractionListener, DictionaryPageFragment.OnFragmentInteractionListener, AnagramPageFragment.OnAnagramFragmentListener, WikiPageFragment.OnFragmentInteractionListener {
+public class CrosswordSliderActivity extends AppCompatActivity implements CrosswordPageFragment.OnFragmentInteractionListener, DictionaryPageFragment.OnFragmentInteractionListener, AnagramPageFragment.OnAnagramFragmentListener, WikiPageFragment.OnFragmentInteractionListener {
 
     private static final String LOG_TAG = "CrosswordSliderActivity";
 
