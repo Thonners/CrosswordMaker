@@ -153,25 +153,25 @@ public class CluePageFragment extends Fragment implements ActivityCompat.OnReque
             }
         });
 
+        if (HomeActivity.deviceHasCameraCapability(requireActivity())) {
+            takeCluePhotoButton.setOnClickListener(v -> {
+                Log.d(LOG_TAG, "Take picture button pressed");
+                dispatchTakePictureIntent();
+            });
+            fromGalleryButton.setOnClickListener(v -> {
+                Log.d(LOG_TAG, "From gallery button pressed");
+                getImageFromGallery.launch(new String[]{"image/*"});
+            });
+
+        } else {
+            // If device doesn't have camera availability, display
+            // error message
+            TextView textView = view.findViewById(R.id.take_picture_clues_text_view);
+            textView.setText(getResources().getString(R.string.take_clue_picture_error));
+        }
+
         if (clueImageFileExists()) {
             setClueImageInView();
-        } else {
-            if (HomeActivity.deviceHasCameraCapability(requireActivity())) {
-                takeCluePhotoButton.setOnClickListener(v -> {
-                    Log.d(LOG_TAG, "Take picture button pressed");
-                    dispatchTakePictureIntent();
-                });
-                fromGalleryButton.setOnClickListener(v -> {
-                    Log.d(LOG_TAG, "From gallery button pressed");
-                    getImageFromGallery.launch(new String[]{"image/*"});
-                });
-
-            } else {
-                // If no picture file found and device doesn't have camera availability, display
-                // error message
-                TextView textView = view.findViewById(R.id.take_picture_clues_text_view);
-                textView.setText(getResources().getString(R.string.take_clue_picture_error));
-            }
         }
     }
 
@@ -224,11 +224,16 @@ public class CluePageFragment extends Fragment implements ActivityCompat.OnReque
         }
     }
 
+    private void removeImage() {
+        Log.d(LOG_TAG, "Removing image");
+        clueImageInterface.setClueImage(Uri.EMPTY);
+        getCluesLayout.setVisibility(View.VISIBLE);
+    }
+
     private boolean clueImageFileExists() {
         Uri uri = getImageUri();
         return (uri != null && !uri.toString().matches(Uri.EMPTY.toString()));
     }
-
 
     public void dispatchTakePictureIntent() {
         Log.d(LOG_TAG, "dispatchPictureIntent method started");
@@ -257,12 +262,12 @@ public class CluePageFragment extends Fragment implements ActivityCompat.OnReque
 
     private void showOverwriteClueImageFileDialog() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(getResources().getString(R.string.dialog_overwrite_clue_image_message));
-        builder.setPositiveButton(getResources().getString(R.string.dialog_overwrite),
+        builder.setTitle(getResources().getString(R.string.dialog_remove_clue_image_message));
+        builder.setPositiveButton(getResources().getString(R.string.dialog_remove),
                 new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                dispatchTakePictureIntent();
+                removeImage();
             }
         });
         builder.setNegativeButton(getResources().getString(R.string.dialog_cancel),

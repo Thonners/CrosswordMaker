@@ -134,8 +134,9 @@
     <string name="pub_date_dialog_title">Select the date</string>
     <string name="pub_other">Other</string>
     <string name="dialog_overwrite">Overwrite</string>
+    <string name="dialog_remove">Remove</string>
     <string name="dialog_overwrite_crossword_message">A save file for this crossword already exists.\nDo you wish to overwrite it\?</string>
-    <string name="dialog_overwrite_clue_image_message">Retake picture? This will overwrite the existing clue image\?</string>
+    <string name="dialog_remove_clue_image_message"> Remove picture?\n(You can take a new one afterwards)</string>
 
     <array name="publications">
         <item name="pub0">The Evening Standard</item>
