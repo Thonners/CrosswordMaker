@@ -40,7 +40,9 @@ public class CluePageFragment extends Fragment implements ActivityCompat.OnReque
     private static final String ARG_FILE_PATH = "filePath";
 
     private TouchImageView clueImageViewTouch;
+    private View getCluesLayout;
     private View takeCluePhotoButton;
+    private View fromGalleryButton;
     private Uri clueImageUri = Uri.EMPTY;
 
 
@@ -52,7 +54,15 @@ public class CluePageFragment extends Fragment implements ActivityCompat.OnReque
         @Override
         public void onActivityResult(Uri uri) {
             // Handle the returned Uri
-            Log.d(LOG_TAG, "Received callback from activity result with URI: " + uri.toString());
+            if (uri == null) {
+                Log.w(LOG_TAG, "Received null URI from activity result.");
+            } else {
+                Log.d(LOG_TAG,
+                        "Received callback from activity result with URI: " + uri.toString());
+                clueImageInterface.setClueImage(uri);
+                Log.d(LOG_TAG, "Image URI: " + getImageUri().toString());
+                setClueImageInView();
+            }
         }
     });
     private final ActivityResultLauncher<Uri> mGetImageFromCamera =
@@ -65,10 +75,7 @@ public class CluePageFragment extends Fragment implements ActivityCompat.OnReque
             if (result) {
                 clueImageInterface.setClueImage(clueImageUri);
                 Log.d(LOG_TAG, "Image URI: " + getImageUri().toString());
-                clueImageViewTouch.setImageURI(getImageUri());
-                clueImageViewTouch.invalidate();
-                removePhotoButton();
-                Log.d(LOG_TAG, "Image set and button removed.");
+                setClueImageInView();
             } else {
                 Log.w(LOG_TAG, "Camera app was unable to save image to URI: " + getImageUri());
             }
@@ -130,7 +137,9 @@ public class CluePageFragment extends Fragment implements ActivityCompat.OnReque
     private void initialise(View view) {
 
         Log.d(LOG_TAG, "Initialising...");
+        getCluesLayout = view.findViewById(R.id.get_clues_layout);
         takeCluePhotoButton = view.findViewById(R.id.take_picture_clues_button);
+        fromGalleryButton = view.findViewById(R.id.get_library_clues_button);
         clueImageViewTouch = view.findViewById(R.id.image_view_clues);
         clueImageViewTouch.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -144,16 +153,17 @@ public class CluePageFragment extends Fragment implements ActivityCompat.OnReque
 
         if (clueImageFileExists()) {
             setClueImageInView();
-            removePhotoButton();
         } else {
             if (HomeActivity.deviceHasCameraCapability(requireActivity())) {
-                takeCluePhotoButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Log.d(LOG_TAG, "Take picture button pressed");
-                        dispatchTakePictureIntent();
-                    }
+                takeCluePhotoButton.setOnClickListener(v -> {
+                    Log.d(LOG_TAG, "Take picture button pressed");
+                    dispatchTakePictureIntent();
                 });
+                fromGalleryButton.setOnClickListener(v -> {
+                    Log.d(LOG_TAG, "From gallery button pressed");
+                    mGetContent.launch("image/*");
+                });
+
             } else {
                 // If no picture file found and device doesn't have camera availability, display
                 // error message
@@ -199,20 +209,22 @@ public class CluePageFragment extends Fragment implements ActivityCompat.OnReque
         Log.d(LOG_TAG, "Image should be set.");
         clueImageViewTouch.setZoom(2.0f);
         clueImageViewTouch.setZoom(1.0f);
+        Log.d(LOG_TAG, "Removing 'new image' buttons/view'.");
+        hideGetCluesLayout();
     }
 
-    private void removePhotoButton() {
-        //Remove button from view
-        if (takeCluePhotoButton != null) {
-            Log.d(LOG_TAG, "Removing photo button");
-            ((ViewGroup) takeCluePhotoButton.getParent()).removeView(takeCluePhotoButton);
-            takeCluePhotoButton = null;    // Force to null. Not sure what it would be without this.
+    private void hideGetCluesLayout() {
+        // Hide layout from view
+        if (getCluesLayout != null) {
+            Log.d(LOG_TAG, "Removing getCluesLayout");
+            // Just hide it so we can bring it back if the user wants to take another picture...
+            getCluesLayout.setVisibility(View.GONE);
         }
     }
 
     private boolean clueImageFileExists() {
         Uri uri = getImageUri();
-        return (getImageUri() != null && !getImageUri().toString().matches(Uri.EMPTY.toString()));
+        return (uri != null && !uri.toString().matches(Uri.EMPTY.toString()));
     }
 
 
@@ -268,5 +280,6 @@ public class CluePageFragment extends Fragment implements ActivityCompat.OnReque
             dispatchTakePictureIntent();
         }
     }
+
 
 }

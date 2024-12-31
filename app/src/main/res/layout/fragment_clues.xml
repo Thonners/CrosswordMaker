@@ -1,39 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/clue_fragment_layout"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/clue_image_padding">
 
-    <androidx.cardview.widget.CardView
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/take_picture_clues_button"
-        android:layout_gravity="center"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        card_view:cardCornerRadius="4dp"
-        android:layout_marginTop="@dimen/home_card_margin"
-        android:layout_marginLeft="@dimen/home_card_margin"
-        android:layout_marginRight="@dimen/home_card_margin">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/get_clues_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
         <TextView
             android:id="@+id/take_picture_clues_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="@dimen/home_card_margin"
             android:gravity="center"
-            android:textStyle="normal"
+            android:padding="@dimen/home_card_padding"
+            android:text="@string/take_clue_picture_prompt"
             android:textColor="@color/text_default"
             android:textSize="@dimen/home_card_text_size_main"
-            android:text="@string/take_clue_picture_prompt"
-            android:padding="@dimen/home_card_padding"
-            android:layout_margin="@dimen/home_card_margin"
-            android:layout_alignParentTop="true"/>
-    </androidx.cardview.widget.CardView>
+            android:textStyle="normal"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_editor_absoluteX="12dp" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/take_picture_clues_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="@dimen/home_card_margin"
+            app:cardCornerRadius="4dp"
+            app:layout_constraintWidth_percent="0.3"
+            app:layout_constraintEnd_toStartOf="@+id/get_library_clues_button"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/take_picture_clues_text_view">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/home_card_margin">
+
+                <ImageView
+                    android:id="@+id/take_picture_clues_button_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/baseline_add_a_photo_24"
+                    android:contentDescription="@string/take_clue_picture_prompt_camera"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/take_clue_picture_prompt_camera"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/take_picture_clues_button_icon" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/get_library_clues_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/home_card_margin"
+            app:cardCornerRadius="4dp"
+            app:layout_constraintWidth_percent="0.3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/take_picture_clues_button"
+            app:layout_constraintTop_toBottomOf="@+id/take_picture_clues_text_view">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/home_card_margin">
+
+                <ImageView
+                    android:id="@+id/get_library_clues_button_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/baseline_collections_24"
+                    android:contentDescription="@string/take_clue_picture_prompt_library"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/take_clue_picture_prompt_library"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/get_library_clues_button_icon" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        </androidx.cardview.widget.CardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.thonners.crosswordmaker.TouchImageView
         android:id="@+id/image_view_clues"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_gravity="center_horizontal" />
+
 
 </LinearLayout>
