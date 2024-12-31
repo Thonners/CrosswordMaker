@@ -32,6 +32,7 @@
     <dimen name="home_card_icon_size">40dp</dimen>
     <dimen name="saved_prompt_margin_horizontal">40dp</dimen>
     <dimen name="edit_button_padding">20dp</dimen>
+    <dimen name="tabViewMinWidth">200dp</dimen>
 
     <dimen name="about_dialog_padding">12dp</dimen>
 

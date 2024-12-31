@@ -1,6 +1,8 @@
 package com.thonners.crosswordmaker;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
@@ -11,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.util.Objects;
@@ -156,6 +160,25 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
 
         // Get tab titles
         tabTitles = getResources().getTextArray(R.array.tab_titles);
+        TabLayout tabLayout = findViewById(R.id.tab_layout);
+
+        new TabLayoutMediator(tabLayout, pager, (tab, position) -> {
+            tab.setText(tabTitles[position]);
+        }).attach();
+
+        Point size = new Point();
+        getWindowManager().getDefaultDisplay().getSize(size);
+
+        int screenWidth = size.x;
+        int tabPadding = (int) (0.25 * screenWidth);
+        for (int i = 0; i < tabLayout.getChildCount(); i++) {
+            View child = tabLayout.getChildAt(i);
+            if (child instanceof LinearLayout) {
+                Log.d(LOG_TAG,
+                        "Found LinearLayout. Length: " + ((LinearLayout) child).getChildCount());
+                child.setPadding(tabPadding, 0, tabPadding, 0);
+            }
+        }
 
     }
 
