@@ -1,19 +1,20 @@
 package com.thonners.crosswordmaker;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -21,33 +22,13 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-
-import android.provider.MediaStore;
-
 import androidx.core.content.ContextCompat;
-
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.GridLayout;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import java.io.File;
-import java.io.IOException;
 
 import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
 
 
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link CluePageFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link CluePageFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * A {@link Fragment} subclass to display the clues.
  */
 public class CluePageFragment extends Fragment implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -135,7 +116,6 @@ public class CluePageFragment extends Fragment implements ActivityCompat.OnReque
         super.onCreate(savedInstanceState);
         Log.d(LOG_TAG, "onCreate called");
         Log.d(LOG_TAG, "clueImageInterface = " + clueImageInterface.getClueImageUri().toString());
-        // TODO: Remove the crossword file path string from the bundle as we don't need it
     }
 
     @Override
@@ -143,9 +123,7 @@ public class CluePageFragment extends Fragment implements ActivityCompat.OnReque
                              Bundle savedInstanceState) {
         // Inflate the view
         View view = inflater.inflate(R.layout.fragment_clues, container, false);
-
         initialise(view);
-
         return view;
     }
 
@@ -242,21 +220,13 @@ public class CluePageFragment extends Fragment implements ActivityCompat.OnReque
         Log.d(LOG_TAG, "dispatchPictureIntent method started");
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PERMISSION_GRANTED) {
             Log.d(LOG_TAG, "Camera permissions granted. Starting the takePictureIntent");
-            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if (takePictureIntent.resolveActivity(getContext().getPackageManager()) == null)
-                Log.d(LOG_TAG, " resolveImageIntent == null");
-            if (getActivity().getPackageManager() == null)
-                Log.d(LOG_TAG, " getPackageManager == null");
-            if (getContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
-                Log.d(LOG_TAG, " camera feature == null");
-
             try {
                 ContentValues values = new ContentValues();
                 values.put(MediaStore.Images.Media.TITLE, titleInterface.getTitle());
                 values.put(MediaStore.Images.Media.DESCRIPTION, "Clue image");
                 clueImageUri =
                         requireContext().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-                Log.d(LOG_TAG, " Trying to save URI as: " + clueImageUri.toString());
+                Log.d(LOG_TAG, " Trying to save URI as: " + clueImageUri);
                 mGetImageFromCamera.launch(clueImageUri);
             } catch (ActivityNotFoundException e) {
                 // display error state to the user
