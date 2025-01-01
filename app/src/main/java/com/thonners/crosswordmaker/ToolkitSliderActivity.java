@@ -3,24 +3,25 @@ package com.thonners.crosswordmaker;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-
-import com.google.android.material.snackbar.Snackbar;
-
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import com.google.android.material.snackbar.Snackbar;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
+
+
 /**
- * Created by mat on 07/03/15.
+ * Created by Thonners on 07/03/15.
  */
 public class ToolkitSliderActivity extends AppCompatActivity implements DictionaryPageFragment.OnFragmentInteractionListener, AnagramPageFragment.OnAnagramFragmentListener, WikiPageFragment.OnFragmentInteractionListener {
 
@@ -32,8 +33,8 @@ public class ToolkitSliderActivity extends AppCompatActivity implements Dictiona
     private static final int ANAGRAM_TAB = 2;
     private static final int WIKI_TAB = 3;
 
-    private ViewPager pager;               // Handles the transition between fragments
-    private PagerAdapter pagerAdapter;     // Provides the pages for the pager
+    private ViewPager2 pager;               // This handles the animation/transition between pages
+    private FragmentStateAdapter pagerAdapter;     // This provides the pages for the PagerAdapter.
 
     private boolean dontShowKeyboard = false;
 
@@ -102,12 +103,12 @@ public class ToolkitSliderActivity extends AppCompatActivity implements Dictiona
     }
 
     private void initialise() {
-        // Initialise pager
+        // Instantiate a ViewPager and a PagerAdapter.
         pager = findViewById(R.id.pager);
-        pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+        pagerAdapter = new ScreenSlidePagerAdapter(this);
         pager.setAdapter(pagerAdapter);
         pager.setOffscreenPageLimit(NUM_PAGES);
-        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        pager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageScrollStateChanged(int state) {
                 if (state == ViewPager.SCROLL_STATE_IDLE) {
@@ -157,15 +158,18 @@ public class ToolkitSliderActivity extends AppCompatActivity implements Dictiona
     }
 
     private void hideKeyboard() {
-        // Method to hide the keyboard
-        InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        Log.d(LOG_TAG, "Hide keyboard called");
+        View view = pager.getRootView();
+        InputMethodManager imm =
+                (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
     }
 
     private void showKeyboard(View view) {
         Log.d(LOG_TAG, "Show keyboard called");
         // Method to hide the keyboard
-        InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager inputManager =
+                (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
     }
 
@@ -173,13 +177,14 @@ public class ToolkitSliderActivity extends AppCompatActivity implements Dictiona
      * A simple pager adapter that represents 5 ScreenSlidePageFragment objects, in
      * sequence.
      */
-    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
-        public ScreenSlidePagerAdapter(FragmentManager fm) {
-            super(fm);
+    private class ScreenSlidePagerAdapter extends FragmentStateAdapter {
+        public ScreenSlidePagerAdapter(FragmentActivity fragment) {
+            super(fragment);
         }
 
+        @NonNull
         @Override
-        public Fragment getItem(int position) {
+        public Fragment createFragment(int position) {
 
             switch (position) {
                 case MANUAL_ANAGRAM_TAB:
@@ -197,18 +202,15 @@ public class ToolkitSliderActivity extends AppCompatActivity implements Dictiona
             }
 
             // Safety net - in case position is out of range shown above. Should never be needed
+            wikiPageFragment = new WikiPageFragment();
             return wikiPageFragment;
         }
 
         @Override
-        public int getCount() {
+        public int getItemCount() {
             return NUM_PAGES;
         }
 
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return tabTitles[position];
-        }
     }
 
     public void searchDictionary(String searchTerm) {
