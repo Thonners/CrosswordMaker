@@ -24,8 +24,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import java.util.Objects;
-
 
 public class CrosswordSliderActivity extends AppCompatActivity implements CrosswordPageFragment.OnFragmentInteractionListener, DictionaryPageFragment.OnFragmentInteractionListener, AnagramPageFragment.OnAnagramFragmentListener, WikiPageFragment.OnFragmentInteractionListener {
 
