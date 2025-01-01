@@ -50,7 +50,7 @@ MERGED from com.android.support:support-v4:22.2.0:22:5
 		ADDED from AndroidManifest.xml:15:9
 	android:theme
 		ADDED from AndroidManifest.xml:17:9
-activity#com.thonners.crosswordmaker.HomeActivity
+activity#com.thonners.crosswordmaker.ui.activities.HomeActivity
 ADDED from AndroidManifest.xml:18:9
 	android:label
 		ADDED from AndroidManifest.xml:20:13
@@ -66,7 +66,7 @@ category#android.intent.category.LAUNCHER
 ADDED from AndroidManifest.xml:24:17
 	android:name
 		ADDED from AndroidManifest.xml:24:27
-activity#com.thonners.crosswordmaker.NewCrosswordActivity
+activity#com.thonners.crosswordmaker.ui.activities.NewCrosswordActivity
 ADDED from AndroidManifest.xml:27:9
 	android:label
 		ADDED from AndroidManifest.xml:29:13
@@ -90,7 +90,7 @@ ADDED from AndroidManifest.xml:35:9
 		ADDED from AndroidManifest.xml:38:13
 	android:name
 		ADDED from AndroidManifest.xml:36:13
-activity#com.thonners.crosswordmaker.CrosswordLibraryActivity
+activity#com.thonners.crosswordmaker.ui.activities.CrosswordLibraryActivity
 ADDED from AndroidManifest.xml:44:9
 	android:label
 		ADDED from AndroidManifest.xml:46:13
@@ -98,7 +98,7 @@ ADDED from AndroidManifest.xml:44:9
 		ADDED from AndroidManifest.xml:47:13
 	android:name
 		ADDED from AndroidManifest.xml:45:13
-activity#com.thonners.crosswordmaker.CrosswordSliderActivity
+activity#com.thonners.crosswordmaker.ui.activities.CrosswordSliderActivity
 ADDED from AndroidManifest.xml:52:9
 	android:screenOrientation
 		ADDED from AndroidManifest.xml:57:13
@@ -110,7 +110,7 @@ ADDED from AndroidManifest.xml:52:9
 		ADDED from AndroidManifest.xml:56:13
 	android:name
 		ADDED from AndroidManifest.xml:53:13
-activity#com.thonners.crosswordmaker.ToolkitSliderActivity
+activity#com.thonners.crosswordmaker.ui.activities.ToolkitSliderActivity
 ADDED from AndroidManifest.xml:62:9
 	android:screenOrientation
 		ADDED from AndroidManifest.xml:67:13

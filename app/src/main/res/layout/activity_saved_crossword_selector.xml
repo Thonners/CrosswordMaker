@@ -4,16 +4,17 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.thonners.crosswordmaker.CrosswordLibraryActivity" >
+    tools:context="com.thonners.crosswordmaker.ui.activities.CrosswordLibraryActivity">
 
     <androidx.cardview.widget.CardView
-            android:id="@+id/saved_file_selection_prompt"
+        android:id="@+id/saved_file_selection_prompt"
         android:layout_height="@dimen/home_card_default_height"
         android:layout_width="fill_parent"
         android:layout_marginTop="@dimen/saved_prompt_margin_horizontal"
         android:layout_marginLeft="@dimen/saved_prompt_margin_horizontal"
         android:layout_marginRight="@dimen/saved_prompt_margin_horizontal"
         android:padding="@dimen/home_card_padding">
+
         <TextView
             android:id="@+id/saved_file_selection_prompt_TV"
             android:layout_width="wrap_content"
@@ -21,7 +22,7 @@
             android:text="@string/saved_file_selection_prompt"
             android:textSize="@dimen/home_card_text_size_main"
             android:textStyle="bold"
-            android:layout_gravity="center"/>
+            android:layout_gravity="center" />
     </androidx.cardview.widget.CardView>
 
     <ScrollView

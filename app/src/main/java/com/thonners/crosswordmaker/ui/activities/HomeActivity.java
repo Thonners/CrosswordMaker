@@ -1,4 +1,4 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.ui.activities;
 
 import android.Manifest;
 import android.app.Activity;
@@ -19,6 +19,13 @@ import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.thonners.crosswordmaker.Crossword;
+import com.thonners.crosswordmaker.CrosswordLibraryManager;
+import com.thonners.crosswordmaker.CrosswordTwo;
+import com.thonners.crosswordmaker.HttpsServerConnection;
+import com.thonners.crosswordmaker.R;
+import com.thonners.crosswordmaker.ServerConnection;
+import com.thonners.crosswordmaker.SettingsFragment;
 
 import android.os.Bundle;
 

@@ -9,9 +9,10 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.EditText;
 
 import androidx.core.content.res.ResourcesCompat;
+
+import com.thonners.crosswordmaker.ui.activities.HomeActivity;
 
 /**
  * Created by mat on 30/11/14.
@@ -26,27 +27,29 @@ public class Cell extends androidx.appcompat.widget.AppCompatEditText implements
     private int column;
     private String cellName; // String to make it quicker to include in debugging. Format (X,Y)
 
-    private Clue hClue = null;  // Horizontal clue to which cell belongs - initialise as null, and set later if required.
+    private Clue hClue = null;  // Horizontal clue to which cell belongs - initialise as null,
+    // and set later if required.
     private Clue vClue = null; // Vertical clue to which cell belongs
-    private Clue activeClue = null; // Set the active clue so that cell focus can move as input is done
+    private Clue activeClue = null; // Set the active clue so that cell focus can move as input
+    // is done
     private CellView cellView = null;
 
     public boolean[] hyphens = new boolean[4];
     public boolean[] wordSplits = new boolean[4];
 
     public enum CellSide {
-        LEFT,
-        RIGHT,
-        TOP,
-        BOTTOM;
+        LEFT, RIGHT, TOP, BOTTOM;
     }
 
     private int maxLength = 1; // Max number of letters in the editText
-    private InputFilter[] whiteCellInputFilter = {new InputFilter.AllCaps(), new InputFilter.LengthFilter(maxLength), new InputFilter() {
+    private InputFilter[] whiteCellInputFilter = {new InputFilter.AllCaps(),
+            new InputFilter.LengthFilter(maxLength), new InputFilter() {
         @Override
-        public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+        public CharSequence filter(CharSequence source, int start, int end, Spanned dest,
+                                   int dstart, int dend) {
 
-            // Input filter ensures that letter entered is a letter. Sets it to "" (i.e. nothing) if not.
+            // Input filter ensures that letter entered is a letter. Sets it to "" (i.e. nothing)
+            // if not.
             for (int i = start; i < end; i++) {
                 if (!Character.isLetter(source.charAt(start))) {
                     return "";
@@ -59,7 +62,8 @@ public class Cell extends androidx.appcompat.widget.AppCompatEditText implements
 
     private boolean blackCell;
     public Character value;
-    public boolean gridMakingPhase = true;    // If gridMakingPhase, clicking on a cell changes it from black to white
+    public boolean gridMakingPhase = true;    // If gridMakingPhase, clicking on a cell changes
+    // it from black to white
 
     // Constructor:
     // For creating the initial grid, all cells start life as white cells
@@ -74,13 +78,15 @@ public class Cell extends androidx.appcompat.widget.AppCompatEditText implements
         setBlackCellStatus(false); // Force all cells to start life white
 
         // TODO: Add theming for cell backgrounds, etc so we can dark theme!
-        this.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.cell_white, null));
+        this.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.cell_white,
+                null));
         this.setTextColor(context.getResources().getColor(R.color.black, null));
         this.setClickable(true);
         this.setFocusable(false);   // Initialise as false for gridMaker
         this.setPadding(0, 0, 0, 0);
         this.setGravity(Gravity.CENTER);
-        this.setSelectAllOnFocus(true);         // Will select text on focus so user doesn't need to delete previous text if incorrect
+        this.setSelectAllOnFocus(true);         // Will select text on focus so user doesn't need
+        // to delete previous text if incorrect
         this.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
 
         setOnClickListener(this);
@@ -96,7 +102,8 @@ public class Cell extends androidx.appcompat.widget.AppCompatEditText implements
         column = c;
         blackCell = blackCellIn;
 
-        this.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.cell_white, null));
+        this.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.cell_white,
+                null));
     }
 
     private void setCrossword(Crossword cwd) {
@@ -104,24 +111,28 @@ public class Cell extends androidx.appcompat.widget.AppCompatEditText implements
     }
 
     private void setBlackCell() {
-        this.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.cell_black, null));
+        this.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.cell_black,
+                null));
     }
 
     private void setWhiteCell() {
-        this.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.cell_white, null));
+        this.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.cell_white,
+                null));
     }
 
     public void setFocusedMajor() {
         if (!this.hasFocus()) {
             requestFocus();
         }
-        this.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.cell_focus_main, null));
+        this.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.cell_focus_main
+                , null));
     }
 
     public void setFocusedMinor() {
         // Make sure it's not a black cell, as this can get called when doing hyphens/word splits
         if (!isBlackCell()) {
-            this.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.cell_focus_minor, null));
+            this.setBackground(ResourcesCompat.getDrawable(getResources(),
+                    R.drawable.cell_focus_minor, null));
         }
     }
 
@@ -142,7 +153,8 @@ public class Cell extends androidx.appcompat.widget.AppCompatEditText implements
         if (gridMakingPhase) {
             Log.d("GridMakingPhase", "Trying to toggleBlackCell()");
             toggleBlackCell();
-            crossword.toggleOppositeBlackCell(this);    // Get crossword to toggleBlackCell of the cell rotationally opposite this one
+            crossword.toggleOppositeBlackCell(this);    // Get crossword to toggleBlackCell of
+            // the cell rotationally opposite this one
             return;
         }
 
@@ -168,10 +180,12 @@ public class Cell extends androidx.appcompat.widget.AppCompatEditText implements
 
 
                 if (activeClue != null) {
-                    Log.d(LOG_TAG, "Active clue not null, highlighting cells. Clue name: " + activeClue.getClueID());
+                    Log.d(LOG_TAG,
+                            "Active clue not null, highlighting cells. Clue name: " + activeClue.getClueID());
                     activeClue.highlightClue(this);
                 } else {
-                    // Default to selecting horizontal clue if cell belongs to both a horizontal and vertical clue but isn't active
+                    // Default to selecting horizontal clue if cell belongs to both a horizontal
+                    // and vertical clue but isn't active
                     if (hClue != null) {
                         hClue.highlightClue(this);
                     } else if (vClue != null) {
@@ -268,7 +282,8 @@ public class Cell extends androidx.appcompat.widget.AppCompatEditText implements
     }
 
     public int getCellId(int rowCount) {
-        return (this.row * rowCount + column);     // Cells are numbered from 0 through to rowCount^2 -1
+        return (this.row * rowCount + column);     // Cells are numbered from 0 through to
+        // rowCount^2 -1
     }
 
     public int getRow() {

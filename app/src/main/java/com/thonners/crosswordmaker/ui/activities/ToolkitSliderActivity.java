@@ -1,4 +1,4 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.ui.activities;
 
 import android.content.Context;
 import android.net.Uri;
@@ -14,6 +14,12 @@ import android.widget.LinearLayout;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+import com.thonners.crosswordmaker.AnagramPageFragment;
+import com.thonners.crosswordmaker.DictionaryPageFragment;
+import com.thonners.crosswordmaker.InstructionsDialog;
+import com.thonners.crosswordmaker.ManualAnagramPageFragment;
+import com.thonners.crosswordmaker.R;
+import com.thonners.crosswordmaker.WikiPageFragment;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;

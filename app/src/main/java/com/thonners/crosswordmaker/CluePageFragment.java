@@ -27,6 +27,8 @@ import androidx.core.content.ContextCompat;
 
 import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
 
+import com.thonners.crosswordmaker.ui.activities.HomeActivity;
+
 
 /**
  * A {@link Fragment} subclass to display the clues.

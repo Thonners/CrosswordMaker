@@ -1,4 +1,4 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.ui.activities;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -12,6 +12,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import com.thonners.crosswordmaker.Card;
+import com.thonners.crosswordmaker.CrosswordLibraryManager;
+import com.thonners.crosswordmaker.CrosswordTwo;
+import com.thonners.crosswordmaker.FooterButton;
+import com.thonners.crosswordmaker.R;
 
 import java.util.Arrays;
 import java.util.List;

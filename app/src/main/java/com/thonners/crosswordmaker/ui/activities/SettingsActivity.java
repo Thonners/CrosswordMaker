@@ -1,8 +1,10 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.ui.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import com.thonners.crosswordmaker.SettingsFragment;
 
 /**
  * Simple Activity to display the SettingsFragment.
@@ -18,8 +20,7 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Make the fragment the main content
-        getFragmentManager().beginTransaction()
-                .replace(android.R.id.content, new SettingsFragment())
-                .commit();
+        getFragmentManager().beginTransaction().replace(android.R.id.content,
+                new SettingsFragment()).commit();
     }
 }

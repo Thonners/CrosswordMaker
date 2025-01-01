@@ -1,4 +1,4 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.ui.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +12,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.NumberPicker;
+
+import com.thonners.crosswordmaker.Crossword;
+import com.thonners.crosswordmaker.GridMaker;
+import com.thonners.crosswordmaker.R;
+import com.thonners.crosswordmaker.SettingsFragment;
 
 /**
  * NewCrosswordActivity Activity
@@ -101,7 +106,8 @@ public class NewCrosswordActivity extends AppCompatActivity {
     }
 
     public void autoEnterClicked(View view) {
-        // Work out the grid from a photo. Put the boolean value into the gridmaker intent and have that deal with getting the image
+        // Work out the grid from a photo. Put the boolean value into the gridmaker intent and
+        // have that deal with getting the image
         // Get number entered
         int rows = numberPicker.getValue();
 
@@ -121,7 +127,8 @@ public class NewCrosswordActivity extends AppCompatActivity {
      */
     private int getDefaultColumns() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        String defaultColumnsString = sharedPref.getString(SettingsFragment.KEY_PREF_DEFAULT_COLUMNS, "" + defaultCols);
+        String defaultColumnsString =
+                sharedPref.getString(SettingsFragment.KEY_PREF_DEFAULT_COLUMNS, "" + defaultCols);
         // Parse the string value to an int
         try {
             defaultCols = Integer.parseInt(defaultColumnsString);
