@@ -15,6 +15,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.thonners.crosswordmaker.ui.fragments.DictionaryPageFragment;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -39,10 +41,14 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void, Void, String
     private static final String suggestionIdentifier = "<suggestion>";
     private static final String successfulSearchIdentifier = "<entry id=";
 
-    public static final int SEARCH_NOT_COMPLETED = -1; // Initialise to this value, so if cancelled before proper value can be set, it will be known. Also use if search failed for some other reason.
+    public static final int SEARCH_NOT_COMPLETED = -1; // Initialise to this value, so if
+    // cancelled before proper value can be set, it will be known. Also use if search failed for
+    // some other reason.
     public static final int SEARCH_SUCCESSFUL = 0; // For a search which completed successfully
-    public static final int SEARCH_SUGGESTIONS = 1; // For an unsuccessful search, but one with suggestions
-    public static final int SEARCH_NO_SUGGESTIONS = 2; //For an unsuccessful search that's so bad there are no suggestions
+    public static final int SEARCH_SUGGESTIONS = 1; // For an unsuccessful search, but one with
+    // suggestions
+    public static final int SEARCH_NO_SUGGESTIONS = 2; //For an unsuccessful search that's so bad
+    // there are no suggestions
 
     private static final int WORD_NOT_FOUND = -1;
     private static final int WORD = 0;
@@ -62,7 +68,8 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void, Void, String
     private LinearLayout progressLinearLayout;
     private Button searchButton;
 
-    private final String urlPrefix = "https://www.dictionaryapi.com/api/v1/references/collegiate/xml/";
+    private final String urlPrefix = "https://www.dictionaryapi" +
+            ".com/api/v1/references/collegiate/xml/";
     private final String urlSuffix = "?key=";
     private String url;
 
@@ -70,17 +77,22 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void, Void, String
      * Constructor.
      *
      * @param appContext        Application context
-     * @param aSearchTerm       The search term entered by the user, to be looked up in the MW dictionary.
+     * @param aSearchTerm       The search term entered by the user, to be looked up in the MW
+     *                          dictionary.
      * @param progressLinLayout The LinearLayout containing the progress/loading spinner.
      * @param aSearchButton     The search button
-     * @param aListener         The listener instance of the main activity, to pass the results to at the end.
+     * @param aListener         The listener instance of the main activity, to pass the results
+     *                          to at the end.
      */
-    public DictionaryMWDownloadDefinition(Context appContext, String aSearchTerm, LinearLayout progressLinLayout, Button aSearchButton, DictionaryMWDownloadDefinitionListener aListener) {
+    public DictionaryMWDownloadDefinition(Context appContext, String aSearchTerm,
+                                          LinearLayout progressLinLayout, Button aSearchButton,
+                                          DictionaryMWDownloadDefinitionListener aListener) {
         context = appContext;
         listener = aListener;
         progressLinearLayout = progressLinLayout;
         searchButton = aSearchButton;
-        searchTerm = aSearchTerm.replaceAll(" ", "%20");     // Replace all is to properly handle spaces for the website url
+        searchTerm = aSearchTerm.replaceAll(" ", "%20");     // Replace all is to properly handle
+        // spaces for the website url
         searchSuccess = SEARCH_NOT_COMPLETED;
 
         url = urlPrefix + searchTerm + urlSuffix + context.getString(R.string.dictionary_mw_api_key);
@@ -96,10 +108,7 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void, Void, String
         // Show progress bar - animatedly
         progressLinearLayout.setAlpha(0.0f);
         progressLinearLayout.setVisibility(View.VISIBLE);
-        progressLinearLayout.animate()
-                .alpha(1.0f)
-                .setListener(null)
-                .setDuration(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_DURATION);
+        progressLinearLayout.animate().alpha(1.0f).setListener(null).setDuration(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_DURATION);
 
         // Set search button not clickable
         searchButton.setClickable(false);
@@ -123,8 +132,7 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void, Void, String
             HttpResponse response = client.execute(request);
             InputStream in;
             in = response.getEntity().getContent();
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(in));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             StringBuilder str = new StringBuilder();
             String line = null;
             while ((line = reader.readLine()) != null) {
@@ -132,7 +140,7 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void, Void, String
             }
             in.close();
             xmlRaw = str.toString();
-//            Log.d(LOG_TAG, "Server connection received, xml: " + xmlRaw);
+            //            Log.d(LOG_TAG, "Server connection received, xml: " + xmlRaw);
         } catch (IllegalStateException e) {
             Log.e(LOG_TAG, e.getMessage());
         } catch (IOException e) {
@@ -143,7 +151,8 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void, Void, String
 
     /**
      * Method called once the definition download has completed. Hides the loading spinner, parses
-     * the downloaded XML and turns it into views, and, once the exit animation is complete, calls the
+     * the downloaded XML and turns it into views, and, once the exit animation is complete,
+     * calls the
      * {@link DictionaryMWDownloadDefinitionListener#completionCallBack(ViewGroup, int)}
      * method on the listener from the main activity to pass the final results view back.
      *
@@ -157,44 +166,41 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void, Void, String
         final ViewGroup finalView = decodeXML(rawXML);
         Log.d(LOG_TAG, "XML Decoded. ");
         // Hide progress bar
-        progressLinearLayout.animate()
-                .alpha(0.0f)
-                .setDuration(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_DURATION)
-                .setListener(new Animator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart(Animator animator) {
+        progressLinearLayout.animate().alpha(0.0f).setDuration(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_DURATION).setListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
 
-                    }
+            }
 
-                    /**
-                     * Called once the exit-animation for the spinner is complete, to pass the
-                     * results back to the main Activity.
-                     * @param animator The animator controlling the removal of the loading spinner.
-                     */
-                    @Override
-                    public void onAnimationEnd(Animator animator) {
-                        Log.d(LOG_TAG, "ProgressLayout Exit Animation complete");
-                        // Get rid of the progress view
-                        progressLinearLayout.setVisibility(View.GONE);
-                        // Return search button to normal
-                        searchButton.setClickable(true);
-                        searchButton.setText(R.string.search);
+            /**
+             * Called once the exit-animation for the spinner is complete, to pass the
+             * results back to the main Activity.
+             * @param animator The animator controlling the removal of the loading spinner.
+             */
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                Log.d(LOG_TAG, "ProgressLayout Exit Animation complete");
+                // Get rid of the progress view
+                progressLinearLayout.setVisibility(View.GONE);
+                // Return search button to normal
+                searchButton.setClickable(true);
+                searchButton.setText(R.string.search);
 
-                        if (!isCancelled()) {
-                            listener.completionCallBack(finalView, searchSuccess);
-                        }
-                    }
+                if (!isCancelled()) {
+                    listener.completionCallBack(finalView, searchSuccess);
+                }
+            }
 
-                    @Override
-                    public void onAnimationCancel(Animator animator) {
+            @Override
+            public void onAnimationCancel(Animator animator) {
 
-                    }
+            }
 
-                    @Override
-                    public void onAnimationRepeat(Animator animator) {
+            @Override
+            public void onAnimationRepeat(Animator animator) {
 
-                    }
-                });
+            }
+        });
     }
 
     /**
@@ -205,18 +211,26 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void, Void, String
      * or failure with regards to looking up the word.
      *
      * @param rawXML The ram XML data as received from Merriam-Webster
-     * @return The ViewGroup containing cards with TextViews containing the sorted, formatted results.
+     * @return The ViewGroup containing cards with TextViews containing the sorted, formatted
+     * results.
      */
     private ViewGroup decodeXML(String rawXML) {
         // Turn the raw XML into a view
         LinearLayout view = new LinearLayout(context);
         view.setOrientation(LinearLayout.VERTICAL);
-        //view.setPadding(context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding),context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding),context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding),context.getResources().getDimensionPixelOffset(R.dimen.home_card_padding));
+        //view.setPadding(context.getResources().getDimensionPixelOffset(R.dimen
+        // .home_card_padding),context.getResources().getDimensionPixelOffset(R.dimen
+        // .home_card_padding),context.getResources().getDimensionPixelOffset(R.dimen
+        // .home_card_padding),context.getResources().getDimensionPixelOffset(R.dimen
+        // .home_card_padding));
         if (rawXML.contains(suggestionIdentifier)) {
-            // Then the word was not found. Create a linear layout with multiple TextViews, one on top of the other. Hide all text views of suggested words to stop accidental cheating.
+            // Then the word was not found. Create a linear layout with multiple TextViews, one
+            // on top of the other. Hide all text views of suggested words to stop accidental
+            // cheating.
             searchSuccess = SEARCH_SUGGESTIONS;
             // Make the prompt.
-            String wordNotFoundPrompt = context.getResources().getString(R.string.dictionary_word_not_found) + " " + context.getResources().getString(R.string.dictionary_suggestions_prompt);
+            String wordNotFoundPrompt =
+                    context.getResources().getString(R.string.dictionary_word_not_found) + " " + context.getResources().getString(R.string.dictionary_suggestions_prompt);
             TextView promptTV = createTextView(wordNotFoundPrompt, WORD_NOT_FOUND);
             promptTV.setAlpha(0.0f);
             view.addView(promptTV, 0);
@@ -225,9 +239,11 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void, Void, String
             rawXML = rawXML.replaceAll("</suggestion>", "");
             rawXML = rawXML.replaceAll("</entry_list>", "");
 
-            // Split the results by the <suggestion> tag. First value (at index 0) will not be of interest.
+            // Split the results by the <suggestion> tag. First value (at index 0) will not be of
+            // interest.
             String[] suggestions = rawXML.split("<suggestion>");
-            for (int i = 1; i < suggestions.length; i++) {   // Start at 1 as first value is rubbish (see above)
+            for (int i = 1; i < suggestions.length; i++) {   // Start at 1 as first value is
+                // rubbish (see above)
                 //TextView newTextView = createHiddenTextView(suggestions[i], SUGGESTIONS);
                 //view.addView(newTextView,i);
 
@@ -299,8 +315,10 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void, Void, String
     /**
      * @param textToDisplay The text to be shown
      * @param createVisible Whether to make the TextView visible, or create it hidden.
-     * @param displayType   The type of text to be displayed - from the public static options of this class.
-     * @return A text view of the input text, with the correct formatting as specified by the displayType.
+     * @param displayType   The type of text to be displayed - from the public static options of
+     *                      this class.
+     * @return A text view of the input text, with the correct formatting as specified by the
+     * displayType.
      */
     private TextView createTextView(String textToDisplay, boolean createVisible, int displayType) {
         TextView tv = new TextView(context);

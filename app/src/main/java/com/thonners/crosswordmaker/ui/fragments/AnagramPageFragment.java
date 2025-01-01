@@ -1,4 +1,4 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.ui.fragments;
 
 import android.animation.Animator;
 import android.app.Activity;
@@ -26,6 +26,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.thonners.crosswordmaker.R;
+import com.thonners.crosswordmaker.ServerConnection;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,8 +39,10 @@ public class AnagramPageFragment extends Fragment {
 
     private static final String LOG_TAG = "AnagramPageFragment";
 
-    private int hashMapSize = 315000;   // Size for the hashMap to allow loadFactor < 0.75 whilst fitting all the words in the dictionary
-    private HashMap<String, ArrayList<String>> dictionaryHM = new HashMap<>(hashMapSize);    // Hashmap to store the options in
+    private int hashMapSize = 315000;   // Size for the hashMap to allow loadFactor < 0.75 whilst
+    // fitting all the words in the dictionary
+    private HashMap<String, ArrayList<String>> dictionaryHM = new HashMap<>(hashMapSize);    //
+    // Hashmap to store the options in
 
     private ArrayList<String> dictionary = new ArrayList<>();
     private ArrayList<String[]> dictionaryByLetter = new ArrayList<>();
@@ -45,7 +50,8 @@ public class AnagramPageFragment extends Fragment {
 
     private boolean serverAvailable = false;
     private boolean dictionaryLoaded = false;
-    private boolean buttonIsClear = false;    // Variable to store whether the button next to the search bar should be 'search' or 'clear'
+    private boolean buttonIsClear = false;    // Variable to store whether the button next to the
+    // search bar should be 'search' or 'clear'
 
     private OnAnagramFragmentListener mListener;
 
@@ -106,8 +112,8 @@ public class AnagramPageFragment extends Fragment {
         try {
             mListener = (OnAnagramFragmentListener) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnAnagramFragmentListener");
+            throw new ClassCastException(activity.toString() + " must implement " +
+                    "OnAnagramFragmentListener");
         }
     }
 
@@ -140,13 +146,15 @@ public class AnagramPageFragment extends Fragment {
      */
     private void checkServer() {
 
-        // Load locally if offline mode, otherwise proceed to check server connection. If connection fails,
+        // Load locally if offline mode, otherwise proceed to check server connection. If
+        // connection fails,
         // dictionary will be loaded locally anyway.
         if (getOfflineMode()) {
             loadDictionaryLocally();
         } else {
             // Test server connection
-            ServerConnection.ServerConnectionListener listener = new ServerConnection.ServerConnectionListener() {
+            ServerConnection.ServerConnectionListener listener =
+                    new ServerConnection.ServerConnectionListener() {
                 @Override
                 public void serverConnectionResponse(ServerConnection.SocketIdentifier requestSuccess, ArrayList<String> answers) {
 
@@ -184,7 +192,8 @@ public class AnagramPageFragment extends Fragment {
         // Check whether Low RAM mode enabled on settings
         Activity activity = getActivity();
         if (activity != null) {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            SharedPreferences sharedPreferences =
+                    PreferenceManager.getDefaultSharedPreferences(getActivity());
             if (sharedPreferences != null) {
                 return sharedPreferences.getBoolean(SettingsFragment.KEY_PREF_LOW_RAM, false);
             }
@@ -193,7 +202,8 @@ public class AnagramPageFragment extends Fragment {
     }
 
     /**
-     * Method to load the local copy of the sopwads dictionary into memory and prepare it for anagram/wordfit lookup.
+     * Method to load the local copy of the sopwads dictionary into memory and prepare it for
+     * anagram/wordfit lookup.
      * If low RAM mode enabled, show error message instead of loading
      */
     private void loadDictionaryLocally() {
@@ -207,7 +217,9 @@ public class AnagramPageFragment extends Fragment {
             LoadDictionaryTask loadDictionaryTask = new LoadDictionaryTask();
             loadDictionaryTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         } else {
-            Log.d(LOG_TAG, "Low RAM mode enabled, so not reading the dictionary. Showing error instead.");
+            Log.d(LOG_TAG,
+                    "Low RAM mode enabled, so not reading the dictionary. Showing error " +
+                            "instead.");
             // Show an error to explain why the solver isn't available
             addLowRamNoServerError();
         }
@@ -224,20 +236,24 @@ public class AnagramPageFragment extends Fragment {
         // Clear view ready for results, then search
         Log.d(LOG_TAG, "Search button clicked. ");
         hideKeyboard();
-        clearResults(true); // Move the call to search() into the clearResults method, so it can be executed after any exit animations if required
+        clearResults(true); // Move the call to search() into the clearResults method, so it can
+        // be executed after any exit animations if required
     }
 
     /**
-     * Method to animate the clearing of the results views. The call to search() is at the end of this
+     * Method to animate the clearing of the results views. The call to search() is at the end of
+     * this
      * method to
      *
-     * @param search If true, and there are no results in the results view, calls {@link AnagramPageFragment#search()}
+     * @param search If true, and there are no results in the results view, calls
+     *               {@link AnagramPageFragment#search()}
      */
     private void clearResults(boolean search) {
         // Return to 0
         resultCount = 0;
 
-        // Create the listener reference that will eventually call search(), but for all but the last animation will be null
+        // Create the listener reference that will eventually call search(), but for all but the
+        // last animation will be null
         Animator.AnimatorListener animatorListener = null;
 
         // Clear the results view
@@ -274,12 +290,7 @@ public class AnagramPageFragment extends Fragment {
                 View view = resultsLinearLayout.getChildAt(i);
                 if (view != null) {
                     Log.d(LOG_TAG, "Animating removal. i = " + i);
-                    view.animate()
-                            .alpha(0.0f)
-                            .translationY(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_Y_TRANSLATE)
-                            .setStartDelay(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_STAGGER * resultCount)
-                            .setDuration(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_DURATION)
-                            .setListener(animatorListener);
+                    view.animate().alpha(0.0f).translationY(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_Y_TRANSLATE).setStartDelay(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_STAGGER * resultCount).setDuration(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_DURATION).setListener(animatorListener);
                     resultCount++;
                 }
             }
@@ -293,33 +304,44 @@ public class AnagramPageFragment extends Fragment {
     }
 
     /**
-     * Execute the search for the solution to either the anagram or word-fit. (Called by clearResults(true), so it only occurs once the animations have finished)
+     * Execute the search for the solution to either the anagram or word-fit. (Called by
+     * clearResults(true), so it only occurs once the animations have finished)
      * <p>
-     * Anagram or word-fit is decided based on whether the search term contains '.' (unknown letters) or not.
+     * Anagram or word-fit is decided based on whether the search term contains '.' (unknown
+     * letters) or not.
      */
     private void search() {
-        // Search for either anagrams or word fits depending on whether the input text contains a '.'
+        // Search for either anagrams or word fits depending on whether the input text contains a
+        // '.'
 
         Log.d(LOG_TAG, "Checking input... ");
         // First check input and ignore any non letters or '.'s
-        String searchStringOriginal = inputBox.getText().toString().trim().replaceAll(" ", ""); // Remove all spaces
+        String searchStringOriginal = inputBox.getText().toString().trim().replaceAll(" ", "");
+        // Remove all spaces
         String searchString = "";
         boolean containsIllegalCharacters = false;
 
-        // Check all characters in the search are legal for either anagram or word-fit (i.e. letters or '.')
+        // Check all characters in the search are legal for either anagram or word-fit (i.e.
+        // letters or '.')
         for (int i = 0; i < searchStringOriginal.length(); i++) {
             if (Character.isLetter(searchStringOriginal.toLowerCase().charAt(i)) || searchStringOriginal.charAt(i) == '.') {
-                Log.d(LOG_TAG, "Adding '" + searchStringOriginal.substring(i, i + 1) + "' to search string (currently = " + searchString + " as this is a valid character for input.");
+                Log.d(LOG_TAG, "Adding '" + searchStringOriginal.substring(i, i + 1) + "' to " +
+                        "search string (currently = " + searchString + " as this is a valid " +
+                        "character for input.");
                 // Acceptable character, so add to array
                 searchString = searchString + searchStringOriginal.substring(i, i + 1);
             } else {
-                Log.d(LOG_TAG, "Illegal character found in input: " + searchStringOriginal.substring(i, i + 1));
-                containsIllegalCharacters = true; // Doesn't matter if this is overwritten multiple times
+                Log.d(LOG_TAG,
+                        "Illegal character found in input: " + searchStringOriginal.substring(i,
+                                i + 1));
+                containsIllegalCharacters = true; // Doesn't matter if this is overwritten
+                // multiple times
             }
         }
 
 
-        Log.d(LOG_TAG, "Original input string: " + searchStringOriginal + " || Tidied string  = " + searchString);
+        Log.d(LOG_TAG,
+                "Original input string: " + searchStringOriginal + " || Tidied string  = " + searchString);
 
         if (!containsIllegalCharacters) {
             if (searchString.contains(".")) {
@@ -343,11 +365,13 @@ public class AnagramPageFragment extends Fragment {
     private void searchWordFit(String input) {
         // Get it from the server if available, otherwise do it locally
         if (serverAvailable) {
-            ServerConnection.ServerConnectionListener listener = new ServerConnection.ServerConnectionListener() {
+            ServerConnection.ServerConnectionListener listener =
+                    new ServerConnection.ServerConnectionListener() {
                 @Override
                 public void serverConnectionResponse(ServerConnection.SocketIdentifier requestSuccess, ArrayList<String> answers) {
                     if (requestSuccess == ServerConnection.SocketIdentifier.WORD_FIT_SOLUTIONS_SUCCESS) {
-                        Log.d(LOG_TAG, "Word-fit results received from server: " + answers.toString());
+                        Log.d(LOG_TAG,
+                                "Word-fit results received from server: " + answers.toString());
                         addToResults(answers);
                     } else {
                         Log.d(LOG_TAG, "No word-fit results received from server.");
@@ -399,7 +423,8 @@ public class AnagramPageFragment extends Fragment {
             Log.d(LOG_TAG, "searching entire dictionary. Will be slow...");
             dictionaryToSearch = dictionary;
         } else {
-            Log.d(LOG_TAG, "searching words beginning with " + input.charAt(0) + " ... dictionaryByLetter.length = " + dictionaryByLetter.size());
+            Log.d(LOG_TAG, "searching words beginning with " + input.charAt(0) + " ... " +
+                    "dictionaryByLetter.length = " + dictionaryByLetter.size());
             String[] dic = dictionaryByLetter.get(getLetterIndex(input.charAt(0)));
 
             dictionaryToSearch = Arrays.asList(dic);
@@ -423,19 +448,23 @@ public class AnagramPageFragment extends Fragment {
     /**
      * Method to solve the anagram.
      * <p>
-     * Sorts the letters of the search term into alphabetical order, then checks whether the dictionary
-     * HashSet contains a key with the same string. If so, the values are all anagrams of the search string.
+     * Sorts the letters of the search term into alphabetical order, then checks whether the
+     * dictionary
+     * HashSet contains a key with the same string. If so, the values are all anagrams of the
+     * search string.
      *
      * @param input
      */
     private void searchAnagram(String input) {
         // If server available, get answer from there, otherwise do it locally
         if (serverAvailable) {
-            ServerConnection.ServerConnectionListener listener = new ServerConnection.ServerConnectionListener() {
+            ServerConnection.ServerConnectionListener listener =
+                    new ServerConnection.ServerConnectionListener() {
                 @Override
                 public void serverConnectionResponse(ServerConnection.SocketIdentifier requestSuccess, ArrayList<String> answers) {
                     if (requestSuccess == ServerConnection.SocketIdentifier.ANAGRAM_SOLUTIONS_SUCCESS) {
-                        Log.d(LOG_TAG, "Anagram results received from server: " + answers.toString());
+                        Log.d(LOG_TAG,
+                                "Anagram results received from server: " + answers.toString());
                         addToResults(answers);
                     } else {
                         Log.d(LOG_TAG, "No anagram results received from server.");
@@ -461,7 +490,8 @@ public class AnagramPageFragment extends Fragment {
             ServerConnection serverConnection = new ServerConnection(listener);
             serverConnection.getAnagramResults(input);
         } else {
-            // Order letters, then check if hashset contains a match. If so, print the output options
+            // Order letters, then check if hashset contains a match. If so, print the output
+            // options
             // Sort letters
             String inputSorted = sortWord(input);
             // Check if in HashMap
@@ -470,7 +500,9 @@ public class AnagramPageFragment extends Fragment {
                 ArrayList<String> answers = dictionaryHM.get(inputSorted);
                 addToResults(answers);
             } else {
-                Log.d(LOG_TAG, "No match found for: " + inputSorted + ", which originally came from " + input);
+                Log.d(LOG_TAG,
+                        "No match found for: " + inputSorted + ", which originally came " + "from" +
+                                " " + input);
                 addToResults(getString(R.string.no_match_found), false);
             }
         }
@@ -536,12 +568,17 @@ public class AnagramPageFragment extends Fragment {
         }
 
         tv.setText(result);
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(R.dimen.dictionary_word));
-        tv.setPadding(getResources().getDimensionPixelOffset(R.dimen.home_card_padding), getResources().getDimensionPixelOffset(R.dimen.home_card_padding), getResources().getDimensionPixelOffset(R.dimen.home_card_padding), getResources().getDimensionPixelOffset(R.dimen.home_card_padding));
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                getResources().getDimension(R.dimen.dictionary_word));
+        tv.setPadding(getResources().getDimensionPixelOffset(R.dimen.home_card_padding),
+                getResources().getDimensionPixelOffset(R.dimen.home_card_padding),
+                getResources().getDimensionPixelOffset(R.dimen.home_card_padding),
+                getResources().getDimensionPixelOffset(R.dimen.home_card_padding));
         cardView.addView(tv);
         cardView.setUseCompatPadding(true);
         TypedValue outValue = new TypedValue();
-        getActivity().getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
+        getActivity().getTheme().resolveAttribute(android.R.attr.selectableItemBackground,
+                outValue, true);
         tv.setBackgroundResource(outValue.resourceId);
 
         // Prep for Animation
@@ -551,12 +588,7 @@ public class AnagramPageFragment extends Fragment {
         resultsLinearLayout.addView(cardView);
 
         // Animate
-        cardView.animate()
-                .alpha(1.0f)
-                .translationY(0)
-                .setStartDelay(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_STAGGER * resultCount)
-                .setDuration(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_DURATION)
-                .setListener(null);
+        cardView.animate().alpha(1.0f).translationY(0).setStartDelay(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_STAGGER * resultCount).setDuration(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_DURATION).setListener(null);
 
         // Increment the result count so subsequent cards will be delayed on their entry animation
         resultCount++;
@@ -578,7 +610,9 @@ public class AnagramPageFragment extends Fragment {
         tv.setGravity(Gravity.CENTER_HORIZONTAL);
         //tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         // Set the height/width to match parent
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        LinearLayout.LayoutParams params =
+                new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT);
         resultsLinearLayout.addView(tv, params);
     }
 
@@ -586,7 +620,8 @@ public class AnagramPageFragment extends Fragment {
      * Shows a toast explaining that only letters and '.' are legal for searching with.
      */
     private void showIllegalCharactersToast() {
-        Toast illegalCharactersToast = Toast.makeText(getActivity(), getString(R.string.illegalCharacterToast), Toast.LENGTH_SHORT);
+        Toast illegalCharactersToast = Toast.makeText(getActivity(),
+                getString(R.string.illegalCharacterToast), Toast.LENGTH_SHORT);
         illegalCharactersToast.show();
     }
 
@@ -741,7 +776,8 @@ public class AnagramPageFragment extends Fragment {
     }
 
     /**
-     * Method to make the search button clickable, changing the text and setting the onClickListener.
+     * Method to make the search button clickable, changing the text and setting the
+     * onClickListener.
      */
     private void setSearchButtonClickable() {
         // Allow the search button to be pressed once dictionary is loaded
@@ -758,7 +794,8 @@ public class AnagramPageFragment extends Fragment {
     }
 
     /**
-     * Stop the search button being clicked again once it has been clicked and a word-fit search is on-going.
+     * Stop the search button being clicked again once it has been clicked and a word-fit search
+     * is on-going.
      */
     private void setSearchButtonNotClickable() {
         // Prevent the search button being pressed while looking up word-solver answers
@@ -770,7 +807,8 @@ public class AnagramPageFragment extends Fragment {
 
     /**
      * Disable the search button because the dictionary isn't loaded.
-     * This will usually be becuase there's no server connection and the user has selected 'low RAM mode'.
+     * This will usually be becuase there's no server connection and the user has selected 'low
+     * RAM mode'.
      */
     private void setSearchButtonDisabled() {
         // Disable search button
@@ -809,8 +847,10 @@ public class AnagramPageFragment extends Fragment {
      */
     private void hideKeyboard() {
         // Method to hide the keyboard
-        InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        InputMethodManager inputManager =
+                (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+                InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
     /**
@@ -871,7 +911,8 @@ public class AnagramPageFragment extends Fragment {
      */
     private class GetWordSolverAnswers extends AsyncTask<String, Void, String> {
         /**
-         * Async task to compute the word-solver answers. Allows it to be moved off the main UI Thread.
+         * Async task to compute the word-solver answers. Allows it to be moved off the main UI
+         * Thread.
          * <p>
          * Created by mat on 04/10/15.
          */
@@ -918,11 +959,7 @@ public class AnagramPageFragment extends Fragment {
         progressSpinnerLinLayout.setTranslationY(300);
         progressSpinnerLinLayout.setAlpha(0.0f);
         progressSpinnerLinLayout.setVisibility(View.VISIBLE);
-        progressSpinnerLinLayout.animate()
-                .alpha(1.0f)
-                .translationY(0)
-                .setDuration(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_DURATION)
-                .setListener(null);
+        progressSpinnerLinLayout.animate().alpha(1.0f).translationY(0).setDuration(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_DURATION).setListener(null);
 
         // Stop the search button from being pressed
         setSearchButtonNotClickable();
@@ -934,11 +971,7 @@ public class AnagramPageFragment extends Fragment {
      */
     private void hideLoadingSpinner() {
         // Show the progress spinner
-        progressSpinnerLinLayout.animate()
-                .alpha(0.0f)
-                .translationY(300)
-                .setDuration(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_DURATION)
-                .setListener(null);
+        progressSpinnerLinLayout.animate().alpha(0.0f).translationY(300).setDuration(DictionaryPageFragment.ENTRY_EXIT_ANIMATION_DURATION).setListener(null);
         progressSpinnerLinLayout.setVisibility(View.GONE);
 
         // Stop the search button from being pressed

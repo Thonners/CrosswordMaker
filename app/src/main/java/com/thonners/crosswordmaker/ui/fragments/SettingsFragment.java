@@ -1,7 +1,9 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.ui.fragments;
 
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+
+import com.thonners.crosswordmaker.R;
 
 /**
  * A PreferenceFragment to display the app's settings/options.

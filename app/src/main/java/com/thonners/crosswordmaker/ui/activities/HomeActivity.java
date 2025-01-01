@@ -25,7 +25,7 @@ import com.thonners.crosswordmaker.CrosswordTwo;
 import com.thonners.crosswordmaker.HttpsServerConnection;
 import com.thonners.crosswordmaker.R;
 import com.thonners.crosswordmaker.ServerConnection;
-import com.thonners.crosswordmaker.SettingsFragment;
+import com.thonners.crosswordmaker.ui.fragments.SettingsFragment;
 
 import android.os.Bundle;
 

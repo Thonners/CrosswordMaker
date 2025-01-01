@@ -1,4 +1,4 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.ui.fragments;
 
 import android.animation.Animator;
 import android.content.Context;
@@ -7,6 +7,9 @@ import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.thonners.crosswordmaker.ManualAnagramKnownLetterCardView;
+import com.thonners.crosswordmaker.ManualAnagramTextView;
+import com.thonners.crosswordmaker.R;
 
 import androidx.fragment.app.Fragment;
 import androidx.legacy.widget.Space;

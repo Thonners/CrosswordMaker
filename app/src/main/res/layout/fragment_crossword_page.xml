@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:android.support.design="http://schemas.android.com/apk/res-auto"
-    tools:context="com.thonners.crosswordmaker.CrosswordPageFragment">
+    tools:context="com.thonners.crosswordmaker.ui.fragments.CrosswordPageFragment">
 
     <LinearLayout
         android:id="@+id/view_pager"

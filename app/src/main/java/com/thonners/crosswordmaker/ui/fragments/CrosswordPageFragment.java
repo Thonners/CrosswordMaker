@@ -1,7 +1,6 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.ui.fragments;
 
 import android.app.Activity;
-import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -20,6 +19,15 @@ import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.thonners.crosswordmaker.CellView;
+import com.thonners.crosswordmaker.Clue;
+import com.thonners.crosswordmaker.ClueChecklistEntryTextView;
+import com.thonners.crosswordmaker.Crossword;
+import com.thonners.crosswordmaker.CrosswordCanvas;
+import com.thonners.crosswordmaker.CrosswordGrid;
+import com.thonners.crosswordmaker.CrosswordTwo;
+import com.thonners.crosswordmaker.HorizontalScrollViewNoFocus;
+import com.thonners.crosswordmaker.R;
 
 import java.io.File;
 import java.io.IOException;

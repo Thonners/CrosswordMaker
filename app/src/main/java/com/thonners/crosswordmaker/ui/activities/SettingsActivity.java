@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-import com.thonners.crosswordmaker.SettingsFragment;
+import com.thonners.crosswordmaker.ui.fragments.SettingsFragment;
 
 /**
  * Simple Activity to display the SettingsFragment.

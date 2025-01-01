@@ -1,4 +1,4 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.ui.fragments;
 
 import android.animation.Animator;
 import android.app.Activity;
@@ -26,6 +26,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.thonners.crosswordmaker.Card;
+import com.thonners.crosswordmaker.DictionaryMWDownloadDefinition;
+import com.thonners.crosswordmaker.R;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -38,9 +42,12 @@ import android.widget.Toast;
 public class DictionaryPageFragment extends Fragment {
     private static final String LOG_TAG = "DictionaryFragment";
 
-    public static final int ENTRY_EXIT_ANIMATION_DURATION = 250;       // Duration of an entry/exit animation for the results cards
-    public static final int ENTRY_EXIT_ANIMATION_Y_TRANSLATE = 100;    // Y translation distance for an entry/exit animation for the results cards
-    public static final int ENTRY_EXIT_ANIMATION_STAGGER = 50;        // Delay duration between subsequent views for an entry/exit animation for the results cards
+    public static final int ENTRY_EXIT_ANIMATION_DURATION = 250;       // Duration of an
+    // entry/exit animation for the results cards
+    public static final int ENTRY_EXIT_ANIMATION_Y_TRANSLATE = 100;    // Y translation distance
+    // for an entry/exit animation for the results cards
+    public static final int ENTRY_EXIT_ANIMATION_STAGGER = 50;        // Delay duration between
+    // subsequent views for an entry/exit animation for the results cards
 
     private Button searchButton;
     private EditText inputBox;
@@ -98,8 +105,8 @@ public class DictionaryPageFragment extends Fragment {
         try {
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
+            throw new ClassCastException(activity.toString() + " must implement " +
+                    "OnFragmentInteractionListener");
         }
     }
 
@@ -124,12 +131,16 @@ public class DictionaryPageFragment extends Fragment {
         // Search button clicked. Check internet connected.
         if (!networkIsAvailable()) {
             // Toast to say connect to internet
-            Log.d(LOG_TAG, "Search button clicked. Internet connection not detected. Showing toast and doing nothing else...");
-            Toast toast = Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.dictionary_internet_connection_required), Toast.LENGTH_SHORT);
+            Log.d(LOG_TAG, "Search button clicked. Internet connection not detected. Showing " +
+                    "toast and doing nothing else...");
+            Toast toast = Toast.makeText(getActivity().getApplicationContext(),
+                    getResources().getString(R.string.dictionary_internet_connection_required),
+                    Toast.LENGTH_SHORT);
             toast.show();
         } else if (searchMWUnderway) {
             // Show searching toast
-            Log.d(LOG_TAG, "SearchMWUnderway = true, implying search hasn't yet returned, so not submitting new search yet.");
+            Log.d(LOG_TAG, "SearchMWUnderway = true, implying search hasn't yet returned, so not " +
+                    "submitting new search yet.");
             //showAlreadySearchingToast();
         } else {
             // Hide keyboard. & clear any previous results from the results view.
@@ -145,7 +156,9 @@ public class DictionaryPageFragment extends Fragment {
             Log.d(LOG_TAG, "Search button clicked. Trying MW dictionary");
             searchMWDictionary(searchTerm);
         } else {
-            Toast toast = Toast.makeText(getActivity().getApplicationContext(), getResources().getString(R.string.tutorial_toast_dictionary), Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(getActivity().getApplicationContext(),
+                    getResources().getString(R.string.tutorial_toast_dictionary),
+                    Toast.LENGTH_SHORT);
             toast.show();
         }
     }
@@ -163,13 +176,16 @@ public class DictionaryPageFragment extends Fragment {
         // Set to prevent multiple searches running at once
         searchMWUnderway = true;
         // Search the MerriamWebster dictionary
-        DictionaryMWDownloadDefinition.DictionaryMWDownloadDefinitionListener listener = new DictionaryMWDownloadDefinition.DictionaryMWDownloadDefinitionListener() {
+        DictionaryMWDownloadDefinition.DictionaryMWDownloadDefinitionListener listener =
+                new DictionaryMWDownloadDefinition.DictionaryMWDownloadDefinitionListener() {
             @Override
-            public void completionCallBack(final ViewGroup theFinalView, final int searchSuccessState) {
+            public void completionCallBack(final ViewGroup theFinalView,
+                                           final int searchSuccessState) {
                 // Handle what happens to the output from the dictionary here
                 switch (searchSuccessState) {
                     case DictionaryMWDownloadDefinition.SEARCH_NOT_COMPLETED:
-                        Log.d(LOG_TAG, "Something went wrong with the search. Status returned from DictionaryMWDownloadDefinition as -1");
+                        Log.d(LOG_TAG, "Something went wrong with the search. Status returned " +
+                                "from DictionaryMWDownloadDefinition as -1");
                         TextView tv = new TextView(getActivity());
                         tv.setText(getString(R.string.dictionary_error));
                         resultsLinearLayout.addView(tv);
@@ -182,12 +198,7 @@ public class DictionaryPageFragment extends Fragment {
                             Log.d(LOG_TAG, "Animating results in...");
                             for (int i = 0; i < theFinalView.getChildCount(); i++) {
                                 View view = theFinalView.getChildAt(i);
-                                view.animate()
-                                        .translationY(0)
-                                        .setDuration(ENTRY_EXIT_ANIMATION_DURATION)
-                                        .alpha(1.0f)
-                                        .setStartDelay(ENTRY_EXIT_ANIMATION_STAGGER * i)
-                                        .setListener(null);
+                                view.animate().translationY(0).setDuration(ENTRY_EXIT_ANIMATION_DURATION).alpha(1.0f).setStartDelay(ENTRY_EXIT_ANIMATION_STAGGER * i).setListener(null);
                             }
                         }
                         break;
@@ -197,94 +208,83 @@ public class DictionaryPageFragment extends Fragment {
                         resultsLinearLayout.addView(theFinalView);
                         final TextView promptTV = (TextView) theFinalView.getChildAt(0);
                         promptTV.setClickable(true);
-                        promptTV.animate()
-                                .setDuration(ENTRY_EXIT_ANIMATION_DURATION)
-                                .alpha(1.0f)
-                                .setListener(null);
+                        promptTV.animate().setDuration(ENTRY_EXIT_ANIMATION_DURATION).alpha(1.0f).setListener(null);
                         promptTV.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 // Turn all the hidden TextViews to VISIBLE
                                 Log.d(LOG_TAG, "Prompt clicked. Changing promprt text...");
-                                promptTV.animate()
-                                        .alpha(0.0f)
-                                        .setDuration(ENTRY_EXIT_ANIMATION_DURATION)
-                                        .translationY(ENTRY_EXIT_ANIMATION_Y_TRANSLATE)
-                                        .setListener(new Animator.AnimatorListener() {
+                                promptTV.animate().alpha(0.0f).setDuration(ENTRY_EXIT_ANIMATION_DURATION).translationY(ENTRY_EXIT_ANIMATION_Y_TRANSLATE).setListener(new Animator.AnimatorListener() {
+                                    @Override
+                                    public void onAnimationStart(Animator animator) {
+
+                                    }
+
+                                    @Override
+                                    public void onAnimationEnd(Animator animator) {
+                                        promptTV.setText(getString(R.string.dictionary_suggestions));
+
+                                        Card searchGoogleCard = new Card(getActivity(),
+                                                getString(R.string.dictionary_search_google));
+                                        searchGoogleCard.setTranslationY(ENTRY_EXIT_ANIMATION_Y_TRANSLATE);
+                                        searchGoogleCard.setAlpha(0.0f);
+                                        searchGoogleCard.setVisibility(View.VISIBLE);
+                                        searchGoogleCard.setOnClickListener(new View.OnClickListener() {
                                             @Override
-                                            public void onAnimationStart(Animator animator) {
-
-                                            }
-
-                                            @Override
-                                            public void onAnimationEnd(Animator animator) {
-                                                promptTV.setText(getString(R.string.dictionary_suggestions));
-
-                                                Card searchGoogleCard = new Card(getActivity(), getString(R.string.dictionary_search_google));
-                                                searchGoogleCard.setTranslationY(ENTRY_EXIT_ANIMATION_Y_TRANSLATE);
-                                                searchGoogleCard.setAlpha(0.0f);
-                                                searchGoogleCard.setVisibility(View.VISIBLE);
-                                                searchGoogleCard.setOnClickListener(new View.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(View v) {
-                                                        Log.d(LOG_TAG, "Search Google Clicked - Searching for: " + searchTerm);
-                                                        searchGoogle(searchTerm);
-                                                    }
-                                                });
-                                                resultsLinearLayout.addView(searchGoogleCard, 0);
-                                                searchGoogleCard.animate()
-                                                        .alpha(1.0f)
-                                                        .setDuration(ENTRY_EXIT_ANIMATION_DURATION)
-                                                        .translationY(0)
-                                                        .setListener(null);
-
-                                                Log.d(LOG_TAG, "Setting options to visible");
-                                                for (int i = 0; i < theFinalView.getChildCount(); i++) {
-                                                    View view = theFinalView.getChildAt(i);
-                                                    view.setAlpha(0.0f);
-                                                    view.setTranslationY(ENTRY_EXIT_ANIMATION_Y_TRANSLATE);
-                                                    if (view instanceof Card) {
-                                                        final Card card = (Card) theFinalView.getChildAt(i);
-                                                        card.setVisibility(View.VISIBLE);
-                                                        card.setOnClickListener(new View.OnClickListener() {
-                                                            @Override
-                                                            public void onClick(View v) {
-                                                                Log.d(LOG_TAG, "Suggestion clicked. Searching Dictionary for: " + card.getSuggestionText());
-                                                                mListener.searchDictionary(card.getSuggestionText());
-                                                            }
-                                                        });
-
-                                                    } else if (view instanceof TextView) {
-                                                    } else {
-                                                        Log.d(LOG_TAG, "Child is a " + theFinalView.getChildAt(i).getClass().getName());
-                                                        Log.d(LOG_TAG, "Something's gone wrong!");
-                                                    }
-                                                    // Animate the entry
-                                                    view.animate()
-                                                            .alpha(1.0f)
-                                                            .setDuration(ENTRY_EXIT_ANIMATION_DURATION)
-                                                            .translationY(0)
-                                                            .setStartDelay(ENTRY_EXIT_ANIMATION_STAGGER * i)
-                                                            .setListener(null);
-                                                }
-                                            }
-
-                                            @Override
-                                            public void onAnimationCancel(Animator animator) {
-
-                                            }
-
-                                            @Override
-                                            public void onAnimationRepeat(Animator animator) {
-
+                                            public void onClick(View v) {
+                                                Log.d(LOG_TAG, "Search Google Clicked - Searching" +
+                                                        " for: " + searchTerm);
+                                                searchGoogle(searchTerm);
                                             }
                                         });
+                                        resultsLinearLayout.addView(searchGoogleCard, 0);
+                                        searchGoogleCard.animate().alpha(1.0f).setDuration(ENTRY_EXIT_ANIMATION_DURATION).translationY(0).setListener(null);
+
+                                        Log.d(LOG_TAG, "Setting options to visible");
+                                        for (int i = 0; i < theFinalView.getChildCount(); i++) {
+                                            View view = theFinalView.getChildAt(i);
+                                            view.setAlpha(0.0f);
+                                            view.setTranslationY(ENTRY_EXIT_ANIMATION_Y_TRANSLATE);
+                                            if (view instanceof Card) {
+                                                final Card card = (Card) theFinalView.getChildAt(i);
+                                                card.setVisibility(View.VISIBLE);
+                                                card.setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View v) {
+                                                        Log.d(LOG_TAG, "Suggestion clicked. " +
+                                                                "Searching Dictionary for: " + card.getSuggestionText());
+                                                        mListener.searchDictionary(card.getSuggestionText());
+                                                    }
+                                                });
+
+                                            } else if (view instanceof TextView) {
+                                            } else {
+                                                Log.d(LOG_TAG,
+                                                        "Child is a " + theFinalView.getChildAt(i).getClass().getName());
+                                                Log.d(LOG_TAG, "Something's gone wrong!");
+                                            }
+                                            // Animate the entry
+                                            view.animate().alpha(1.0f).setDuration(ENTRY_EXIT_ANIMATION_DURATION).translationY(0).setStartDelay(ENTRY_EXIT_ANIMATION_STAGGER * i).setListener(null);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onAnimationCancel(Animator animator) {
+
+                                    }
+
+                                    @Override
+                                    public void onAnimationRepeat(Animator animator) {
+
+                                    }
+                                });
 
                             }
                         });
                         break;
                     case DictionaryMWDownloadDefinition.SEARCH_NO_SUGGESTIONS:
-                        Log.d(LOG_TAG, "Search returned unsuccessfully, without suggestions. Showing word not found message");
+                        Log.d(LOG_TAG, "Search returned unsuccessfully, without suggestions. " +
+                                "Showing word not found message");
                         CardView cardView = new CardView(getActivity());
                         cardView.setUseCompatPadding(true);
                         TextView tv2 = new TextView(getActivity());
@@ -303,23 +303,29 @@ public class DictionaryPageFragment extends Fragment {
                 searchMWUnderway = false;  // Reset to allow future searches
             }
         };
-        DictionaryMWDownloadDefinition definition = new DictionaryMWDownloadDefinition(getActivity(), query, progressLinearLayout, searchButton, listener);
+        DictionaryMWDownloadDefinition definition =
+                new DictionaryMWDownloadDefinition(getActivity(), query, progressLinearLayout,
+                        searchButton, listener);
         definition.execute();
     }
 
     private void hideKeyboard() {
         // Method to hide the keyboard
-        InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        InputMethodManager inputManager =
+                (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+                InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
     private void clearResultsView(boolean search) {
         Log.d(LOG_TAG, "clearResultsView called");
-        // Get number of children to the view - use this to determine how deep need to go to get to the cards
+        // Get number of children to the view - use this to determine how deep need to go to get
+        // to the cards
         if (resultsLinearLayout.getChildCount() > 0) {
             Log.d(LOG_TAG, "Linear layout child count > 0");
             if (resultsLinearLayout.getChildAt(0) instanceof LinearLayout) {
-                LinearLayout resultsInnerLinearLayout = (LinearLayout) resultsLinearLayout.getChildAt(0);
+                LinearLayout resultsInnerLinearLayout =
+                        (LinearLayout) resultsLinearLayout.getChildAt(0);
                 animateViewsOutOfLayout(resultsInnerLinearLayout, search);
             } else {
                 animateViewsOutOfLayout(resultsLinearLayout, search);
@@ -366,12 +372,7 @@ public class DictionaryPageFragment extends Fragment {
             View view = resultsLinearLayout.getChildAt(i);
             if (view != null) {
                 Log.d(LOG_TAG, "Animating view removal. childcount = " + layout.getChildCount());
-                view.animate()
-                        .setDuration(ENTRY_EXIT_ANIMATION_DURATION)
-                        .alpha(0.0f)
-                        .translationY(ENTRY_EXIT_ANIMATION_Y_TRANSLATE)
-                        .setStartDelay(ENTRY_EXIT_ANIMATION_STAGGER * j)
-                        .setListener(animatorListener);
+                view.animate().setDuration(ENTRY_EXIT_ANIMATION_DURATION).alpha(0.0f).translationY(ENTRY_EXIT_ANIMATION_Y_TRANSLATE).setStartDelay(ENTRY_EXIT_ANIMATION_STAGGER * j).setListener(animatorListener);
             }
             j++;
         }
@@ -379,7 +380,8 @@ public class DictionaryPageFragment extends Fragment {
     }
 
     private boolean networkIsAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }

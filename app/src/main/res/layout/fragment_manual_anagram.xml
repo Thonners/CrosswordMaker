@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.thonners.crosswordmaker.CrosswordPageFragment">
+    tools:context="com.thonners.crosswordmaker.ui.fragments.CrosswordPageFragment">
 
     <TextView
         android:id="@+id/anagram_prompt"

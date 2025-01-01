@@ -1,4 +1,4 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.ui.fragments;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -27,6 +27,9 @@ import androidx.core.content.ContextCompat;
 
 import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
 
+import com.thonners.crosswordmaker.CrosswordTwo;
+import com.thonners.crosswordmaker.R;
+import com.thonners.crosswordmaker.TouchImageView;
 import com.thonners.crosswordmaker.ui.activities.HomeActivity;
 
 
