@@ -1,4 +1,4 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.data.crossword;
 
 import android.util.Log;
 
@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
+import com.thonners.crosswordmaker.data.crossword.exceptions.NoOtherClueException;
 
 public class CellTwo {
     private final static String LOG_TAG = "CellTwo";
@@ -174,6 +175,3 @@ public class CellTwo {
     }
 }
 
-class NoOtherClueException extends Exception {
-
-}

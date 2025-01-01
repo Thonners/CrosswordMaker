@@ -23,9 +23,9 @@ import com.thonners.crosswordmaker.CellView;
 import com.thonners.crosswordmaker.Clue;
 import com.thonners.crosswordmaker.ClueChecklistEntryTextView;
 import com.thonners.crosswordmaker.Crossword;
-import com.thonners.crosswordmaker.CrosswordCanvas;
+import com.thonners.crosswordmaker.ui.components.CrosswordCanvas;
 import com.thonners.crosswordmaker.CrosswordGrid;
-import com.thonners.crosswordmaker.CrosswordTwo;
+import com.thonners.crosswordmaker.data.crossword.CrosswordTwo;
 import com.thonners.crosswordmaker.HorizontalScrollViewNoFocus;
 import com.thonners.crosswordmaker.R;
 

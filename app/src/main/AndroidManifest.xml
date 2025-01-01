@@ -57,7 +57,7 @@
                 android:value="com.thonners.crosswordmaker.ui.activities.HomeActivity" />
         </activity>
         <activity
-            android:name=".GridMaker"
+            android:name=".ui.activities.GridMaker"
             android:label="@string/title_activity_grid_maker"
             android:parentActivityName=".ui.activities.HomeActivity"
             android:screenOrientation="portrait">

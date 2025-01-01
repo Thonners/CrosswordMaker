@@ -26,8 +26,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.thonners.crosswordmaker.Card;
-import com.thonners.crosswordmaker.DictionaryMWDownloadDefinition;
+import com.thonners.crosswordmaker.ui.components.Card;
+import com.thonners.crosswordmaker.data.internet.DictionaryMWDownloadDefinition;
 import com.thonners.crosswordmaker.R;
 
 
@@ -139,8 +139,8 @@ public class DictionaryPageFragment extends Fragment {
             toast.show();
         } else if (searchMWUnderway) {
             // Show searching toast
-            Log.d(LOG_TAG, "SearchMWUnderway = true, implying search hasn't yet returned, so not " +
-                    "submitting new search yet.");
+            Log.d(LOG_TAG, "SearchMWUnderway = true, implying search hasn't yet returned, so not "
+                    + "submitting new search yet.");
             //showAlreadySearchingToast();
         } else {
             // Hide keyboard. & clear any previous results from the results view.
@@ -184,8 +184,9 @@ public class DictionaryPageFragment extends Fragment {
                 // Handle what happens to the output from the dictionary here
                 switch (searchSuccessState) {
                     case DictionaryMWDownloadDefinition.SEARCH_NOT_COMPLETED:
-                        Log.d(LOG_TAG, "Something went wrong with the search. Status returned " +
-                                "from DictionaryMWDownloadDefinition as -1");
+                        Log.d(LOG_TAG,
+                                "Something went wrong with the search. Status returned " + "from " +
+                                        "DictionaryMWDownloadDefinition as -1");
                         TextView tv = new TextView(getActivity());
                         tv.setText(getString(R.string.dictionary_error));
                         resultsLinearLayout.addView(tv);
@@ -232,8 +233,8 @@ public class DictionaryPageFragment extends Fragment {
                                         searchGoogleCard.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
-                                                Log.d(LOG_TAG, "Search Google Clicked - Searching" +
-                                                        " for: " + searchTerm);
+                                                Log.d(LOG_TAG, "Search Google Clicked - " +
+                                                        "Searching" + " for: " + searchTerm);
                                                 searchGoogle(searchTerm);
                                             }
                                         });

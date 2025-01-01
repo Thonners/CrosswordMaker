@@ -1,4 +1,4 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.ui.components;
 
 import android.content.Context;
 import android.os.Build;
@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.thonners.crosswordmaker.R;
 
 /**
  * Class to be used in the known letters layout at the bottom of the manual anagram page.
@@ -68,13 +70,17 @@ public class ManualAnagramKnownLetterCardView extends CardView {
      * @param context Application context
      */
     public void initialise(Context context) {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
+        LinearLayout.LayoutParams params =
+                new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT, 1f);
         params.leftMargin = 2;
         params.rightMargin = 2;
         params.bottomMargin = 3;
         this.setLayoutParams(params);
         tv = (TextView) ((LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.manual_anagram_known_letters_card_view, null);
-        LinearLayout.LayoutParams tvParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams tvParams =
+                new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
         tv.setGravity(Gravity.CENTER_HORIZONTAL);
         this.addView(tv, tvParams);
         clearLetter();

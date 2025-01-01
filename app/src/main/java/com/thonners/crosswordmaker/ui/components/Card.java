@@ -1,4 +1,4 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.ui.components;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -9,6 +9,9 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.thonners.crosswordmaker.R;
+import com.thonners.crosswordmaker.data.internet.XmlParser;
 
 /**
  * Created by mat on 20/04/15.

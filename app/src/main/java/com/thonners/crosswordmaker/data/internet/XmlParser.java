@@ -1,4 +1,4 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.data.internet;
 
 import android.util.Log;
 import android.util.Xml;
@@ -23,13 +23,17 @@ public class XmlParser {
 
     private static final String LOG_TAG = "xmlParser";
 
-    private static final String CHARSET = "UTF-8"; // Change this string if necessary. Used to be CHARSET = StandardCharsets.UTF_8 ;
+    private static final String CHARSET = "UTF-8"; // Change this string if necessary. Used to be
+    // CHARSET = StandardCharsets.UTF_8 ;
 
-    private static final String XML_TAG_ENTRY_LIST = "entry_list"; //Hopefully it will ignore the 'version="1.0"' also in the entry tag. Contains the entire feed
-    private static final String XML_TAG_ENTRY = "entry";           //Hopefully it will ignore the ' id=X' also in the entry tag
+    private static final String XML_TAG_ENTRY_LIST = "entry_list"; //Hopefully it will ignore the
+    // 'version="1.0"' also in the entry tag. Contains the entire feed
+    private static final String XML_TAG_ENTRY = "entry";           //Hopefully it will ignore the
+    // ' id=X' also in the entry tag
     private static final String XML_TAG_WORD = "ew";               // Word to be defined
     private static final String XML_TAG_DEFINITION_ZONE = "def";   // Tag containing the definition
-    private static final String XML_TAG_DEFINITION_NUMBER = "sn";  // Tag which precedes the definition in the XML.
+    private static final String XML_TAG_DEFINITION_NUMBER = "sn";  // Tag which precedes the
+    // definition in the XML.
     private static final String XML_TAG_DEFINITION = "dt";         // Tag containing the definition
     private static final String XML_TAG_WORD_TYPE = "fl";          // Tag denoting verb, noun, etc.
 
@@ -56,7 +60,8 @@ public class XmlParser {
      * Converts rawXML, as downloaded/received from the MerriamWebster dictionary and turns it into
      * a list of {@link Entry}s.
      * <p>
-     * This method just sets up the {@link XmlPullParser}, then calls {@link #readFeed(XmlPullParser)}.
+     * This method just sets up the {@link XmlPullParser}, then calls
+     * {@link #readFeed(XmlPullParser)}.
      *
      * @param in The InputStream of raw XML received from the MW dictionary.
      * @return An ArrayList of {@link Entry}s, extracted from the input rawXML.
@@ -81,14 +86,16 @@ public class XmlParser {
      * Loops through all objects in the parser, ignoring the {@link XmlPullParser#START_TAG}, and
      * finishing at the {@link XmlPullParser#END_TAG}.
      * <p>
-     * The useful results are read by {@link #readEntry(XmlPullParser)}. Other entries are {@link #skip(XmlPullParser)}'ed
+     * The useful results are read by {@link #readEntry(XmlPullParser)}. Other entries are
+     * {@link #skip(XmlPullParser)}'ed
      *
      * @param parser The parser instance containing the rawXML downloaded from MW.
      * @return An ArrayList of {@link Entry}s, extracted from the input rawXML.
      * @throws XmlPullParserException
      * @throws IOException
      */
-    private ArrayList<Entry> readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
+    private ArrayList<Entry> readFeed(XmlPullParser parser) throws XmlPullParserException,
+            IOException {
         ArrayList<Entry> entries = new ArrayList<>();
 
         Log.d(LOG_TAG, "Reading Feed...");
@@ -113,11 +120,13 @@ public class XmlParser {
      * Wrapper method to read an 'entry', where the entry is the complete definition as received.
      * <p>
      * For each type of XML tag read, this method then calls the appropriate method, from
-     * {@link #readWord(XmlPullParser)}, {@link #readWordType(XmlPullParser)}, or {@link #readDefinitions(XmlPullParser)},
+     * {@link #readWord(XmlPullParser)}, {@link #readWordType(XmlPullParser)}, or
+     * {@link #readDefinitions(XmlPullParser)},
      * and adds the result to the appropriate part of the entry.
      *
      * @param parser The parser instance containing the rawXML downloaded from MW.
-     * @return An {@link Entry} containing the word, word type, definition, etc. as extracted from the XML.
+     * @return An {@link Entry} containing the word, word type, definition, etc. as extracted
+     * from the XML.
      * @throws XmlPullParserException
      * @throws IOException
      */
@@ -185,15 +194,18 @@ public class XmlParser {
      * <p>
      * Complexity is added by the nested tags around certain words in a definition received from MW.
      * e.g. Links to other words, etc. which are used on the website but not by this app.
-     * The method deals with these extra tags by keeping a count of how 'deep' the current XML object
-     * is, and then continuing to read data and add it to the current definition until the depth == 0.
+     * The method deals with these extra tags by keeping a count of how 'deep' the current XML
+     * object
+     * is, and then continuing to read data and add it to the current definition until the depth
+     * == 0.
      *
      * @param parser The parser instance containing the rawXML downloaded from MW.
      * @return An ArrayList of String definitions for the word being defined.
      * @throws IOException
      * @throws XmlPullParserException
      */
-    private ArrayList<String> readDefinitions(XmlPullParser parser) throws IOException, XmlPullParserException {
+    private ArrayList<String> readDefinitions(XmlPullParser parser) throws IOException,
+            XmlPullParserException {
         // Extract all the definitions from the various numbered definitions
         ArrayList<String> definitions = new ArrayList<String>();
         String definitionNumber = "";
@@ -206,11 +218,13 @@ public class XmlParser {
             switch (parser.next()) {
                 case XmlPullParser.END_TAG:
                     depth--;
-                    Log.d(LOG_TAG, "End tag found for: " + parser.getName() + ". Depth now = " + depth);
+                    Log.d(LOG_TAG,
+                            "End tag found for: " + parser.getName() + ". Depth now = " + depth);
                     break;
                 case XmlPullParser.START_TAG:
                     depth++;
-                    Log.d(LOG_TAG, "Start tag found for: " + parser.getName() + ". Depth now = " + depth);
+                    Log.d(LOG_TAG,
+                            "Start tag found for: " + parser.getName() + ". Depth now = " + depth);
                     if (parser.getName().matches(XML_TAG_DEFINITION_NUMBER)) {
                         definitionNumber = "";
                         int defNoDepth = 1;
@@ -218,14 +232,16 @@ public class XmlParser {
                             switch (parser.next()) {
                                 case XmlPullParser.END_TAG:
                                     defNoDepth--;
-                                    Log.d(LOG_TAG, "End tag found for: " + parser.getName() + ". defNoDepth now = " + depth);
+                                    Log.d(LOG_TAG, "End tag found for: " + parser.getName() + ". " +
+                                            "defNoDepth now = " + depth);
                                     if (parser.getName().matches(XML_TAG_DEFINITION_NUMBER)) {
                                         depth--;
                                     }
                                     break;
                                 case XmlPullParser.START_TAG:
                                     defNoDepth++;
-                                    Log.d(LOG_TAG, "Start tag found for: " + parser.getName() + ". defNoDepth now = " + depth);
+                                    Log.d(LOG_TAG, "Start tag found for: " + parser.getName() +
+                                            ". defNoDepth now = " + depth);
                                     break;
                                 case XmlPullParser.TEXT:
                                     definitionNumber = definitionNumber + parser.getText();
@@ -242,15 +258,19 @@ public class XmlParser {
                             switch (parser.next()) {
                                 case XmlPullParser.END_TAG:
                                     defDepth--;
-                                    Log.d(LOG_TAG, "Within definition tags, end tag found for: " + parser.getName() + ". defDepth now = " + defDepth);
+                                    Log.d(LOG_TAG,
+                                            "Within definition tags, end tag found for: " + parser.getName() + ". defDepth now = " + defDepth);
                                     if (parser.getName().matches(XML_TAG_DEFINITION)) {
-                                        // Reduce depth by 1 here as the closing <dt> tag will not be picked up by the main loop as when this inner while loop ends, parser.next() will be called.
+                                        // Reduce depth by 1 here as the closing <dt> tag will
+                                        // not be picked up by the main loop as when this inner
+                                        // while loop ends, parser.next() will be called.
                                         depth--;
                                     }
                                     break;
                                 case XmlPullParser.START_TAG:
                                     defDepth++;
-                                    Log.d(LOG_TAG, "Within definition tags, start tag found for: " + parser.getName() + ". defDepth now = " + defDepth);
+                                    Log.d(LOG_TAG, "Within definition tags, start tag found for: "
+                                            + parser.getName() + ". defDepth now = " + defDepth);
                                     break;
                                 case XmlPullParser.TEXT:
                                     Log.d(LOG_TAG, "Some definition text: " + parser.getText());
@@ -259,7 +279,8 @@ public class XmlParser {
                             }
                         }
                         if (definition.startsWith(":")) {
-                            definition = definition.substring(1);   // Remove the ':' from the front of the definition string if it exists, so a space can be put in
+                            definition = definition.substring(1);   // Remove the ':' from the
+                            // front of the definition string if it exists, so a space can be put in
                         }
                         if (!definitionNumber.matches("") && !definitionNumber.matches("null")) {
                             definition = definitionNumber + ": " + definition;
@@ -316,7 +337,8 @@ public class XmlParser {
     }
 
     /**
-     * Class of dictionary entries, containing variables for the word being defined, the type of word,
+     * Class of dictionary entries, containing variables for the word being defined, the type of
+     * word,
      * and the definition.
      */
     public static class Entry {

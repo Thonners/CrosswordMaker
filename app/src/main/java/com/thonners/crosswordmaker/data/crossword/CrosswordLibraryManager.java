@@ -1,4 +1,4 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.data.crossword;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +7,9 @@ import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.thonners.crosswordmaker.Crossword;
+import com.thonners.crosswordmaker.CrosswordGridEditor;
+import com.thonners.crosswordmaker.R;
 import com.thonners.crosswordmaker.ui.activities.CrosswordSliderActivity;
 import com.thonners.crosswordmaker.ui.activities.HomeActivity;
 

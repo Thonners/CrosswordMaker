@@ -1,10 +1,12 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.ui.components;
 
 import android.app.Dialog;
 import android.os.Bundle;
 
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AlertDialog;
+
+import com.thonners.crosswordmaker.R;
 
 /**
  * DialogFragment to show instructions on how to use the app.
@@ -22,8 +24,7 @@ public class InstructionsDialog extends DialogFragment {
         // Use builder to make dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         // Add text
-        builder.setTitle(R.string.instructions)
-                .setMessage(R.string.manual_anagram_instructions);
+        builder.setTitle(R.string.instructions).setMessage(R.string.manual_anagram_instructions);
 
         // Create and return the Dialog
         return builder.create();

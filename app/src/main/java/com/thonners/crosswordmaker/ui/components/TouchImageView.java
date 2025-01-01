@@ -1,4 +1,4 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.ui.components;
 /*
  * TouchImageView.java
  * By: Michael Ortiz
@@ -184,7 +184,8 @@ public class TouchImageView extends AppCompatImageView {
     @Override
     public void setScaleType(ScaleType type) {
         if (type == ScaleType.FIT_START || type == ScaleType.FIT_END) {
-            throw new UnsupportedOperationException("TouchImageView does not support FIT_START or FIT_END");
+            throw new UnsupportedOperationException("TouchImageView does not support FIT_START or" +
+                    " FIT_END");
         }
         if (type == ScaleType.MATRIX) {
             super.setScaleType(ScaleType.MATRIX);
@@ -286,7 +287,8 @@ public class TouchImageView extends AppCompatImageView {
         onDrawReady = true;
         imageRenderedAtLeastOnce = true;
         if (delayedZoomVariables != null) {
-            setZoom(delayedZoomVariables.scale, delayedZoomVariables.focusX, delayedZoomVariables.focusY, delayedZoomVariables.scaleType);
+            setZoom(delayedZoomVariables.scale, delayedZoomVariables.focusX,
+                    delayedZoomVariables.focusY, delayedZoomVariables.scaleType);
             delayedZoomVariables = null;
         }
         super.onDraw(canvas);
@@ -505,10 +507,8 @@ public class TouchImageView extends AppCompatImageView {
             maxTrans = 0;
         }
 
-        if (trans < minTrans)
-            return -trans + minTrans;
-        if (trans > maxTrans)
-            return -trans + maxTrans;
+        if (trans < minTrans) return -trans + minTrans;
+        if (trans > maxTrans) return -trans + maxTrans;
         return 0;
     }
 
@@ -601,7 +601,8 @@ public class TouchImageView extends AppCompatImageView {
                 //
                 // FIT_START and FIT_END not supported
                 //
-                throw new UnsupportedOperationException("TouchImageView does not support FIT_START or FIT_END");
+                throw new UnsupportedOperationException("TouchImageView does not support " +
+                        "FIT_START or FIT_END");
 
         }
 
@@ -649,14 +650,16 @@ public class TouchImageView extends AppCompatImageView {
             //
             float prevActualWidth = prevMatchViewWidth * normalizedScale;
             float actualWidth = getImageWidth();
-            translateMatrixAfterRotate(Matrix.MTRANS_X, transX, prevActualWidth, actualWidth, prevViewWidth, viewWidth, drawableWidth);
+            translateMatrixAfterRotate(Matrix.MTRANS_X, transX, prevActualWidth, actualWidth,
+                    prevViewWidth, viewWidth, drawableWidth);
 
             //
             // Height
             //
             float prevActualHeight = prevMatchViewHeight * normalizedScale;
             float actualHeight = getImageHeight();
-            translateMatrixAfterRotate(Matrix.MTRANS_Y, transY, prevActualHeight, actualHeight, prevViewHeight, viewHeight, drawableHeight);
+            translateMatrixAfterRotate(Matrix.MTRANS_Y, transY, prevActualHeight, actualHeight,
+                    prevViewHeight, viewHeight, drawableHeight);
 
             //
             // Set the matrix to the adjusted scale and translate values.
@@ -699,7 +702,8 @@ public class TouchImageView extends AppCompatImageView {
 
     /**
      * After rotating, the matrix needs to be translated. This function finds the area of image
-     * which was previously centered and adjusts translations so that is again the center, post-rotation.
+     * which was previously centered and adjusts translations so that is again the center,
+     * post-rotation.
      *
      * @param axis          Matrix.MTRANS_X or Matrix.MTRANS_Y
      * @param trans         the value of trans in that axis before the rotation
@@ -709,7 +713,9 @@ public class TouchImageView extends AppCompatImageView {
      * @param viewSize      width/height of view after rotation
      * @param drawableSize  width/height of drawable
      */
-    private void translateMatrixAfterRotate(int axis, float trans, float prevImageSize, float imageSize, int prevViewSize, int viewSize, int drawableSize) {
+    private void translateMatrixAfterRotate(int axis, float trans, float prevImageSize,
+                                            float imageSize, int prevViewSize, int viewSize,
+                                            int drawableSize) {
         if (imageSize < viewSize) {
             //
             // The width/height of image is less than the view's width/height. Center it.
@@ -724,8 +730,10 @@ public class TouchImageView extends AppCompatImageView {
 
         } else {
             //
-            // Find the area of the image which was previously centered in the view. Determine its distance
-            // from the left/top side of the view as a fraction of the entire image's width/height. Use that percentage
+            // Find the area of the image which was previously centered in the view. Determine
+            // its distance
+            // from the left/top side of the view as a fraction of the entire image's
+            // width/height. Use that percentage
             // to calculate the trans in the new view width/height.
             //
             float percentage = (Math.abs(trans) + (0.5f * prevViewSize)) / prevImageSize;
@@ -845,8 +853,7 @@ public class TouchImageView extends AppCompatImageView {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         last.set(curr);
-                        if (fling != null)
-                            fling.cancelFling();
+                        if (fling != null) fling.cancelFling();
                         setState(State.DRAG);
                         break;
 
@@ -933,13 +940,15 @@ public class TouchImageView extends AppCompatImageView {
             }
 
             if (animateToZoomBoundary) {
-                DoubleTapZoom doubleTap = new DoubleTapZoom(targetZoom, viewWidth / 2, viewHeight / 2, true);
+                DoubleTapZoom doubleTap = new DoubleTapZoom(targetZoom, viewWidth / 2,
+                        viewHeight / 2, true);
                 compatPostOnAnimation(doubleTap);
             }
         }
     }
 
-    private void scaleImage(double deltaScale, float focusX, float focusY, boolean stretchImageToSuper) {
+    private void scaleImage(double deltaScale, float focusX, float focusY,
+                            boolean stretchImageToSuper) {
 
         float lowerScale, upperScale;
         if (stretchImageToSuper) {
@@ -978,7 +987,8 @@ public class TouchImageView extends AppCompatImageView {
         private float startZoom, targetZoom;
         private float bitmapX, bitmapY;
         private boolean stretchImageToSuper;
-        private AccelerateDecelerateInterpolator interpolator = new AccelerateDecelerateInterpolator();
+        private AccelerateDecelerateInterpolator interpolator =
+                new AccelerateDecelerateInterpolator();
         private PointF startTouch;
         private PointF endTouch;
 
@@ -1075,7 +1085,8 @@ public class TouchImageView extends AppCompatImageView {
      *
      * @param x            x-coordinate of touch event
      * @param y            y-coordinate of touch event
-     * @param clipToBitmap Touch event may occur within view, but outside image content. True, to clip return value
+     * @param clipToBitmap Touch event may occur within view, but outside image content. True, to
+     *                    clip return value
      *                     to the bounds of the bitmap size.
      * @return Coordinates of the point touched, in the coordinate system of the original drawable.
      */
@@ -1152,8 +1163,8 @@ public class TouchImageView extends AppCompatImageView {
                 minY = maxY = startY;
             }
 
-            scroller.fling(startX, startY, (int) velocityX, (int) velocityY, minX,
-                    maxX, minY, maxY);
+            scroller.fling(startX, startY, (int) velocityX, (int) velocityY, minX, maxX, minY,
+                    maxY);
             currX = startX;
             currY = startY;
         }
@@ -1213,7 +1224,8 @@ public class TouchImageView extends AppCompatImageView {
             }
         }
 
-        public void fling(int startX, int startY, int velocityX, int velocityY, int minX, int maxX, int minY, int maxY) {
+        public void fling(int startX, int startY, int velocityX, int velocityY, int minX,
+                          int maxX, int minY, int maxY) {
             if (isPreGingerbread) {
                 scroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);
             } else {
@@ -1290,6 +1302,7 @@ public class TouchImageView extends AppCompatImageView {
     private void printMatrixInfo() {
         float[] n = new float[9];
         matrix.getValues(n);
-        Log.d(DEBUG, "Scale: " + n[Matrix.MSCALE_X] + " TransX: " + n[Matrix.MTRANS_X] + " TransY: " + n[Matrix.MTRANS_Y]);
+        Log.d(DEBUG, "Scale: " + n[Matrix.MSCALE_X] + " TransX: " + n[Matrix.MTRANS_X] + " TransY" +
+                ": " + n[Matrix.MTRANS_Y]);
     }
 }

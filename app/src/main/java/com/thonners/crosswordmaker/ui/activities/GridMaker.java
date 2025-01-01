@@ -1,4 +1,4 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.ui.activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -28,6 +28,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.thonners.crosswordmaker.Crossword;
+import com.thonners.crosswordmaker.R;
+import com.thonners.crosswordmaker.data.crossword.CrosswordLibraryManager;
+import com.thonners.crosswordmaker.data.crossword.CrosswordTwo;
+import com.thonners.crosswordmaker.ui.components.CrosswordCanvas;
 
 import java.io.File;
 import java.util.ArrayList;

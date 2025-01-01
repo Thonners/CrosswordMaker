@@ -1,4 +1,4 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.data.internet;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -25,10 +25,12 @@ public class HttpsServerConnection {
 
 
     /**
-     * The interface through which responses from the server will be passed back to the initiating fragment/activity.
+     * The interface through which responses from the server will be passed back to the
+     * initiating fragment/activity.
      */
     public interface ServerConnectionListener {
-        void serverConnectionResponse(ServerConnection.SocketIdentifier requestSuccess, ArrayList<String> answers);
+        void serverConnectionResponse(ServerConnection.SocketIdentifier requestSuccess,
+                                      ArrayList<String> answers);
 
         void setServerAvailable(boolean serverAvailable);
 
@@ -40,7 +42,8 @@ public class HttpsServerConnection {
     /**
      * Constructor
      *
-     * @param serverConnectionListener The interface through which responses from the server will be passed back to the initiating fragment/activity.
+     * @param serverConnectionListener The interface through which responses from the server will
+     *                                be passed back to the initiating fragment/activity.
      */
     public HttpsServerConnection(ServerConnectionListener serverConnectionListener) {
         this.serverConnectionListener = serverConnectionListener;
@@ -48,7 +51,8 @@ public class HttpsServerConnection {
     }
 
     /**
-     * Method to test the connection to the server, and if successful, to use the listener to call the appropriate method
+     * Method to test the connection to the server, and if successful, to use the listener to
+     * call the appropriate method
      */
     public void testServerConnection() {
         Log.d(LOG_TAG, "Testing connection...");
@@ -62,7 +66,8 @@ public class HttpsServerConnection {
 
 class ServerConnectionTaskRunner {
 
-    private final Executor executor = Executors.newSingleThreadExecutor(); // change according to your requirements
+    private final Executor executor = Executors.newSingleThreadExecutor(); // change according to
+    // your requirements
     private final Handler handler = new Handler(Looper.getMainLooper());
 
     public interface Callback<R> {

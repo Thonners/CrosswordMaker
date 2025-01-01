@@ -1,6 +1,8 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.data.crossword;
 
 import androidx.annotation.NonNull;
+
+import com.thonners.crosswordmaker.data.crossword.exceptions.NoMoreCellsException;
 
 import java.util.ArrayList;
 
@@ -79,6 +81,3 @@ public class ClueTwo {
     }
 }
 
-class NoMoreCellsException extends Exception {
-
-}

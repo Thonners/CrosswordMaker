@@ -14,7 +14,6 @@ import android.view.View;
 import android.widget.NumberPicker;
 
 import com.thonners.crosswordmaker.Crossword;
-import com.thonners.crosswordmaker.GridMaker;
 import com.thonners.crosswordmaker.R;
 import com.thonners.crosswordmaker.ui.fragments.SettingsFragment;
 

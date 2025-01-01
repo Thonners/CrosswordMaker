@@ -80,7 +80,7 @@ ADDED from AndroidManifest.xml:31:13
 		ADDED from AndroidManifest.xml:32:17
 	android:value
 		ADDED from AndroidManifest.xml:33:17
-activity#com.thonners.crosswordmaker.GridMaker
+activity#com.thonners.crosswordmaker.ui.activities.GridMaker
 ADDED from AndroidManifest.xml:35:9
 	android:screenOrientation
 		ADDED from AndroidManifest.xml:39:13

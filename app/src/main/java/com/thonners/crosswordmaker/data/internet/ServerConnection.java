@@ -1,4 +1,4 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.data.internet;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -26,7 +26,8 @@ public class ServerConnection {
     /**
      * Constructor
      *
-     * @param serverConnectionListener The interface through which responses from the server will be passed back to the initiating fragment/activity.
+     * @param serverConnectionListener The interface through which responses from the server will
+     *                                be passed back to the initiating fragment/activity.
      */
     public ServerConnection(ServerConnectionListener serverConnectionListener) {
         this.serverConnectionListener = serverConnectionListener;
@@ -34,7 +35,8 @@ public class ServerConnection {
     }
 
     /**
-     * The interface through which responses from the server will be passed back to the initiating fragment/activity.
+     * The interface through which responses from the server will be passed back to the
+     * initiating fragment/activity.
      */
     public interface ServerConnectionListener {
         void serverConnectionResponse(SocketIdentifier requestSuccess, ArrayList<String> answers);
@@ -47,7 +49,8 @@ public class ServerConnection {
     }
 
     /**
-     * Method to test the connection to the server, and if successful, to use the listener to call the appropriate method
+     * Method to test the connection to the server, and if successful, to use the listener to
+     * call the appropriate method
      */
     public void testServerConnection() {
         Log.d(LOG_TAG, "Testing connection...");
@@ -63,7 +66,8 @@ public class ServerConnection {
             }
         };
         // Create a dataTransfer instance with the appropriate inputs
-        DataTransfer dataTransfer = new DataTransfer(new Connection(SocketIdentifier.CONNECTION_TEST, ""), listener);
+        DataTransfer dataTransfer =
+                new DataTransfer(new Connection(SocketIdentifier.CONNECTION_TEST, ""), listener);
         //dataTransfer.execute() ;
         dataTransfer.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
@@ -72,7 +76,8 @@ public class ServerConnection {
      * Method to solicit the answers from the server for the word-fit given.
      * Results will be passed back by the ServerConnectionListener.
      *
-     * @param input The String describing the word-fit request, with '.'s in place of unknown letters.
+     * @param input The String describing the word-fit request, with '.'s in place of unknown
+     *              letters.
      */
     public void getWordFitResults(String input) {
         Log.d(LOG_TAG, "Getting word-fit solutions for: " + input);
@@ -90,7 +95,8 @@ public class ServerConnection {
             }
         };
         // Create a dataTransfer instance with the appropriate inputs
-        DataTransfer dataTransfer = new DataTransfer(new Connection(SocketIdentifier.WORD_FIT, input), listener);
+        DataTransfer dataTransfer = new DataTransfer(new Connection(SocketIdentifier.WORD_FIT,
+                input), listener);
         serverConnectionListener.callShowLoadingSpinner();
         dataTransfer.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
@@ -109,7 +115,8 @@ public class ServerConnection {
                 Log.d(LOG_TAG, "ServerCallback called (inside getAnagramResults).");
                 serverConnectionListener.callHideLoadingSpinner();
                 if (resultConnection != null && resultConnection.getResultIdentifier() == SocketIdentifier.ANAGRAM_SOLUTIONS_SUCCESS) {
-                    Log.d(LOG_TAG, "Results for anagram: " + resultConnection.getInput() + " = " + resultConnection.getResult().toString());
+                    Log.d(LOG_TAG,
+                            "Results for anagram: " + resultConnection.getInput() + " = " + resultConnection.getResult().toString());
                     serverConnectionListener.serverConnectionResponse(SocketIdentifier.ANAGRAM_SOLUTIONS_SUCCESS, resultConnection.getResult());
                 } else {
                     Log.d(LOG_TAG, "No results for anagram: " + resultConnection.getInput());
@@ -119,7 +126,8 @@ public class ServerConnection {
             }
         };
         // Create a dataTransfer instance with the appropriate inputs
-        DataTransfer dataTransfer = new DataTransfer(new Connection(SocketIdentifier.ANAGRAM, input), listener);
+        DataTransfer dataTransfer = new DataTransfer(new Connection(SocketIdentifier.ANAGRAM,
+                input), listener);
         //dataTransfer.execute() ;
         serverConnectionListener.callShowLoadingSpinner();
         dataTransfer.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -127,28 +135,20 @@ public class ServerConnection {
     }
 
     /**
-     * Enum to identify the type of connection requested from a client, when connecting to the server.
+     * Enum to identify the type of connection requested from a client, when connecting to the
+     * server.
      * <p>
      * Master enum file in CrosswordToolkitServer project. This is just a copy.
      */
     public enum SocketIdentifier {
         // Connection tests
-        CONNECTION_TEST((byte) 1),
-        CONNECTION_TEST_SUCCESSFUL((byte) 2),
-        // New crosswords
-        NEW_CROSSWORD_CHECK((byte) 10),
-        DOWNLOAD_CROSSWORD_GRID((byte) 20),
-        SAVE_NEW_CROSSWORD((byte) 30),
-        // Saving progress
-        SAVE_PROGRESS((byte) 40),
-        SAVE_PROGRESS_SUCCESS((byte) 41),
-        // Anagrams
-        ANAGRAM((byte) 100),
-        ANAGRAM_SOLUTIONS_EMPTY((byte) 101),
-        ANAGRAM_SOLUTIONS_SUCCESS((byte) 102),
-        // Word fit
-        WORD_FIT((byte) 110),
-        WORD_FIT_SOLUTIONS_EMPTY((byte) 111),
+        CONNECTION_TEST((byte) 1), CONNECTION_TEST_SUCCESSFUL((byte) 2), // New crosswords
+        NEW_CROSSWORD_CHECK((byte) 10), DOWNLOAD_CROSSWORD_GRID((byte) 20),
+        SAVE_NEW_CROSSWORD((byte) 30), // Saving progress
+        SAVE_PROGRESS((byte) 40), SAVE_PROGRESS_SUCCESS((byte) 41), // Anagrams
+        ANAGRAM((byte) 100), ANAGRAM_SOLUTIONS_EMPTY((byte) 101),
+        ANAGRAM_SOLUTIONS_SUCCESS((byte) 102), // Word fit
+        WORD_FIT((byte) 110), WORD_FIT_SOLUTIONS_EMPTY((byte) 111),
         WORD_FIT_SOLUTIONS_SUCCESS((byte) 112);
 
         private byte id;
@@ -191,8 +191,10 @@ public class ServerConnection {
         /**
          * Constructor
          *
-         * @param socketIdentifier The SocketIdentifier enum to identify the type of request being made of the server
-         * @param input            The String to go with the request, if the request is to solve an anagram or word-fit.
+         * @param socketIdentifier The SocketIdentifier enum to identify the type of request
+         *                         being made of the server
+         * @param input            The String to go with the request, if the request is to solve
+         *                         an anagram or word-fit.
          */
         public Connection(SocketIdentifier socketIdentifier, String input) {
             this.requestIdentifier = socketIdentifier;
@@ -228,7 +230,8 @@ public class ServerConnection {
         }
 
         /**
-         * @param resultIdentifier The SocketIdentifier enum of the result - received from the server
+         * @param resultIdentifier The SocketIdentifier enum of the result - received from the
+         *                         server
          */
         public void setResultIdentifier(SocketIdentifier resultIdentifier) {
             this.resultIdentifier = resultIdentifier;
@@ -258,8 +261,10 @@ public class ServerConnection {
         /**
          * Constructor
          *
-         * @param inputConnection The Connection instance which holds the request information - the type of request and any inputs.
-         * @param listener        The DataTransferListener which will be used to interact with the activity/fragment once the ASyncTask returns.
+         * @param inputConnection The Connection instance which holds the request information -
+         *                        the type of request and any inputs.
+         * @param listener        The DataTransferListener which will be used to interact with
+         *                        the activity/fragment once the ASyncTask returns.
          */
         public DataTransfer(Connection inputConnection, DataTransferListener listener) {
             this.returnConnection = inputConnection;
@@ -350,7 +355,8 @@ public class ServerConnection {
         /**
          * Executed on the UI thread once the doInBackground method has returned.
          *
-         * @param returnConnection The Connection instance with results data populated from the server's response.
+         * @param returnConnection The Connection instance with results data populated from the
+         *                         server's response.
          */
         @Override
         protected void onPostExecute(Connection returnConnection) {

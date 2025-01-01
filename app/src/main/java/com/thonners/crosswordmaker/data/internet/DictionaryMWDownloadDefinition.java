@@ -1,4 +1,4 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.data.internet;
 
 import android.animation.Animator;
 import android.content.Context;
@@ -15,6 +15,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.thonners.crosswordmaker.R;
+import com.thonners.crosswordmaker.ui.components.Card;
 import com.thonners.crosswordmaker.ui.fragments.DictionaryPageFragment;
 
 import org.apache.http.HttpResponse;
@@ -68,8 +70,8 @@ public class DictionaryMWDownloadDefinition extends AsyncTask<Void, Void, String
     private LinearLayout progressLinearLayout;
     private Button searchButton;
 
-    private final String urlPrefix = "https://www.dictionaryapi" +
-            ".com/api/v1/references/collegiate/xml/";
+    private final String urlPrefix = "https://www.dictionaryapi" + ".com/api/v1/references" +
+            "/collegiate/xml/";
     private final String urlSuffix = "?key=";
     private String url;
 

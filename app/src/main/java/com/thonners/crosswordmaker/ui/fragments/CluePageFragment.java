@@ -27,9 +27,9 @@ import androidx.core.content.ContextCompat;
 
 import static androidx.core.content.PermissionChecker.PERMISSION_GRANTED;
 
-import com.thonners.crosswordmaker.CrosswordTwo;
+import com.thonners.crosswordmaker.data.crossword.CrosswordTwo;
 import com.thonners.crosswordmaker.R;
-import com.thonners.crosswordmaker.TouchImageView;
+import com.thonners.crosswordmaker.ui.components.TouchImageView;
 import com.thonners.crosswordmaker.ui.activities.HomeActivity;
 
 

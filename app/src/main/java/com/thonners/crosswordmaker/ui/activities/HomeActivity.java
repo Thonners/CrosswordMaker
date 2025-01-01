@@ -20,11 +20,11 @@ import androidx.annotation.NonNull;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.thonners.crosswordmaker.Crossword;
-import com.thonners.crosswordmaker.CrosswordLibraryManager;
-import com.thonners.crosswordmaker.CrosswordTwo;
-import com.thonners.crosswordmaker.HttpsServerConnection;
+import com.thonners.crosswordmaker.data.crossword.CrosswordLibraryManager;
+import com.thonners.crosswordmaker.data.crossword.CrosswordTwo;
+import com.thonners.crosswordmaker.data.internet.HttpsServerConnection;
 import com.thonners.crosswordmaker.R;
-import com.thonners.crosswordmaker.ServerConnection;
+import com.thonners.crosswordmaker.data.internet.ServerConnection;
 import com.thonners.crosswordmaker.ui.fragments.SettingsFragment;
 
 import android.os.Bundle;

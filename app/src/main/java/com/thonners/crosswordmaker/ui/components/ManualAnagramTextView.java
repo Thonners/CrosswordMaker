@@ -1,14 +1,12 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.ui.components;
 
 import android.content.Context;
-import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.util.Log;
+
+import com.thonners.crosswordmaker.R;
 
 
 /**
@@ -53,17 +51,21 @@ public class ManualAnagramTextView extends androidx.appcompat.widget.AppCompatTe
      *
      * @param context      Application context
      * @param letterChar   Character, i.e. letter, to assign to this view.
-     * @param letterCount  The total number of letters in the anagram. Used to determine spacing of letters in results.
+     * @param letterCount  The total number of letters in the anagram. Used to determine spacing
+     *                     of letters in results.
      * @param parentView   The view this textView is to be added to.
-     * @param anchorViewID The resource ID of the anchor view - as this will be positioned relative to that.
+     * @param anchorViewID The resource ID of the anchor view - as this will be positioned
+     *                     relative to that.
      */
-    public ManualAnagramTextView(Context context, char letterChar, int letterCount, RelativeLayout parentView, int anchorViewID) {
+    public ManualAnagramTextView(Context context, char letterChar, int letterCount,
+                                 RelativeLayout parentView, int anchorViewID) {
         super(context);
         initialise(letterChar, letterCount, parentView, anchorViewID);
     }
 
 
-    public void initialise(char letterChar, int letterCount, RelativeLayout parentView, int anchorViewID) {
+    public void initialise(char letterChar, int letterCount, RelativeLayout parentView,
+                           int anchorViewID) {
         this.letterCount = letterCount;
         this.parentViewID = parentView.getId();
         this.parentView = parentView;
@@ -75,8 +77,12 @@ public class ManualAnagramTextView extends androidx.appcompat.widget.AppCompatTe
 
         // Set the font size
         this.setTextSize(getResources().getDimensionPixelSize(R.dimen.manual_anagram_text_size));
-        // Letter spacing radius determines the size of the circle in which the letters will be displayed. Circle size grows as letter count grows, to keep sensible spacing between letters.
-        letterSpacingRadius = (int) (Math.max(((double) letterCount / MAX_LETTERS_PER_CIRCLE), 1.0) * this.getTextSize()); // Ensure that the radius multiplier will be at least 1 if there are fewer than MAX_LETTERS_PER_CIRCLE letters
+        // Letter spacing radius determines the size of the circle in which the letters will be
+        // displayed. Circle size grows as letter count grows, to keep sensible spacing between
+        // letters.
+        letterSpacingRadius = (int) (Math.max(((double) letterCount / MAX_LETTERS_PER_CIRCLE),
+                1.0) * this.getTextSize()); // Ensure that the radius multiplier will be at least
+        // 1 if there are fewer than MAX_LETTERS_PER_CIRCLE letters
 
 
     }
@@ -101,9 +107,13 @@ public class ManualAnagramTextView extends androidx.appcompat.widget.AppCompatTe
      * the calculateMargins() method.
      */
     public void setPosition() {
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        if (letterNo == -1) { // Never happens, just keep here in case want to put a letter in the middle of the circle again.
-            params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE); // Not sure the parent view is required here
+        RelativeLayout.LayoutParams params =
+                new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+        if (letterNo == -1) { // Never happens, just keep here in case want to put a letter in
+            // the middle of the circle again.
+            params.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE); // Not sure the
+            // parent view is required here
         } else {
             params.leftMargin = leftMargin;
             params.bottomMargin = bottomMargin;
@@ -120,21 +130,29 @@ public class ManualAnagramTextView extends androidx.appcompat.widget.AppCompatTe
     }
 
     /**
-     * Method to calculate the margins to be applied to this text view, when positioned in the results layout.
+     * Method to calculate the margins to be applied to this text view, when positioned in the
+     * results layout.
      * The margins determine this view's position.
      * <p>
-     * The calculation derives the margins by working out the x/y coordinates of points around a circle.
-     * The circle's radius is calculated in the constructor to ensure sensible spacing of the letters.
+     * The calculation derives the margins by working out the x/y coordinates of points around a
+     * circle.
+     * The circle's radius is calculated in the constructor to ensure sensible spacing of the
+     * letters.
      * This view's letterNumber is used to determine how far around the circle this particular view
      * will be positioned; letterNo * 360 / letterCount, to give angle between vertical and position
      * vector of this view.
      */
     private void calculateMargins() {
-        // Don't think these are needed, since it's always the bottom left corner being reference (both anchor and this view)
-        double midpointOffsetX = this.getTextSize() / 2; // To be added to the offset to move the spacing from the bottom corner to the mid point of the view (Assuming it is the same size)
+        // Don't think these are needed, since it's always the bottom left corner being reference
+        // (both anchor and this view)
+        double midpointOffsetX = this.getTextSize() / 2; // To be added to the offset to move the
+        // spacing from the bottom corner to the mid point of the view (Assuming it is the same
+        // size)
         double midpointOffsetY = this.getTextSize() / 2;
 
-        // Calculate angle between each letter. LetterCount must be greater than 2 else a /0 error will occur. TODO: Put this check in the calling function which creates this instance.
+        // Calculate angle between each letter. LetterCount must be greater than 2 else a /0
+        // error will occur. TODO: Put this check in the calling function which creates this
+        //  instance.
         double dTheta = 2 * Math.PI / (letterCount);
         // Calculate theta (angle from dead above anchorView
         double theta = (letterNo - 1) * dTheta;
@@ -155,7 +173,8 @@ public class ManualAnagramTextView extends androidx.appcompat.widget.AppCompatTe
      * If letter is known, make text faded to remove it from user's focus in results view.
      * If letter is not known, return it to normal appearance.
      *
-     * @param isKnown Whether the position in the answer of the letter this text view is for is known by the user.
+     * @param isKnown Whether the position in the answer of the letter this text view is for is
+     *                known by the user.
      */
     public void setLetterKnown(boolean isKnown) {
         letterKnown = isKnown;

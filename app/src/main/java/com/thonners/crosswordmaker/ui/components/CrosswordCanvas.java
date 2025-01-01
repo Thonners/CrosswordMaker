@@ -1,4 +1,4 @@
-package com.thonners.crosswordmaker;
+package com.thonners.crosswordmaker.ui.components;
 
 import static androidx.core.content.ContextCompat.getSystemService;
 
@@ -17,6 +17,11 @@ import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
+
+import com.thonners.crosswordmaker.R;
+import com.thonners.crosswordmaker.data.crossword.CellTwo;
+import com.thonners.crosswordmaker.data.crossword.ClueTwo;
+import com.thonners.crosswordmaker.data.crossword.CrosswordTwo;
 
 
 public class CrosswordCanvas extends View implements View.OnTouchListener,

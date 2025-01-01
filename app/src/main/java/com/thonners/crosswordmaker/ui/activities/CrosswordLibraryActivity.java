@@ -13,10 +13,10 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.thonners.crosswordmaker.Card;
-import com.thonners.crosswordmaker.CrosswordLibraryManager;
-import com.thonners.crosswordmaker.CrosswordTwo;
-import com.thonners.crosswordmaker.FooterButton;
+import com.thonners.crosswordmaker.ui.components.Card;
+import com.thonners.crosswordmaker.data.crossword.CrosswordLibraryManager;
+import com.thonners.crosswordmaker.data.crossword.CrosswordTwo;
+import com.thonners.crosswordmaker.ui.components.FooterButton;
 import com.thonners.crosswordmaker.R;
 
 import java.util.Arrays;

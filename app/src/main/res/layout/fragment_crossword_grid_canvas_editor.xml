@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.thonners.crosswordmaker.CrosswordCanvas
+    <com.thonners.crosswordmaker.ui.components.CrosswordCanvas
         android:id="@+id/edit_crossword_canvas"
         android:layout_width="match_parent"
         android:layout_height="0dp"

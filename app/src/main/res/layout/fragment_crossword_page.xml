@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.thonners.crosswordmaker.CrosswordCanvas
+            <com.thonners.crosswordmaker.ui.components.CrosswordCanvas
                 android:id="@+id/edit_crossword_canvas"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"

@@ -7,8 +7,8 @@ import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.thonners.crosswordmaker.ManualAnagramKnownLetterCardView;
-import com.thonners.crosswordmaker.ManualAnagramTextView;
+import com.thonners.crosswordmaker.ui.components.ManualAnagramKnownLetterCardView;
+import com.thonners.crosswordmaker.ui.components.ManualAnagramTextView;
 import com.thonners.crosswordmaker.R;
 
 import androidx.fragment.app.Fragment;

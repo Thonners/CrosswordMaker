@@ -27,7 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.thonners.crosswordmaker.R;
-import com.thonners.crosswordmaker.ServerConnection;
+import com.thonners.crosswordmaker.data.internet.ServerConnection;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -501,8 +501,8 @@ public class AnagramPageFragment extends Fragment {
                 addToResults(answers);
             } else {
                 Log.d(LOG_TAG,
-                        "No match found for: " + inputSorted + ", which originally came " + "from" +
-                                " " + input);
+                        "No match found for: " + inputSorted + ", which originally came " + "from"
+                                + " " + input);
                 addToResults(getString(R.string.no_match_found), false);
             }
         }

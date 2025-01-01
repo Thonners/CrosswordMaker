@@ -4,6 +4,9 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.thonners.crosswordmaker.data.crossword.CrosswordLibraryManager;
+import com.thonners.crosswordmaker.ui.components.CrosswordCanvas;
+import com.thonners.crosswordmaker.ui.components.FooterButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -46,9 +49,9 @@ public class CrosswordGridEditor extends AppCompatActivity {
         Log.d(LOG_TAG, "Getting the canvas editor view");
         CrosswordCanvas canvasEditor = findViewById(R.id.edit_crossword_canvas);
         Log.d(LOG_TAG, "initialising");
-//        canvasEditor.initialise(500, 500, crossword);
-//        Log.d(LOG_TAG, "Invalidating");
-//        canvasEditor.invalidate();
+        //        canvasEditor.initialise(500, 500, crossword);
+        //        Log.d(LOG_TAG, "Invalidating");
+        //        canvasEditor.invalidate();
     }
 
     @Override
@@ -97,7 +100,8 @@ public class CrosswordGridEditor extends AppCompatActivity {
 
 
     private void showWarningToast() {
-        Toast.makeText(this, getResources().getString(R.string.edit_warning_toast), Toast.LENGTH_LONG).show();
+        Toast.makeText(this, getResources().getString(R.string.edit_warning_toast),
+                Toast.LENGTH_LONG).show();
     }
 
     private void showDeleteDialog() {
@@ -138,7 +142,8 @@ public class CrosswordGridEditor extends AppCompatActivity {
         // Save the new grid to the crossword
         // Save admin details to newCrosswordStringArray
         for (int i = 0; i < Crossword.SAVE_ARRAY_START_INDEX; i++) {
-            Log.d(LOG_TAG, "Setting value at index position " + i + " of newCrosswordSA to: " + originalCrosswordStringArray[i]);
+            Log.d(LOG_TAG,
+                    "Setting value at index position " + i + " of newCrosswordSA to: " + originalCrosswordStringArray[i]);
             newCrossworyStringArray[i] = originalCrosswordStringArray[i];
         }
 
@@ -147,7 +152,8 @@ public class CrosswordGridEditor extends AppCompatActivity {
         // Loop through original and new grids and find where they differ to the original
         for (int i = Crossword.SAVE_ARRAY_START_INDEX; i < originalCrosswordStringArray.length; i++) {
             if (!newCrossworyStringArray[i].matches("-")) {
-                // If new array isn't a black cell, carryover value from old array, unless it used to be a black cell, in which case set it blank
+                // If new array isn't a black cell, carryover value from old array, unless it
+                // used to be a black cell, in which case set it blank
                 String oldValue = originalCrosswordStringArray[i];
                 if (oldValue.matches("-")) {
                     newCrossworyStringArray[i] = "";
