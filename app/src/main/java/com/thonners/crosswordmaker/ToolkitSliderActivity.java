@@ -8,8 +8,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.graphics.Point;
+import android.widget.LinearLayout;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -154,7 +158,22 @@ public class ToolkitSliderActivity extends AppCompatActivity implements Dictiona
         });
 
         tabTitles = getResources().getTextArray(R.array.tab_titles_toolkit);
+        TabLayout tabLayout = findViewById(R.id.tab_layout);
+        new TabLayoutMediator(tabLayout, pager, (tab, position) -> {
+            tab.setText(tabTitles[position]);
+        }).attach();
 
+        Point size = new Point();
+        getWindowManager().getDefaultDisplay().getSize(size);
+
+        int screenWidth = size.x;
+        int tabPadding = (int) (0.25 * screenWidth);
+        for (int i = 0; i < tabLayout.getChildCount(); i++) {
+            View child = tabLayout.getChildAt(i);
+            if (child instanceof LinearLayout) {
+                child.setPadding(tabPadding, 0, tabPadding, 0);
+            }
+        }
     }
 
     private void hideKeyboard() {
