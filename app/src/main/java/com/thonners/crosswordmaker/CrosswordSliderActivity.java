@@ -316,14 +316,11 @@ public class CrosswordSliderActivity extends AppCompatActivity implements Crossw
     }
 
     private void hideKeyboard() {
-        // Method to hide the keyboard
-        try {
-            InputMethodManager inputManager =
-                    (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputManager.hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus()).getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-        } catch (NullPointerException npe) {
-            Log.d(LOG_TAG, "Caught null pointer exception trying to close keyboard.");
-        }
+        Log.d(LOG_TAG, "Hide keyboard called");
+        View view = pager.getRootView();
+        InputMethodManager imm =
+                (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_IMPLICIT_ONLY);
     }
 
     private void hideActionZoom() {
