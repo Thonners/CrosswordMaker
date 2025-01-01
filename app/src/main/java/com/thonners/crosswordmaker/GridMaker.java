@@ -157,7 +157,6 @@ public class GridMaker extends AppCompatActivity {
     }
 
     private void startCrosswordActivity() {
-        // Start the com.thonners.CrosswordMaker.CrosswordActivity using the CrosswordLibraryManager
         CrosswordLibraryManager clm = new CrosswordLibraryManager(this);
         // TODO: Update these for CrosswordTwo
         Log.d(LOG_TAG, "opening crossword: " + crosswordTwo);
@@ -168,7 +167,7 @@ public class GridMaker extends AppCompatActivity {
         // Toast to give hint as to what to do here
         Toast tutorial = Toast.makeText(this,
                 getResources().getString(R.string.tutorial_toast_grid_maker), Toast.LENGTH_LONG);
-//        toastShowCentred(tutorial); // Causes crash in Android 11
+        //        toastShowCentred(tutorial); // Causes crash in Android 11
 
     }
 
@@ -412,14 +411,17 @@ public class GridMaker extends AppCompatActivity {
         // Get values of pixel at these probe locations
         for (int i = 0; i < n; i++) { /* i is the row */
             for (int j = 0; j < n; j++) { /* j is the column */
-//                Log.d(LOG_TAG, "Interogating probe(" + i + "," + j + "), with pixel coords (" +
-//                probeX[i] + "," + probeY[j] + ").");
+                //                Log.d(LOG_TAG, "Interogating probe(" + i + "," + j + "), with
+                //                pixel coords (" +
+                //                probeX[i] + "," + probeY[j] + ").");
                 probeFullColor[i][j] = scaledBitmap.getPixel(probeX[j], probeY[i]);      // Note
                 // switch of i & j, to make [1][2] refer to 3rd point across 2nd row
-//                Log.d(LOG_TAG,"probeFullColor = " + probeFullColor[i][j]) ;
-//                Log.d(LOG_TAG,"probeFullColor.red = " + Color.red(probeFullColor[i][j])) ;  //
-//                Filter turns all Color.alpha to 255, and Color.red=Color.blue=Color.green, so
-//                only interrogate one.
+                //                Log.d(LOG_TAG,"probeFullColor = " + probeFullColor[i][j]) ;
+                //                Log.d(LOG_TAG,"probeFullColor.red = " + Color.red
+                //                (probeFullColor[i][j])) ;  //
+                //                Filter turns all Color.alpha to 255, and Color.red=Color
+                //                .blue=Color.green, so
+                //                only interrogate one.
 
                 // Set pixel (& surrounging pixels) to red to aid debugging
                 for (int a = -3; a <= 3; a++) {
@@ -430,10 +432,12 @@ public class GridMaker extends AppCompatActivity {
 
                 // Assume black if red/blue/gree < 128:
                 if (Color.red(probeFullColor[i][j]) < blackColorThreshold) {
-//                    Log.d(LOG_TAG, "Setting probe(" + i + "," + j + ") to black.");
+                    //                    Log.d(LOG_TAG, "Setting probe(" + i + "," + j + ") to
+                    //                    black.");
                     probeBlack[i][j] = true;
                 } else {
-//                    Log.d(LOG_TAG, "Setting probe(" + i + "," + j + ") to white.");
+                    //                    Log.d(LOG_TAG, "Setting probe(" + i + "," + j + ") to
+                    //                    white.");
                     probeBlack[i][j] = false;
                 }
 
@@ -563,11 +567,9 @@ public class GridMaker extends AppCompatActivity {
         ColorMatrix colorMatrix = new ColorMatrix();
         colorMatrix.setSaturation(0);
 
-        ColorMatrixColorFilter colorMatrixFilter = new ColorMatrixColorFilter(
-                colorMatrix);
+        ColorMatrixColorFilter colorMatrixFilter = new ColorMatrixColorFilter(colorMatrix);
 
-        Bitmap blackAndWhiteBitmap = orginalBitmap.copy(
-                Bitmap.Config.ARGB_8888, true);
+        Bitmap blackAndWhiteBitmap = orginalBitmap.copy(Bitmap.Config.ARGB_8888, true);
 
         Paint paint = new Paint();
         paint.setColorFilter(colorMatrixFilter);

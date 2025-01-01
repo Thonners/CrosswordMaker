@@ -242,7 +242,7 @@ public class CrosswordLibraryManager {
                 addCrosswordToRecents(CrosswordTwo.fromJsonFile(context,
                         crosswordFile.getAbsolutePath()));
                 Log.d(LOG_TAG,
-                        "Starting CrosswordActivity with saved crossword: " + crosswordFile.getName());
+                        "Starting CrosswordSliderActivity with saved crossword: " + crosswordFile.getName());
                 openCrossword(crosswordFile.getAbsolutePath());
             } else {
                 Log.e(LOG_TAG, "Selected 'saved crossword' doesn't seem to exist");
