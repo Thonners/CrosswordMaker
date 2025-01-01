@@ -107,8 +107,7 @@ public class GridMaker extends AppCompatActivity {
         Log.d(LOG_TAG, "Setting crossword displayDate to: " + crosswordDate);
         crosswordTwo.setTitle(crosswordTitle);
         crosswordTwo.setDate(crosswordDate);
-        int gridSize = screenWidth - 80;
-        canvasEditor.initialise(gridSize, gridSize, crosswordTwo);
+        canvasEditor.setCrossword(crosswordTwo);
         Log.d(LOG_TAG, "Invalidating");
         canvasEditor.invalidate();
         // Set Activity Title in the action bar

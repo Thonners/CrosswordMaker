@@ -58,12 +58,11 @@ public class CrosswordCanvas extends View implements View.OnTouchListener,
 
     private static final String LOG_TAG = "CrosswordCanvas";
 
-    private boolean hasBeenInitialised = false;
     private Bitmap gridBitmap, blackCellBitmap, clueNumberBitmap, cellLetterBitmap;
     private Canvas backgroundGrid, blackCellMask, clueNumberCanvas, cellLetterCanvas;
     private Rect bounds;
     private Paint blackPaint, clueHighlightPaint, cellHighlightPaint, cellLetterPaint, whitePaint;
-    private int width, height, cellWidth, outerPadding, clueNumberFontSize;
+    private int width = -1, height = -1, cellWidth, outerPadding, clueNumberFontSize;
     private double cellLetterFontSize;
     private final double cellSizeOverCellLetterSize = 1.2;
     private final int cellSizeOverClueNumberSize = 4, clueNumberPadding = 5;
@@ -90,15 +89,14 @@ public class CrosswordCanvas extends View implements View.OnTouchListener,
         setFocusableInTouchMode(true); // allows the keyboard to pop up on touch down
     }
 
-    public void initialise(int width, int height, CrosswordTwo crossword) {
+    public void setCrossword(CrosswordTwo crossword) {
+        this.crossword = crossword;
+    }
+
+    public void initialise() {
         this.setOnTouchListener(this);
+        setOnKeyListener(crossword);
 
-
-        setOnKeyListener(crossword); // TODO: Should this be set here?
-
-        hasBeenInitialised = true;
-        this.width = width;
-        this.height = height;
         this.cellWidth = width / crossword.rowCount;
         this.outerPadding = (this.width - (this.cellWidth * crossword.rowCount)) / 2;
         this.cellLetterFontSize = cellWidth / cellSizeOverCellLetterSize;
@@ -260,6 +258,12 @@ public class CrosswordCanvas extends View implements View.OnTouchListener,
 
     @Override
     protected void onDraw(Canvas canvas) {
+        Log.d(LOG_TAG, "onDraw. Width: " + getWidth() + ". Height: " + getHeight());
+        if (width <= 0 || height <= 0) {
+            width = getWidth();
+            height = getHeight();
+            if (crossword != null) initialise();
+        }
         // Draw the bitmap on the view canvas
         // Background grid
         canvas.drawBitmap(gridBitmap, null, bounds, null);

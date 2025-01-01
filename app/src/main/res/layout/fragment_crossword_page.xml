@@ -24,10 +24,12 @@
                 android:id="@+id/edit_crossword_canvas"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android.support.design:layout_constraintStart_toStartOf="parent"
-                android.support.design:layout_constraintTop_toTopOf="parent"
                 android.support.design:layout_constrainedWidth="false"
-                android.support.design:layout_constraintDimensionRatio="1:1" />
+                android.support.design:layout_constraintDimensionRatio="1:1"
+                android.support.design:layout_constraintEnd_toEndOf="parent"
+                android.support.design:layout_constraintHorizontal_bias="0.5"
+                android.support.design:layout_constraintStart_toStartOf="parent"
+                android.support.design:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ScrollView

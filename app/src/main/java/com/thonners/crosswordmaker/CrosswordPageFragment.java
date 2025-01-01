@@ -5,6 +5,7 @@ import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -116,10 +117,6 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
         // Get instances of the views
         Log.d(LOG_TAG, "Getting the canvas editor view");
         canvasEditor = view.findViewById(R.id.edit_crossword_canvas);
-        //        crosswordGrid = view.findViewById(R.id.crossword_grid);
-        //        horizontalScrollViewNoFocus = view.findViewById(R.id
-        //        .horizontal_scroll_view_crossword);
-        //        verticalScrollView = view.findViewById(R.id.vertical_scroll_view_crossword);
         //        acrossCluesChecklist = view.findViewById(R.id.clues_checklist_across_layout);
         //        downCluesChecklist = view.findViewById(R.id.clues_checklist_down_layout);
         wordSplitFAB = view.findViewById(R.id.add_word_split);
@@ -139,8 +136,9 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
             Log.e(LOG_TAG, ex.getMessage());
             return view;
         }
+        canvasEditor.setCrossword(crosswordTwo);
 
-        getActivity().setTitle(crosswordTwo.getActivityTitle());
+        requireActivity().setTitle(crosswordTwo.getActivityTitle());
 
         //        // Populate the horizontal clues checklist:
         //        populateCluesChecklists(acrossCluesChecklist, crosswordTwo.getHClues());
@@ -157,19 +155,17 @@ public class CrosswordPageFragment extends Fragment implements View.OnClickListe
         //        word split mode...
         //        crossword.setClickListenerForAllCells(this);
 
-        // TODO: Think about managing this better (other function somewhere, deal with
-        //  portrait/landscape, etc
-        Point size = new Point();
-        getActivity().getWindowManager().getDefaultDisplay().getSize(size);
-        int gridSize = size.x - 80;
-        canvasEditor.initialise(gridSize, gridSize, crosswordTwo);
-        Log.d(LOG_TAG, "Invalidating canvas");
-        canvasEditor.invalidate();
         Log.d(LOG_TAG, "onCreateView returning...");
         return view;
 
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Log.d(LOG_TAG, "onViewCreated called");
+        Log.d(LOG_TAG, "canvasEditor width: " + canvasEditor.getWidth());
+    }
 
     @Override
     public void onAttach(Activity activity) {
