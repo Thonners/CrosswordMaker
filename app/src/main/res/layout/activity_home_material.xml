@@ -125,7 +125,7 @@
                 android:layout_height="@dimen/home_card_icon_size"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:src="@drawable/home_recent" />
+                android:src="@drawable/baseline_history_24" />
 
             <TextView
                 android:id="@+id/home_recent_title"
@@ -153,6 +153,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/home_recent_icon"
+                android:layout_marginTop="@dimen/home_card_padding"
                 card_view:cardCornerRadius="0dp">
 
                 <RelativeLayout
@@ -346,7 +347,7 @@
                 android:layout_width="@dimen/home_card_icon_size"
                 android:layout_height="@dimen/home_card_icon_size"
                 android:layout_alignParentRight="true"
-                android:src="@drawable/settings" />
+                android:src="@drawable/baseline_settings_24" />
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 
