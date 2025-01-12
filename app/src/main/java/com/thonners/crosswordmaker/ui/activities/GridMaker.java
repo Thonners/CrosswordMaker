@@ -100,6 +100,7 @@ public class GridMaker extends AppCompatActivity {
         // Get instances of the views in the layout.xml
         linearLayout = (LinearLayout) findViewById(R.id.grid_maker_linear_layout);
         // Get intents
+        // TODO: Move these constants to CrosswordTwo
         crosswordTitle = getIntent().getStringExtra(Crossword.CROSSWORD_EXTRA_TITLE);
         crosswordDate = getIntent().getStringExtra(Crossword.CROSSWORD_EXTRA_DATE);
         crosswordRowCount = getIntent().getIntExtra(Crossword.CROSSWORD_EXTRA_NO_ROWS, 0);

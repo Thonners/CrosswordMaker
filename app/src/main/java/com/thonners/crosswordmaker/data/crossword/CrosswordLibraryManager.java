@@ -7,7 +7,6 @@ import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.thonners.crosswordmaker.Crossword;
 import com.thonners.crosswordmaker.CrosswordGridEditor;
 import com.thonners.crosswordmaker.R;
 import com.thonners.crosswordmaker.ui.activities.CrosswordSliderActivity;
@@ -127,6 +126,7 @@ public class CrosswordLibraryManager {
         savedCrosswordFiles.add(savedCrossword.getCrosswordFile());
     }
 
+    //    TODO: Update for CrosswordTwo
     public boolean crosswordAlreadyExists(String crosswordName, String crosswordDate) {
         String directoryName =
                 crosswordDate + "-" + crosswordName.replaceAll(" ", "_").replaceAll("-", "__");
@@ -159,7 +159,6 @@ public class CrosswordLibraryManager {
                 BufferedReader br = new BufferedReader(new FileReader(recentCrosswordsFile));
                 String line;
                 while ((line = br.readLine()) != null) {
-                    //                    File newRecentCrosswordFile = new File(rootDir, line);
                     File newRecentCrosswordFile = new File(line);
                     CrosswordTwo crossword = CrosswordTwo.fromJsonFile(context,
                             newRecentCrosswordFile.getAbsolutePath());
@@ -179,13 +178,10 @@ public class CrosswordLibraryManager {
         }
     }
 
-    //    private void addCrosswordToRecents(SavedCrossword newRecentCrossword) {
     private void addCrosswordToRecents(CrosswordTwo newRecentCrossword) {
 
-        //        ArrayList<SavedCrossword> oldRecentCrosswords = getRecentCrosswords();
         ArrayList<CrosswordTwo> oldRecentCrosswords = getRecentCrosswords();
 
-        /* Debugging */
         for (CrosswordTwo s : oldRecentCrosswords) {
             Log.d(LOG_TAG, "oldRecentCrosswords contains: " + s.getCrosswordFile().getName());
         }
@@ -211,10 +207,9 @@ public class CrosswordLibraryManager {
             }
         }
 
-        /* Debugging */
         for (CrosswordTwo c : recentCrosswords) {
             Log.d(LOG_TAG, "recentCrosswords now contains: " + c.getCrosswordFile().getName());
-        } //*/
+        }
 
 
         saveRecentFile();
@@ -232,16 +227,12 @@ public class CrosswordLibraryManager {
                         "\n");
             }
             fileWriter.close();
-
-
         } catch (Exception e) {
             Log.e(LOG_TAG, "Couldn't open fileWriter to save the recent crosswords file.");
         }
     }
 
     public void openCrossword(File crosswordFile) {
-
-        String[] savedCrosswordArray = null;
 
         try {
             if (crosswordFile.exists()) {
@@ -270,17 +261,6 @@ public class CrosswordLibraryManager {
         context.startActivity(crosswordActivity);
     }
 
-    private void openCrossword(String[] savedCrossword) { // Deprecated
-
-        showLoadingToast();
-        Log.d(LOG_TAG,
-                "Opening crossword " + savedCrossword[Crossword.SAVED_ARRAY_INDEX_TITLE] + " " + savedCrossword[Crossword.SAVED_ARRAY_INDEX_DATE]);
-        // Start new crossword activity
-        Intent crosswordActivity = new Intent(context, CrosswordSliderActivity.class);
-        crosswordActivity.putExtra(Crossword.CROSSWORD_EXTRA, savedCrossword);
-        context.startActivity(crosswordActivity);
-    }
-
     private void showLoadingToast() {
         // Display loading toast as load can take a while
         Toast loadingToast = Toast.makeText(context, context.getString(R.string.loading),
@@ -288,23 +268,30 @@ public class CrosswordLibraryManager {
         loadingToast.show();
     }
 
+    // TODO: Update to CrosswordTwo
     public void openEditCrossword(File savedCrosswordDir) {
-        Log.d(LOG_TAG, "Opening crossword for editing from file: " + savedCrosswordDir.getPath());
-        try {
-            File crossword = new File(savedCrosswordDir, Crossword.SAVE_CROSSWORD_FILE_NAME);
-            openEditCrossword(Crossword.getSaveArray(crossword));
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "Exception thrown when trying to get file: " + e.getMessage());
-        }
+        Log.d(LOG_TAG, "openEditCrossword still needs updating for CrosswordTwo");
+        //        Log.d(LOG_TAG, "Opening crossword for editing from file: " + savedCrosswordDir
+        //        .getPath());
+        //        try {
+        //            File crossword = new File(savedCrosswordDir, Crossword
+        //            .SAVE_CROSSWORD_FILE_NAME);
+        //            openEditCrossword(Crossword.getSaveArray(crossword));
+        //        } catch (Exception e) {
+        //            Log.e(LOG_TAG, "Exception thrown when trying to get file: " + e.getMessage());
+        //        }
     }
 
+    // TODO: Update to CrosswordTwo
     private void openEditCrossword(String[] savedCrossword) {
-        Log.d(LOG_TAG,
-                "Opening crossword for editing" + savedCrossword[Crossword.SAVED_ARRAY_INDEX_TITLE] + " " + savedCrossword[Crossword.SAVED_ARRAY_INDEX_DATE]);
-        // Start new crossword activity
-        Intent editCrosswordActivity = new Intent(context, CrosswordGridEditor.class);
-        editCrosswordActivity.putExtra(Crossword.CROSSWORD_EXTRA, savedCrossword);
-        context.startActivity(editCrosswordActivity);
+        Log.d(LOG_TAG, "openEditCrossword still needs updating for CrosswordTwo");
+        //                "Opening crossword for editing" + savedCrossword[Crossword
+        //                .SAVED_ARRAY_INDEX_TITLE] + " " + savedCrossword[Crossword
+        //                .SAVED_ARRAY_INDEX_DATE]);
+        //        // Start new crossword activity
+        //        Intent editCrosswordActivity = new Intent(context, CrosswordGridEditor.class);
+        //        editCrosswordActivity.putExtra(Crossword.CROSSWORD_EXTRA, savedCrossword);
+        //        context.startActivity(editCrosswordActivity);
     }
 
     private void removeFromRecents(CrosswordTwo crosswordToBeRemoved) {
@@ -342,100 +329,5 @@ public class CrosswordLibraryManager {
         openHome.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         context.startActivity(openHome);
     }
-
-    public static class SavedCrossword {
-        Context context;
-        File crosswordFile;
-        String title;
-        String saveDate;
-        String displayDate;
-        String percentageComplete;
-
-        public SavedCrossword(Context context, File crosswordFile) {
-            this.context = context;
-            this.crosswordFile = crosswordFile;
-            String[] crosswordDetails = crosswordFile.getName().split("-");
-            this.saveDate = crosswordDetails[0];   // Date extracted from saved file name
-            this.displayDate = Crossword.getDisplayDate(context, crosswordDetails[0]); // Convert
-            // displayDate from saved YYYYMMDD format into locale display displayDate
-            this.title = crosswordDetails[1].replaceAll("__", "-").replaceAll("_", " ");   //
-            // Replace all used to restore any hyphens/spaces that were taken out during the
-            // fileName assignment in Crossword.initialiseSaveFiles
-            this.percentageComplete = calculatePercentageComplete(crosswordFile);
-        }
-
-        private String calculatePercentageComplete(File crosswordDir) {
-            // Return the percentage of the crossword that's complete (based on number of blanks
-            // in the file)
-            File crosswordFile = new File(crosswordDir, Crossword.SAVE_CROSSWORD_FILE_NAME);
-            if (crosswordFile == null) {
-                Log.d(LOG_TAG, "Error finding crossword file in  " + crosswordDir.getName());
-                percentageComplete = "Error finding file";
-            }
-            Log.d(LOG_TAG, "Calculating percentage completion for " + crosswordDir.getName());
-
-            String[] crosswordArray = Crossword.getSaveArray(crosswordFile);
-            int cells = 0, nonBlanks = 0; // Integers to count with
-            for (int i = Crossword.SAVE_ARRAY_START_INDEX; i < crosswordArray.length; i++) {
-                // If a black cell, don't include it in the counting
-                if (!crosswordArray[i].matches("-")) {
-                    cells++;
-                    // Check to see whether the cell is empty or filled
-                    if (!crosswordArray[i].matches("")) {
-                        nonBlanks++;
-                    }
-                }
-            }
-
-            Log.d(LOG_TAG, "Number of cells: " + cells + " & number of nonBlanks = " + nonBlanks);
-
-            int percentage;
-            if (cells > 0) {
-                percentage = (nonBlanks * 100) / cells;
-            } else {
-                percentage = 0;
-            }
-
-            return percentage + "";
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public String getDisplayDate() {
-            return displayDate;
-        }
-
-        public String getDisplayPercentageComplete() {
-            return context.getString(R.string.completion) + " " + percentageComplete + "%";
-        }
-
-        public String getSaveString() {
-            return saveDate + "-" + title.replaceAll(" ", "_").replaceAll("-", "__");
-            // return Crossword.getSaveDate(context, displayDate) + "-" + title.replaceAll(" ",
-            // "_").replaceAll("-","__");
-        }
-
-        public void deleteCrossword() {
-            Log.d(LOG_TAG, "Delete called on " + getSaveString());
-            Log.d(LOG_TAG, "Looping through & deleting files.");
-            // Delete crossword save directory and all files contained within
-            File[] files = crosswordFile.listFiles();
-            for (File f : files) {
-                if (f != null) {
-                    Log.d(LOG_TAG, "Deleting file at: " + f.getPath());
-                    f.delete();
-                }
-            }
-            Log.d(LOG_TAG, "Deleting parent directory: " + crosswordFile.getPath());
-            crosswordFile.delete();
-        }
-
-        public File getCrosswordFile() {
-            return crosswordFile;
-        }
-    }
-
 
 }
